@@ -1,0 +1,2 @@
+# ffmpegpp
+ffmpeg c++ wrapper

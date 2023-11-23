@@ -10,5 +10,7 @@ set(CMAKE_CXX_FLAGS_RELEASE -O3)
 set(CMAKE_CXX_FLAGS_DEBUG -g)
 
 
+set(INSTALL_DIR ${CMAKE_SOURCE_DIR}/build)
+
 add_subdirectory(src)
 add_subdirectory(test)

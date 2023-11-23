@@ -3,6 +3,7 @@
 
 ## test app ##
 ffmpegpp_test
+sample.mp4
 
 ## build directory (make install) ###
 build

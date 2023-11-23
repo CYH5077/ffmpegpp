@@ -1,5 +1,5 @@
 set(SOURCES main.cpp
-            TEST.cpp)
+            video_format.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 enable_testing()
@@ -14,4 +14,8 @@ target_link_libraries(${FFMPEGPP_TEST} PRIVATE ${PROJECT_NAME}
                                             GTest::gmock_main)
 target_include_directories(${FFMPEGPP_TEST} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-add_test(AllTestsInMain ${FFMPEGPP_TEST})
+
+add_custom_command(TARGET ${FFMPEGPP_TEST} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${FFMPEGPP_TEST}> ${CMAKE_SOURCE_DIR}/${FFMPEGPP_TEST}
+    COMMENT "ffmpegpp_test Copy"
+)

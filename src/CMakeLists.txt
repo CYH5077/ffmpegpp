@@ -1,4 +1,5 @@
-set (SOURCES FFMPEG.cpp)
+set (SOURCES AVResult.cpp
+             InputFormat.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

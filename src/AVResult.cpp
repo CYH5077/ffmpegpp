@@ -35,10 +35,10 @@ bool AVResult::success() {
 }
 
 bool AVResult::avFailed(int avErrorCode) {
-    char errorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
-    av_strerror(errorCode, errorMessage, sizeof(errorMessage));
+    char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
+    av_strerror(avErrorCode, avErrorMessage, sizeof(avErrorMessage));
 
-    return this->failed(errorCode, errorMessage);
+    return this->failed(avErrorCode, avErrorMessage);
 }
 
 bool AVResult::failed(int avErrorCode, std::string&& errorMessage) {

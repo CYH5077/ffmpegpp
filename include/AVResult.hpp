@@ -16,7 +16,7 @@ public:
     
     bool success();
     bool avFailed(int avErrorCode);
-    bool failed(int avErrorCode, std::string&& errorMessage);
+    bool failed(int errorCode, std::string&& errorMessage);
 
 private:
     bool result;

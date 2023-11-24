@@ -5,6 +5,9 @@
 ffmpegpp_test
 sample.mp4
 
+## ffmpeg example temp directory ##
+ffmpegexample
+
 ## build directory (make install) ###
 build
 

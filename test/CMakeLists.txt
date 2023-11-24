@@ -1,5 +1,5 @@
 set(SOURCES main.cpp
-            video_format.cpp)
+            video.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 enable_testing()

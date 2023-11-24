@@ -1,5 +1,7 @@
 #include "Muxer.hpp"
 
+#include "CodecContext.hpp"
+
 namespace av {
 
 Muxer::Muxer() {
@@ -94,6 +96,21 @@ bool Muxer::copyStreamsFrom(Demuxer& demuxer, AVResult* result) {
 
         outputStream->codecpar->codec_tag = 0;
     }
+    return result->success();
+}
+
+bool Muxer::createNewStream(CodecContext& codecContext, AVResult* result) {
+    const AVCodec* codec = codecContext.getRawCodecContext()->codec;
+    AVStream* stream = avformat_new_stream(this->formatContext, codec);
+    if (stream == nullptr) {
+        return result->avFailed(AVERROR(ENOMEM));
+    }
+
+    int ret = avcodec_parameters_from_context(stream->codecpar, codecContext.getRawCodecContext());
+    if (ret < 0) {
+        return result->avFailed(ret);
+    }
+
     return result->success();
 }
 

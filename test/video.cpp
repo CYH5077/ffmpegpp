@@ -9,6 +9,7 @@
 #include "Packet.hpp"
 #include "Frame.hpp"
 #include "Muxer.hpp"
+#include "EncodeParameter.hpp"
 
 TEST(Demuxer, Demuxer_Open) {
     av::AVResult result;
@@ -31,9 +32,9 @@ TEST(Demuxer, Demuxer_ReadPacket) {
 
     av::Packet packet;
     while (demuxer.read(&packet, &result)) {
-        std::cout << packet.getPTS() << " "
-                  << packet.getDTS() << " "
-                  << packet.getSize() << std::endl;
+        //std::cout << packet.getPTS() << " "
+        //          << packet.getDTS() << " "
+        //          << packet.getSize() << std::endl;
         packet.unref();
     }
 
@@ -116,5 +117,33 @@ TEST(Muxer, Muxer_Mux) {
 
     av::Muxer muxer;
     muxer.mux(demuxer, TEST::MKV_FILE, &result);
+    ASSERT_TRUE(result.isSuccess());
+}
+
+TEST(Encoder, Encoder_encode) {
+    av::AVResult result;
+
+    av::EncodeParameter encodeParameter;
+    encodeParameter.setBitrate(400000);
+    encodeParameter.setWidth(1900);
+    encodeParameter.setHeight(1680);
+    encodeParameter.setTimeBase(av::Rational(1, 25));
+    encodeParameter.setFrameRate(av::Rational(25, 1));
+    encodeParameter.setGOPSize(10);
+    encodeParameter.setMaxBFrames(0);
+    encodeParameter.setPixelFormat(AV_PIX_FMT_YUV420P);
+
+    av::CodecContext codecContext;
+    av::createEncodeContext(AV_CODEC_ID_H264, encodeParameter, &codecContext, &result);
+    ASSERT_TRUE(result.isSuccess());
+
+    av::Muxer muxer;
+    muxer.open(TEST::OUTPUT_MP4_FILE, &result);
+    ASSERT_TRUE(result.isSuccess());
+
+    muxer.createNewStream(codecContext, &result);
+    ASSERT_TRUE(result.isSuccess());
+
+    muxer.writeHeader(&result);
     ASSERT_TRUE(result.isSuccess());
 }

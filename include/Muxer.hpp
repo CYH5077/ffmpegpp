@@ -9,6 +9,7 @@ extern "C" {
 
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
+#include "CodecContext.hpp"
 
 namespace av {
 
@@ -24,6 +25,8 @@ public:
     void close();
 
     bool copyStreamsFrom(Demuxer& demuxer, AVResult* result);
+    bool createNewStream(CodecContext& codecContext, AVResult* result);
+    
     bool writeHeader(AVResult* result);
 
 public: // Raw pointer

@@ -4,11 +4,13 @@ set (SOURCES AVResult.cpp
              CodecContext.cpp
              Decoder.cpp
              Frame.cpp
-             Muxer.cpp)
+             Muxer.cpp
+             EncodeParameter.cpp
+             Rational.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 
-
+find_package(x264 CONFIG REQUIRED)
 find_package(FFMPEG REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include 
                                                    ${FFMPEG_INCLUDE_DIRS})

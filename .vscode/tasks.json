@@ -1,0 +1,44 @@
+{
+    "tasks": [
+        {
+            "label": "CMake build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "${workspaceRoot}",
+                "-DCMAKE_TOOLCHAIN_FILE=/home/choi/git/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "group": {
+                "kind": "build",
+            }
+        },
+        {
+            "label": "Make build",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "-j10",
+            ],
+            "options":{
+                "cwd": "${workspaceFolder}/build"
+            },
+            "dependsOn":["CMake build"]
+        },
+        {
+            "label": "Project build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": ["Make build"]
+        }
+    ],
+    "version": "2.0.0"
+}

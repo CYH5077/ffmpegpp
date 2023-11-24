@@ -7,7 +7,7 @@
             "program": "${workspaceRoot}/ffmpegpp_test",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -23,7 +23,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C/C++: g++ 활성 파일 빌드",
+            "preLaunchTask": "Project build",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ],

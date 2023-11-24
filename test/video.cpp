@@ -103,6 +103,7 @@ TEST(Decoder, Decoder_Decode) {
             std::cout << "Audio frame!!" << std::endl;
         }
     }, &result);
+    ASSERT_TRUE(result.isSuccess());
 
     
 }

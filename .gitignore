@@ -4,6 +4,9 @@
 ## test app ##
 ffmpegpp_test
 sample.mp4
+sample.mkv
+test.pgm
+
 
 ## ffmpeg example temp directory ##
 ffmpegexample

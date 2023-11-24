@@ -40,6 +40,14 @@ int Packet::getStreamIndex() {
     return this->packet->stream_index;
 }
 
+void Packet::setPos(int pos) {
+    this->packet->pos = pos;
+}
+
+void Packet::setStreamIndex(int streamIndex) {
+    this->packet->stream_index = streamIndex;
+}
+
 AVPacket* Packet::getRawPacket() {
     return this->packet;
 }

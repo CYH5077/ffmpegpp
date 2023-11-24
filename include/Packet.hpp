@@ -24,12 +24,14 @@ public:
 public:
     void unref();
 
-public: // getter 
+public: // getter setter
     int64_t getPTS();
     int64_t getDTS();
     int     getSize();
+    int     getStreamIndex();
 
-    int getStreamIndex();
+    void setPos(int pos);
+    void setStreamIndex(int streamIndex);
     
 public: // Raw pointer
     AVPacket* getRawPacket();

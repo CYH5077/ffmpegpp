@@ -8,6 +8,7 @@
 #include "Decoder.hpp"
 #include "Packet.hpp"
 #include "Frame.hpp"
+#include "Muxer.hpp"
 
 TEST(Demuxer, Demuxer_Open) {
     av::AVResult result;
@@ -96,14 +97,24 @@ TEST(Decoder, Decoder_Decode) {
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
     decoder.decode(demuxer, [&](AVMediaType type, av::Frame& frame) {
         if (type == AVMEDIA_TYPE_VIDEO) {
-            AVFrame* avframe = frame.getRawFrame();
-            save_gray_frame(avframe->data[0], avframe->linesize[0], avframe->width, avframe->height, "test.pgm");
-            frame.printDump();
+            //AVFrame* avframe = frame.getRawFrame();
+            //save_gray_frame(avframe->data[0], avframe->linesize[0], avframe->width, avframe->height, "test.pgm");
+            //frame.printDump();
         } else if (type == AVMEDIA_TYPE_AUDIO) {
-            std::cout << "Audio frame!!" << std::endl;
+            //std::cout << "Audio frame!!" << std::endl;
         }
     }, &result);
     ASSERT_TRUE(result.isSuccess());
+}
 
-    
+TEST(Muxer, Muxer_Mux) {
+    av::AVResult result;
+
+    av::Demuxer demuxer;
+    demuxer.open(TEST::MP4_FILE, &result);
+    ASSERT_TRUE(result.isSuccess());
+
+    av::Muxer muxer;
+    muxer.mux(demuxer, TEST::MKV_FILE, &result);
+    ASSERT_TRUE(result.isSuccess());
 }

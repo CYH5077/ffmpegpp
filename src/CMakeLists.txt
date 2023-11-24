@@ -3,7 +3,8 @@ set (SOURCES AVResult.cpp
              Packet.cpp
              CodecContext.cpp
              Decoder.cpp
-             Frame.cpp)
+             Frame.cpp
+             Muxer.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

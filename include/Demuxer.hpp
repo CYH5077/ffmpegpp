@@ -31,8 +31,11 @@ public: // getter setter
     int getVideoStreamIndex();
     int getAudioStreamIndex();
     
+    uint getStreamCount();
+
     bool isVideoCodecParameters();
     bool isAudioCodecParameters();
+    
     
 public: // Raw Pointer
     AVFormatContext* getRawFormatContext();
@@ -40,6 +43,7 @@ public: // Raw Pointer
     AVCodecParameters* getRawVideoCodecParameters();
     AVCodecParameters* getRawAudioCodecParameters();
 
+    AVStream* getRawStream(int index);
 
 private:
     bool createFormatContext(AVResult* result);

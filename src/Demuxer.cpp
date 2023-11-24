@@ -81,6 +81,10 @@ int Demuxer::getAudioStreamIndex() {
     return this->audioStreamIndex;
 }
 
+uint Demuxer::getStreamCount() {
+    return this->formatContext->nb_streams;
+}
+
 bool Demuxer::isVideoCodecParameters() {
     if (this->videoCodecParameter == nullptr) {
         return false;
@@ -105,6 +109,10 @@ AVCodecParameters* Demuxer::getRawVideoCodecParameters() {
 
 AVCodecParameters* Demuxer::getRawAudioCodecParameters() {
     return this->audioCodecParameter;
+}
+
+AVStream* Demuxer::getRawStream(int index) {
+    return this->formatContext->streams[index];
 }
 
 bool Demuxer::createFormatContext(AVResult* result) {

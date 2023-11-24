@@ -19,6 +19,17 @@ void CodecContext::setAVCodecContext(AVCodecContext* codecContext) {
     this->codecContext = codecContext;
 }
 
+bool CodecContext::isVaildContext() {
+    if (this->codecContext == nullptr) {
+        return false;
+    }   
+    return true;
+}
+
+AVCodecContext* CodecContext::getRawCodecContext() {
+    return this->codecContext;
+}
+
 bool createVideoDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result) {
     if (codecContext == nullptr ||
         result       == nullptr) {

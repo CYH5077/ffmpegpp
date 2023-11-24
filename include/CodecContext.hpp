@@ -24,6 +24,8 @@ public:
 public: // getter setter
     void setAVCodecContext(AVCodecContext* codecContext);
 
+    bool isVaildContext();
+    
 public: // Raw pointer
     AVCodecContext* getRawCodecContext();
     

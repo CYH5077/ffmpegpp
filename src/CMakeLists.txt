@@ -1,7 +1,9 @@
 set (SOURCES AVResult.cpp
              Demuxer.cpp
              Packet.cpp
-             CodecContext.cpp)
+             CodecContext.cpp
+             Decoder.cpp
+             Frame.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

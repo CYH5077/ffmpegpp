@@ -73,6 +73,14 @@ AVCodecID Demuxer::getAudioCodecID() {
     return this->audioCodecParameter->codec_id;
 }
 
+int Demuxer::getVideoStreamIndex() {
+    return this->videoStreamIndex;
+}
+
+int Demuxer::getAudioStreamIndex() {
+    return this->audioStreamIndex;
+}
+
 bool Demuxer::isVideoCodecParameters() {
     if (this->videoCodecParameter == nullptr) {
         return false;
@@ -127,16 +135,16 @@ bool Demuxer::openFormatContext(const std::string& fileName, AVResult* result) {
 }
 
 void Demuxer::findCodecParameters() {
-    int videoStreamIndex = this->findBestStream(AVMEDIA_TYPE_VIDEO);
-    int audioStreamIndex = this->findBestStream(AVMEDIA_TYPE_AUDIO);
+    this->videoStreamIndex = this->findBestStream(AVMEDIA_TYPE_VIDEO);
+    this->audioStreamIndex = this->findBestStream(AVMEDIA_TYPE_AUDIO);
 
-    if (videoStreamIndex >= 0) {
-        AVStream* stream = this->formatContext->streams[videoStreamIndex];
+    if (this->videoStreamIndex >= 0) {
+        AVStream* stream = this->formatContext->streams[this->videoStreamIndex];
         this->videoCodecParameter = stream->codecpar;
     }
 
-    if (audioStreamIndex >= 0) {
-        AVStream* stream = this->formatContext->streams[audioStreamIndex];
+    if (this->audioStreamIndex >= 0) {
+        AVStream* stream = this->formatContext->streams[this->audioStreamIndex];
         this->audioCodecParameter = stream->codecpar;
     }
 }

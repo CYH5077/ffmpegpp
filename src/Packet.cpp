@@ -36,6 +36,10 @@ int Packet::getSize() {
     return this->packet->size;
 }
 
+int Packet::getStreamIndex() {
+    return this->packet->stream_index;
+}
+
 AVPacket* Packet::getRawPacket() {
     return this->packet;
 }

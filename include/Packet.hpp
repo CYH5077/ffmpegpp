@@ -16,7 +16,7 @@ public:
     explicit Packet();
     explicit Packet(AVPacket* packet);
     virtual ~Packet();
-    
+
 public:
     Packet(const Packet&) = delete;
     Packet& operator=(const Packet&) = delete;
@@ -29,6 +29,8 @@ public: // getter
     int64_t getDTS();
     int     getSize();
 
+    int getStreamIndex();
+    
 public: // Raw pointer
     AVPacket* getRawPacket();
 

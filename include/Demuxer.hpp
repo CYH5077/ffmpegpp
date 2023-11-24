@@ -28,6 +28,9 @@ public: // getter setter
     AVCodecID getVideoCodecID();
     AVCodecID getAudioCodecID();
 
+    int getVideoStreamIndex();
+    int getAudioStreamIndex();
+    
     bool isVideoCodecParameters();
     bool isAudioCodecParameters();
     
@@ -49,6 +52,9 @@ private:
 
 private:
     AVFormatContext* formatContext;
+
+    int videoStreamIndex;
+    int audioStreamIndex;
 
     AVCodecParameters* videoCodecParameter;
     AVCodecParameters* audioCodecParameter;

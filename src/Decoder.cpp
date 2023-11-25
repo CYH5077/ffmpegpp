@@ -7,7 +7,7 @@ extern "C" {
 
 namespace av {
 
-Decoder::Decoder(CodecContext& videoContext, CodecContext& audioContext) 
+Decoder::Decoder(CodecContextPtr videoContext, CodecContextPtr audioContext) 
 : videoContext(videoContext)
 , audioContext(audioContext) {
 
@@ -42,10 +42,10 @@ bool Decoder::decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> f
     return result->success();
 }
 
-bool Decoder::decodePacket(CodecContext& codecContext, Packet& packet, Frame* frame, AVResult* result) {
+bool Decoder::decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* frame, AVResult* result) {
     int ret = 0;
 
-    ret = avcodec_send_packet(codecContext.getRawCodecContext(), packet.getRawPacket());
+    ret = avcodec_send_packet(codecContext->getRawCodecContext(), packet.getRawPacket());
     if (ret < 0) {
         char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
         av_strerror(ret, avErrorMessage, sizeof(avErrorMessage));
@@ -54,7 +54,7 @@ bool Decoder::decodePacket(CodecContext& codecContext, Packet& packet, Frame* fr
     }
 
     while (ret >= 0) {
-        ret = avcodec_receive_frame(codecContext.getRawCodecContext(), frame->getRawFrame());
+        ret = avcodec_receive_frame(codecContext->getRawCodecContext(), frame->getRawFrame());
         if (ret < 0) {
             if (ret == AVERROR_EOF || 
                 ret == AVERROR(EAGAIN)) {
@@ -63,7 +63,7 @@ bool Decoder::decodePacket(CodecContext& codecContext, Packet& packet, Frame* fr
             return result->avFailed(ret);
         }
 
-        this->func(av::AVMediaTypeToMediaType((int)codecContext.getRawCodecContext()->codec->type), *frame);
+        this->func(av::AVMediaTypeToMediaType((int)codecContext->getRawCodecContext()->codec->type), *frame);
         
         frame->unref();
     }

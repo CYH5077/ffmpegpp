@@ -42,27 +42,6 @@ TEST(Demuxer, Demuxer_ReadPacket) {
     demuxer.close();
 }
 
-TEST(CodecContext, CodecContext_CreateDecodeContext) {
-    av::AVResult result;
-
-    av::Demuxer demuxer;
-    demuxer.open(TEST::MP4_FILE, &result);
-    ASSERT_TRUE(result.isSuccess());
-
-    av::CodecContext decodeVideoCodecContext;
-    if (demuxer.isVideoCodecParameters()) {
-        av::createVideoDecodeContext(demuxer, &decodeVideoCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-    }
-
-    av::CodecContext decodeAudioCodecContext;
-    if (demuxer.isAudioCodecParameters()) {
-        av::createAudioDecodeContext(demuxer, &decodeAudioCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-    }
-    
-}
-
 static void save_gray_frame(unsigned char *buf, int wrap, int xsize, int ysize, const char *filename)
 {
     FILE *f;
@@ -85,16 +64,10 @@ TEST(Decoder, Decoder_Decode) {
     demuxer.open(TEST::MP4_FILE, &result);
     ASSERT_TRUE(result.isSuccess());
 
-    av::CodecContext decodeVideoCodecContext;
-    if (demuxer.isVideoCodecParameters()) {
-        av::createVideoDecodeContext(demuxer, &decodeVideoCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-    }
-    av::CodecContext decodeAudioCodecContext;
-    if (demuxer.isAudioCodecParameters()) {
-        av::createAudioDecodeContext(demuxer, &decodeAudioCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-    }
+    auto decodeVideoCodecContext = av::createVideoDecodeContext(demuxer, &result);
+    ASSERT_TRUE(result.isSuccess());
+    auto decodeAudioCodecContext = av::createAudioDecodeContext(demuxer, &result);
+    ASSERT_TRUE(result.isSuccess());
 
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
     decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Frame& frame) {
@@ -134,8 +107,7 @@ TEST(Encoder, Encoder_encode) {
     encodeParameter.setMaxBFrames(0);
     encodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
 
-    av::CodecContext codecContext;
-    av::createEncodeContext(av::CODEC_ID::H264, encodeParameter, &codecContext, &result);
+    auto codecContext = av::createEncodeContext(av::CODEC_ID::H264, encodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;

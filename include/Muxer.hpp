@@ -23,7 +23,7 @@ public:
     void close();
 
     bool copyStreamsFrom(Demuxer& demuxer, AVResult* result);
-    bool createNewStream(CodecContext& codecContext, AVResult* result);
+    bool createNewStream(CodecContextPtr codecContext, AVResult* result);
     
     bool writeHeader(AVResult* result);
 

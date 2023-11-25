@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <functional>
 
 #include "AVResult.hpp"
@@ -12,20 +13,20 @@ namespace av {
 
 class Decoder {
 public:
-    explicit Decoder(CodecContext& videoContext, CodecContext& audioContext);
+    explicit Decoder(CodecContextPtr videoContext, CodecContextPtr audioContext);
     virtual ~Decoder();
 
 public:
     bool decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> func, AVResult* result);
     
 private:
-    bool decodePacket(CodecContext& codecContext, Packet& packet, Frame* frame, AVResult* result);
+    bool decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* frame, AVResult* result);
 
 private:
     std::function<void(MEDIA_TYPE, Frame&)> func;
 
-    CodecContext& videoContext;
-    CodecContext& audioContext;
+    CodecContextPtr videoContext;
+    CodecContextPtr audioContext;
 };
 
 };

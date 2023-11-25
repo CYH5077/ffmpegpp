@@ -104,14 +104,14 @@ bool Muxer::copyStreamsFrom(Demuxer& demuxer, AVResult* result) {
     return result->success();
 }
 
-bool Muxer::createNewStream(CodecContext& codecContext, AVResult* result) {
-    const AVCodec* codec = codecContext.getRawCodecContext()->codec;
+bool Muxer::createNewStream(CodecContextPtr codecContext, AVResult* result) {
+    const AVCodec* codec = codecContext->getRawCodecContext()->codec;
     AVStream* stream = avformat_new_stream(this->formatContext, codec);
     if (stream == nullptr) {
         return result->avFailed(AVERROR(ENOMEM));
     }
 
-    int ret = avcodec_parameters_from_context(stream->codecpar, codecContext.getRawCodecContext());
+    int ret = avcodec_parameters_from_context(stream->codecpar, codecContext->getRawCodecContext());
     if (ret < 0) {
         return result->avFailed(ret);
     }

@@ -57,81 +57,104 @@ CodecContext& CodecContext::operator=(CodecContext&& other) {
 
 
 
-bool createVideoDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result) {
-    if (codecContext == nullptr ||
-        result       == nullptr) {
-        return false;
+CodecContextPtr createVideoDecodeContext(Demuxer& demuxer, AVResult* result) {
+    if (result == nullptr) {
+        return nullptr;
     }
-    return createDecodeContext(demuxer.getVideoAVCodecID(), demuxer.getRawVideoCodecParameters(), codecContext, result);
+    return createDecodeContext(demuxer.getVideoAVCodecID(), demuxer.getRawVideoCodecParameters(), result);
 }
 
-bool createAudioDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result) {
-    if (codecContext == nullptr ||
-        result       == nullptr) {
-        return false;
+CodecContextPtr createAudioDecodeContext(Demuxer& demuxer, AVResult* result) {
+    if (result == nullptr) {
+        return nullptr;
     }
-    return createDecodeContext(demuxer.getAudioAVCodecID(), demuxer.getRawAudioCodecParameters(), codecContext, result);
+    return createDecodeContext(demuxer.getAudioAVCodecID(), demuxer.getRawAudioCodecParameters(), result);
 }
 
-bool createDecodeContext(int codecID, AVCodecParameters* codecParameters, CodecContext* codecContext, AVResult* result) {
+CodecContextPtr createDecodeContext(int codecID, AVCodecParameters* codecParameters, AVResult* result) {
+    CodecContextPtr codecContext;
+    try {
+        codecContext = std::make_shared<CodecContext>();
+    } catch (std::bad_alloc& e) {
+        result->failed(-1, e.what());
+        return nullptr;
+    }
+
+    if (codecParameters == nullptr) {
+        return codecContext;
+    }
+
     const AVCodec* decodeCodec = avcodec_find_decoder((AVCodecID)codecID);
     if (decodeCodec == nullptr) {
-        return result->failed(AVERROR(EINVAL), "decoder not found");
+        result->failed(AVERROR(EINVAL), "decoder not found");
+        return codecContext;
     }
 
     AVCodecContext* decodeCodecContext = avcodec_alloc_context3(decodeCodec);
     if (decodeCodecContext == nullptr) {
-        return result->avFailed(AVERROR(ENOMEM));
+        result->avFailed(AVERROR(ENOMEM));
+        return codecContext;
     }
     // 실패시 decodeCodecContext 를 해제하기 위함.
-    CodecContext tempCodecContext(decodeCodecContext);
+    codecContext->setAVCodecContext(decodeCodecContext);
 
     int ret = avcodec_parameters_to_context(decodeCodecContext, codecParameters);
     if (ret < 0) {
-        return result->avFailed(ret);
+        result->avFailed(ret);
+        return codecContext;
     }
 
     ret = avcodec_open2(decodeCodecContext, decodeCodec, nullptr);
     if (ret < 0) {
-        return result->avFailed(ret);
+        result->avFailed(ret);
+        return codecContext;
     }
 
-    *codecContext = std::move(tempCodecContext);
-    return result->success();
+    result->success();
+    return codecContext;
 }
 
-bool createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result) {
-    if (codecContext == nullptr ||
-        result       == nullptr) {
-        return false;
+CodecContextPtr createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, AVResult* result) {
+    if (result == nullptr) {
+        return nullptr;
     }
 
     const AVCodec* codec = avcodec_find_encoder_by_name(codecName.c_str());
     if (codec == nullptr) {
-        return result->failed(-1, "Codec not found");
+        result->failed(-1, "Codec not found");
+        return nullptr;
     }
     
-    return createEncodeContext(codec, encodeParameter, codecContext, result);
+    return createEncodeContext(codec, encodeParameter, result);
 }
 
-bool createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result) {
-    if (codecContext == nullptr ||
-        result       == nullptr) {
-        return false;
+CodecContextPtr createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, AVResult* result) {
+    if (result == nullptr) {
+        return nullptr;
     }
 
     const AVCodec* codec = avcodec_find_encoder((AVCodecID)av::codecIDToAVCodecID(codecID));
     if (codec == nullptr) {
-        return result->failed(-1, "Codec not found");
+        result->failed(-1, "Codec not found");
+        return nullptr;
     }
 
-    return createEncodeContext(codec, encodeParameter, codecContext, result);
+    return createEncodeContext(codec, encodeParameter, result);
 }
 
-bool createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result) {
+CodecContextPtr createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, AVResult* result) {
+    CodecContextPtr codecContext;
+    try {
+        codecContext = std::make_shared<CodecContext>();
+    } catch (std::bad_alloc& e) {
+        result->failed(-1, e.what());
+        return nullptr;
+    }
+
     AVCodecContext* encodeCodecContext = avcodec_alloc_context3(codec);
     if (encodeCodecContext == nullptr) {
-        return result->avFailed(AVERROR(ENOMEM));
+        result->avFailed(AVERROR(ENOMEM));
+        return codecContext;
     }
     encodeCodecContext->bit_rate = encodeParameter.getBitrate();
     encodeCodecContext->width    = encodeParameter.getWidth();
@@ -144,14 +167,15 @@ bool createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter,
     if (codec->id == AV_CODEC_ID_H264) {
         av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
     }
-    CodecContext tempCodecContext(encodeCodecContext);
-
+    codecContext->setAVCodecContext(encodeCodecContext);
+    
     int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
     if (ret < 0) {
-        return result->avFailed(ret);
+        result->avFailed(ret);
+        return codecContext;
     }
 
-    *codecContext = std::move(tempCodecContext);
-    return result->success();
+    result->success();
+    return codecContext;
 }
 };

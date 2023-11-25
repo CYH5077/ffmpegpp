@@ -35,14 +35,16 @@ public: // operator
 private:
     AVCodecContext* codecContext;
 };
+typedef std::shared_ptr<CodecContext> CodecContextPtr;
 
 // Decode AVCodecContext
-bool createVideoDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result);
-bool createAudioDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result);
-bool createDecodeContext(int codecID, AVCodecParameters* codecParameters, CodecContext* codecContext, AVResult* result);
+CodecContextPtr createVideoDecodeContext(Demuxer& demuxer, AVResult* result);
+CodecContextPtr createAudioDecodeContext(Demuxer& demuxer, AVResult* result);
+CodecContextPtr createDecodeContext(int codecID, AVCodecParameters* codecParameters, AVResult* result);
 
 // Encode AVCodecContext
-bool createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
-bool createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
-bool createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
+CodecContextPtr createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, AVResult* result);
+CodecContextPtr createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, AVResult* result);
+CodecContextPtr createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, AVResult* result);
 };
+

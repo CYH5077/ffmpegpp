@@ -28,8 +28,15 @@ CodecContext::~CodecContext() {
         avcodec_free_context(&this->codecContext);
     }
 }
-void CodecContext::setAVCodecContext(AVCodecContext* codecContext) {
-    this->codecContext = codecContext;
+
+Rational CodecContext::getTimeBase() {
+    AVRational timebase = this->codecContext->time_base;
+    return Rational(timebase.num, timebase.den);
+}
+
+Rational CodecContext::getFrameRate() {
+    AVRational framerate = this->codecContext->framerate;
+    return Rational(framerate.num, framerate.den);
 }
 
 bool CodecContext::isVaildContext() {
@@ -37,6 +44,10 @@ bool CodecContext::isVaildContext() {
         return false;
     }   
     return true;
+}
+
+void CodecContext::setAVCodecContext(AVCodecContext* codecContext) {
+    this->codecContext = codecContext;
 }
 
 AVCodecContext* CodecContext::getRawCodecContext() {

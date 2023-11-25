@@ -44,7 +44,10 @@ bool Decoder::decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> f
 
 bool Decoder::decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* frame, AVResult* result) {
     int ret = 0;
-
+    if (codecContext == nullptr) {
+        return true;
+    }
+    
     ret = avcodec_send_packet(codecContext->getRawCodecContext(), packet.getRawPacket());
     if (ret < 0) {
         char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };

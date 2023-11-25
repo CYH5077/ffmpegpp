@@ -3,7 +3,7 @@
 #include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Packet.hpp"
-
+#include "Rational.hpp"
 
 
 namespace av {
@@ -23,6 +23,11 @@ public:
     void printDump();
 
 public: // getter setter
+    Rational getTimeBase();
+    Rational getFrameRate();
+    int getWidth();
+    int getHeight();
+
     int getVideoAVCodecID();
     int getAudioAVCodecID();
 
@@ -58,6 +63,9 @@ private:
     int videoStreamIndex;
     int audioStreamIndex;
 
+    AVStream* videoStream;
+    AVStream* audioStream;
+    
     AVCodecParameters* videoCodecParameter;
     AVCodecParameters* audioCodecParameter;
 };

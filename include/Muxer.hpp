@@ -7,7 +7,7 @@
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
 #include "CodecContext.hpp"
-
+#include "Packet.hpp"
 
 namespace av {
 
@@ -26,7 +26,8 @@ public:
     bool createNewStream(CodecContextPtr codecContext, AVResult* result);
     
     bool writeHeader(AVResult* result);
-
+    bool writePacket(Packet& packet, AVResult* result);
+    
 public: // Raw pointer
     AVFormatContext* getRawFormatContext();
 

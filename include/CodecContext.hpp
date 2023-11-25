@@ -6,7 +6,7 @@
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
 #include "EncodeParameter.hpp"
-
+#include "Rational.hpp"
 
 namespace av {
 
@@ -22,9 +22,13 @@ public:
     CodecContext& operator=(const CodecContext&) = delete;
 
 public: // getter setter
-    void setAVCodecContext(AVCodecContext* codecContext);
+    Rational getTimeBase();
+    Rational getFrameRate();
 
     bool isVaildContext();
+    
+    void setAVCodecContext(AVCodecContext* codecContext);
+
     
 public: // Raw pointer
     AVCodecContext* getRawCodecContext();

@@ -7,7 +7,8 @@ set (SOURCES AVResult.cpp
              Muxer.cpp
              EncodeParameter.cpp
              Rational.cpp
-             AVType.cpp)
+             AVType.cpp
+             Encoder.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

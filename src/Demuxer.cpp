@@ -59,6 +59,24 @@ void Demuxer::printDump() {
     av_dump_format(this->formatContext, 0, nullptr, 0);
 }
 
+Rational Demuxer::getTimeBase() {
+    AVRational timebase = this->videoStream->time_base;
+    return Rational(timebase.num, timebase.den);
+}
+
+Rational Demuxer::getFrameRate() {
+    AVRational framerate = this->videoStream->avg_frame_rate;
+    return Rational(framerate.num, framerate.den);
+}
+
+int Demuxer::getWidth() {
+    return this->videoCodecParameter->width;
+}
+
+int Demuxer::getHeight() {
+    return this->videoCodecParameter->height;
+}
+
 int Demuxer::getVideoAVCodecID() {
     if (this->videoCodecParameter == nullptr) {
         return AV_CODEC_ID_NONE;
@@ -147,13 +165,13 @@ void Demuxer::findCodecParameters() {
     this->audioStreamIndex = this->findBestStream(MEDIA_TYPE::AUDIO);
 
     if (this->videoStreamIndex >= 0) {
-        AVStream* stream = this->formatContext->streams[this->videoStreamIndex];
-        this->videoCodecParameter = stream->codecpar;
+        this->videoStream = this->formatContext->streams[this->videoStreamIndex];
+        this->videoCodecParameter = this->videoStream->codecpar;
     }
 
     if (this->audioStreamIndex >= 0) {
-        AVStream* stream = this->formatContext->streams[this->audioStreamIndex];
-        this->audioCodecParameter = stream->codecpar;
+        this->audioStream = this->formatContext->streams[this->audioStreamIndex];
+        this->audioCodecParameter = this->audioStream->codecpar;
     }
 }
 

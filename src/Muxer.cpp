@@ -63,6 +63,7 @@ bool Muxer::open(const std::string& fileName, AVResult* result) {
 
 void Muxer::close() {
     if (this->formatContext != nullptr) {
+        av_write_trailer(this->formatContext);
         if (!(this->formatContext->flags & AVFMT_NOFILE)) {
             avio_closep(&this->formatContext->pb);
         }
@@ -132,6 +133,14 @@ bool Muxer::writeHeader(AVResult* result) {
     return result->success();
 }
 
+bool Muxer::writePacket(Packet& packet, AVResult* result) {
+    int ret = av_interleaved_write_frame(this->formatContext, packet.getRawPacket());
+    if (ret != 0) {
+        return result->avFailed(ret);
+    }
+    return result->success();
+}
+
 AVFormatContext* Muxer::getRawFormatContext() {
     return this->formatContext;
 }
@@ -158,7 +167,6 @@ bool Muxer::copyPacketsFrom(Demuxer& demuxer, AVResult* result) {
             return result->avFailed(ret);
         }
     }
-    av_write_trailer(this->formatContext);
 
     return result->success();
 }

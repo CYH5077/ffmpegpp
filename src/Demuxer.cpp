@@ -59,14 +59,14 @@ void Demuxer::printDump() {
     av_dump_format(this->formatContext, 0, nullptr, 0);
 }
 
-AVCodecID Demuxer::getVideoCodecID() {
+int Demuxer::getVideoAVCodecID() {
     if (this->videoCodecParameter == nullptr) {
         return AV_CODEC_ID_NONE;
     }
     return this->videoCodecParameter->codec_id;
 }
 
-AVCodecID Demuxer::getAudioCodecID() {
+int Demuxer::getAudioAVCodecID() {
     if (this->audioCodecParameter == nullptr) {
         return AV_CODEC_ID_NONE;
     }
@@ -143,8 +143,8 @@ bool Demuxer::openFormatContext(const std::string& fileName, AVResult* result) {
 }
 
 void Demuxer::findCodecParameters() {
-    this->videoStreamIndex = this->findBestStream(AVMEDIA_TYPE_VIDEO);
-    this->audioStreamIndex = this->findBestStream(AVMEDIA_TYPE_AUDIO);
+    this->videoStreamIndex = this->findBestStream(MEDIA_TYPE::VIDEO);
+    this->audioStreamIndex = this->findBestStream(MEDIA_TYPE::AUDIO);
 
     if (this->videoStreamIndex >= 0) {
         AVStream* stream = this->formatContext->streams[this->videoStreamIndex];
@@ -157,8 +157,8 @@ void Demuxer::findCodecParameters() {
     }
 }
 
-int Demuxer::findBestStream(enum AVMediaType type) {
-    return av_find_best_stream(this->formatContext, type, -1, -1, nullptr, 0);
+int Demuxer::findBestStream(MEDIA_TYPE type) {
+    return av_find_best_stream(this->formatContext, (AVMediaType)av::mediaTypeToAVMediaType(type), -1, -1, nullptr, 0);
 }
 
 bool Demuxer::readPacket(Packet* packet, AVResult* result) {

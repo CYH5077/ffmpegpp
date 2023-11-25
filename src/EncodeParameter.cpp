@@ -1,5 +1,10 @@
 #include "EncodeParameter.hpp"
 
+extern "C" {
+    #include "libavformat/avformat.h"
+}
+
+
 namespace av {
 
 EncodeParameter::EncodeParameter() {
@@ -10,7 +15,7 @@ EncodeParameter::~EncodeParameter() {
 
 }
 
-uint64_t EncodeParameter::getBitrate() {
+unsigned long EncodeParameter::getBitrate() {
     return this->bitrate;
 }
 
@@ -38,11 +43,11 @@ int EncodeParameter::getMaxBFrames() {
     return this->maxBFrames;
 }
 
-AVPixelFormat EncodeParameter::getPixelFormat() {
+PIXEL_FORMAT EncodeParameter::getPixelFormat() {
     return this->pixelFormat;
 }
 
-void EncodeParameter::setBitrate(uint64_t bitrate) {
+void EncodeParameter::setBitrate(unsigned long bitrate) {
     this->bitrate = bitrate;
 }
 
@@ -70,7 +75,7 @@ void EncodeParameter::setMaxBFrames(int maxBFrames) {
     this->maxBFrames = maxBFrames;
 }
 
-void EncodeParameter::setPixelFormat(AVPixelFormat pixelFormat) {
+void EncodeParameter::setPixelFormat(PIXEL_FORMAT pixelFormat) {
     this->pixelFormat = pixelFormat;
 }
 };

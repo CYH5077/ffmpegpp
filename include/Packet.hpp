@@ -3,11 +3,10 @@
 #include <iostream>
 #include <memory>
 
-extern "C" {
-    #include "libavformat/avformat.h"
-}
-
+#include "AVType.hpp"
 #include "AVResult.hpp"
+
+struct AVPacket;
 
 namespace av {
 

@@ -1,5 +1,9 @@
 #include "Rational.hpp"
 
+extern "C" {
+    #include "libavformat/avformat.h"
+}
+
 namespace av {
 
 Rational::Rational() {
@@ -7,8 +11,8 @@ Rational::Rational() {
 }
 
 Rational::Rational(int num, int den) {
-    this->rational.num = num;
-    this->rational.den = den;
+    this->num = num;
+    this->den = den;
 }
 
 Rational::~Rational() {
@@ -16,19 +20,19 @@ Rational::~Rational() {
 }
 
 int Rational::getNum() const {
-    return this->rational.num;
+    return this->num;
 }
 
 int Rational::getDen() const {
-    return this->rational.den;
+    return this->den;
 }
 
 void Rational::setNum(int num) {
-    this->rational.num = num;
+    this->num = num;
 }
 
 void Rational::setDen(int den) {
-    this->rational.den = den;
+    this->den = den;
 }
 
 };

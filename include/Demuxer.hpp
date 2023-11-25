@@ -1,12 +1,12 @@
 #pragma once
 
+#include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Packet.hpp"
 
-extern "C" {
-    #include "libavformat/avformat.h"
-    #include "libavcodec/avcodec.h"
-}
+struct AVFormatContext;
+struct AVCodecParameters;
+struct AVStream;
 
 namespace av {
 
@@ -25,8 +25,8 @@ public:
     void printDump();
 
 public: // getter setter
-    AVCodecID getVideoCodecID();
-    AVCodecID getAudioCodecID();
+    int getVideoAVCodecID();
+    int getAudioAVCodecID();
 
     int getVideoStreamIndex();
     int getAudioStreamIndex();
@@ -50,7 +50,7 @@ private:
     bool openFormatContext(const std::string& fileName, AVResult* result);
     
     void findCodecParameters();
-    int  findBestStream(enum AVMediaType type);
+    int  findBestStream(MEDIA_TYPE type);
 
     bool readPacket(Packet* packet, AVResult* result);
 

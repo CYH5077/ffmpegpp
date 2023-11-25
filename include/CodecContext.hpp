@@ -2,13 +2,13 @@
 
 #include <memory>
 
-extern "C" {
-    #include "libavcodec/avcodec.h"
-}
-
+#include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
 #include "EncodeParameter.hpp"
+
+struct AVCodec;
+struct AVCodecContext;
 
 namespace av {
 
@@ -41,10 +41,10 @@ private:
 // Decode AVCodecContext
 bool createVideoDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result);
 bool createAudioDecodeContext(Demuxer& demuxer, CodecContext* codecContext, AVResult* result);
-bool createDecodeContext(AVCodecID codecID, AVCodecParameters* codecParameters, CodecContext* codecContext, AVResult* result);
+bool createDecodeContext(int codecID, AVCodecParameters* codecParameters, CodecContext* codecContext, AVResult* result);
 
 // Encode AVCodecContext
 bool createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
-bool createEncodeContext(AVCodecID codecID, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
+bool createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
 bool createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, CodecContext* codecContext, AVResult* result);
 };

@@ -1,5 +1,10 @@
 #include "Decoder.hpp"
 
+extern "C" {
+    #include "libavformat/avformat.h"
+    #include "libavcodec/avcodec.h"
+}
+
 namespace av {
 
 Decoder::Decoder(CodecContext& videoContext, CodecContext& audioContext) 
@@ -12,7 +17,7 @@ Decoder::~Decoder() {
 
 }
 
-bool Decoder::decode(Demuxer& demuxer, std::function<void(AVMediaType, Frame&)> func, AVResult* result) {
+bool Decoder::decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> func, AVResult* result) {
     if (result == nullptr) {
         return false;
     }
@@ -58,7 +63,7 @@ bool Decoder::decodePacket(CodecContext& codecContext, Packet& packet, Frame* fr
             return result->avFailed(ret);
         }
 
-        this->func(codecContext.getRawCodecContext()->codec->type, *frame);
+        this->func(av::AVMediaTypeToMediaType((int)codecContext.getRawCodecContext()->codec->type), *frame);
         
         frame->unref();
     }

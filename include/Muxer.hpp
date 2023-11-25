@@ -3,13 +3,12 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-    #include "libavformat/avformat.h"
-}
-
+#include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
 #include "CodecContext.hpp"
+
+struct AVFormatContext;
 
 namespace av {
 

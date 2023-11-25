@@ -1,8 +1,8 @@
 #pragma once
 
-extern "C" {
-    #include "libavformat/avformat.h"
-}
+#include "AVType.hpp"
+
+struct AVFrame;
 
 namespace av {
 

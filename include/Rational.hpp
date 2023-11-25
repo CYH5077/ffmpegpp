@@ -1,8 +1,6 @@
 #pragma once
 
-extern "C" {
-    #include "libavformat/avformat.h"
-}
+#include "AVType.hpp"
 
 namespace av {
 
@@ -20,7 +18,8 @@ public: // getter setter
     void setDen(int den);
     
 private:
-    AVRational rational;
+    int num;
+    int den;
 };
 
 };

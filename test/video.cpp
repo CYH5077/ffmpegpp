@@ -2,6 +2,7 @@
 
 #include "TEST_DEFINE.hpp"
 
+#include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
 #include "CodecContext.hpp"
@@ -96,12 +97,12 @@ TEST(Decoder, Decoder_Decode) {
     }
 
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
-    decoder.decode(demuxer, [&](AVMediaType type, av::Frame& frame) {
-        if (type == AVMEDIA_TYPE_VIDEO) {
+    decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Frame& frame) {
+        if (type == av::MEDIA_TYPE::VIDEO) {
             //AVFrame* avframe = frame.getRawFrame();
             //save_gray_frame(avframe->data[0], avframe->linesize[0], avframe->width, avframe->height, "test.pgm");
             //frame.printDump();
-        } else if (type == AVMEDIA_TYPE_AUDIO) {
+        } else if (type == av::MEDIA_TYPE::AUDIO) {
             //std::cout << "Audio frame!!" << std::endl;
         }
     }, &result);
@@ -131,10 +132,10 @@ TEST(Encoder, Encoder_encode) {
     encodeParameter.setFrameRate(av::Rational(25, 1));
     encodeParameter.setGOPSize(10);
     encodeParameter.setMaxBFrames(0);
-    encodeParameter.setPixelFormat(AV_PIX_FMT_YUV420P);
+    encodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
 
     av::CodecContext codecContext;
-    av::createEncodeContext(AV_CODEC_ID_H264, encodeParameter, &codecContext, &result);
+    av::createEncodeContext(av::CODEC_ID::H264, encodeParameter, &codecContext, &result);
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;

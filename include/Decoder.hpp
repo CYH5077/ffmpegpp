@@ -16,13 +16,13 @@ public:
     virtual ~Decoder();
 
 public:
-    bool decode(Demuxer& demuxer, std::function<void(AVMediaType, Frame&)> func, AVResult* result);
+    bool decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> func, AVResult* result);
     
 private:
     bool decodePacket(CodecContext& codecContext, Packet& packet, Frame* frame, AVResult* result);
 
 private:
-    std::function<void(AVMediaType, Frame&)> func;
+    std::function<void(MEDIA_TYPE, Frame&)> func;
 
     CodecContext& videoContext;
     CodecContext& audioContext;

@@ -1,9 +1,6 @@
 #pragma once
 
-extern "C" {
-    #include "libavformat/avformat.h"
-}
-
+#include "AVType.hpp"
 #include "Rational.hpp"
 
 namespace av {
@@ -14,26 +11,26 @@ public:
     virtual ~EncodeParameter();
 
 public: // getter setter
-    uint64_t getBitrate();
+    unsigned long getBitrate();
     int      getWidth();
     int      getHeight();
     const Rational& getTimeBase();
     const Rational& getFrameRate();
     int      getGOPSize();
     int      getMaxBFrames();
-    AVPixelFormat getPixelFormat();
+    PIXEL_FORMAT getPixelFormat();
 
-    void setBitrate(uint64_t bitrate);
+    void setBitrate(unsigned long bitrate);
     void setWidth(int width);
     void setHeight(int height);
     void setTimeBase(const Rational&& timebase);
     void setFrameRate(const Rational&& framerate);
     void setGOPSize(int gopSize);
     void setMaxBFrames(int maxBFrames);
-    void setPixelFormat(AVPixelFormat pixelFormat);
+    void setPixelFormat(PIXEL_FORMAT pixelFormat);
 
 private:
-    uint64_t bitrate;
+    unsigned long bitrate;
 
     int width;
     int height;
@@ -44,7 +41,7 @@ private:
     int gopSize;
     int maxBFrames;
 
-    AVPixelFormat pixelFormat;
+    PIXEL_FORMAT pixelFormat;
 };
 
 };

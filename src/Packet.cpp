@@ -1,5 +1,9 @@
 #include "Packet.hpp"
 
+extern "C" {
+    #include "libavformat/avformat.h"
+}
+
 namespace av {
 
 Packet::Packet() {

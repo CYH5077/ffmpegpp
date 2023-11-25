@@ -4,9 +4,7 @@
 #include "AVResult.hpp"
 #include "Packet.hpp"
 
-struct AVFormatContext;
-struct AVCodecParameters;
-struct AVStream;
+
 
 namespace av {
 

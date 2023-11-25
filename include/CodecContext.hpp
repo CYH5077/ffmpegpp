@@ -7,8 +7,6 @@
 #include "Demuxer.hpp"
 #include "EncodeParameter.hpp"
 
-struct AVCodec;
-struct AVCodecContext;
 
 namespace av {
 

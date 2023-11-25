@@ -6,7 +6,6 @@
 #include "AVType.hpp"
 #include "AVResult.hpp"
 
-struct AVPacket;
 
 namespace av {
 

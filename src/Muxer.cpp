@@ -140,7 +140,7 @@ bool Muxer::copyPacketsFrom(Demuxer& demuxer, AVResult* result) {
     Packet packet;
     while (demuxer.read(&packet, result)) {
         AVStream* inputStream = demuxer.getRawStream(packet.getStreamIndex());
-        if (packet.getStreamIndex() >= this->streamsMapper.size() ||
+        if (packet.getStreamIndex() >= (int)this->streamsMapper.size() ||
             this->streamsMapper[packet.getStreamIndex()] < 0) {
             packet.unref();
             continue;

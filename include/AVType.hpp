@@ -1,6 +1,15 @@
     #pragma once
 
 
+struct AVCodec;
+struct AVCodecContext;
+struct AVFormatContext;
+struct AVCodecParameters;
+struct AVStream;
+struct AVFrame;
+struct AVFormatContext;
+struct AVPacket;
+
 namespace av {
 
 enum class CODEC_ID {

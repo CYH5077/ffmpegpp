@@ -8,7 +8,6 @@
 #include "Demuxer.hpp"
 #include "CodecContext.hpp"
 
-struct AVFormatContext;
 
 namespace av {
 

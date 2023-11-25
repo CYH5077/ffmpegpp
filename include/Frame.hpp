@@ -2,7 +2,6 @@
 
 #include "AVType.hpp"
 
-struct AVFrame;
 
 namespace av {
 

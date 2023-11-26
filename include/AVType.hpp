@@ -1,6 +1,7 @@
     #pragma once
 
 
+struct AVRational;
 struct AVCodec;
 struct AVCodecContext;
 struct AVFormatContext;

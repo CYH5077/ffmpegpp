@@ -145,6 +145,16 @@ AVFormatContext* Muxer::getRawFormatContext() {
     return this->formatContext;
 }
 
+AVStream* Muxer::getRawStream(MEDIA_TYPE type) {
+    AVMediaType mediaType = (AVMediaType)av::mediaTypeToAVMediaType(type);
+    int streamIndex = av_find_best_stream(this->formatContext, mediaType, -1, -1, nullptr, 0);
+    if (streamIndex < 0) {
+        return nullptr;
+    }
+
+    return this->formatContext->streams[streamIndex];
+}
+
 bool Muxer::copyPacketsFrom(Demuxer& demuxer, AVResult* result) {
     Packet packet;
     while (demuxer.read(&packet, result)) {

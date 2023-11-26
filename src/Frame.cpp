@@ -30,6 +30,14 @@ void Frame::unref() {
     }
 }
 
+Rational Frame::getTimeBase() {
+    return this->timebase;
+}
+
+void Frame::setTimeBase(Rational& timebase) {
+    this->timebase = timebase;
+}
+
 AVFrame* Frame::getRawFrame() {
     return this->frame;
 }

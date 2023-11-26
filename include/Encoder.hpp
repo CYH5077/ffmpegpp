@@ -14,15 +14,14 @@ public:
     virtual~ Encoder();
 
 public: 
-    bool encode(MEDIA_TYPE type, Muxer& muxer, Frame& frame, AVResult* result);
+    bool encode(Muxer& muxer, MEDIA_TYPE type, Frame& frame, AVResult* result);
 
 private:
-    bool encodeFrame(CodecContextPtr codecContext, Muxer& muxer, Frame& frame, AVResult* result);
+    bool encodeFrame(Muxer& muxer, CodecContextPtr codecContext, Frame& frame, AVResult* result);
+    
 private:
     CodecContextPtr videoContext;
     CodecContextPtr audioContext;
-
-    int frameIndex;
 };
 
 };

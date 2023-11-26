@@ -71,7 +71,7 @@ TEST(Decoder, Decoder_Decode) {
     ASSERT_TRUE(result.isSuccess());
 
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
-    decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Frame& frame) {
+    decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Packet& packet, av::Frame& frame) {
         if (type == av::MEDIA_TYPE::VIDEO) {
             //AVFrame* avframe = frame.getRawFrame();
             //save_gray_frame(avframe->data[0], avframe->linesize[0], avframe->width, avframe->height, "test.pgm");
@@ -107,13 +107,13 @@ TEST(Encoder, Encoder_encode) {
     ASSERT_TRUE(result.isSuccess());
 
     av::EncodeParameter encodeParameter;
-    encodeParameter.setBitrate(1000000);
+    encodeParameter.setBitrate(500000);
     encodeParameter.setWidth(demuxer.getWidth());
     encodeParameter.setHeight(demuxer.getHeight());
     encodeParameter.setTimeBase(demuxer.getTimeBase());
     encodeParameter.setFrameRate(demuxer.getFrameRate());
     encodeParameter.setGOPSize(10);
-    encodeParameter.setMaxBFrames(3);
+    encodeParameter.setMaxBFrames(0);
     encodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
 
     av::CodecContextPtr encodeAudioContext = nullptr;
@@ -131,9 +131,9 @@ TEST(Encoder, Encoder_encode) {
 
     av::Encoder encoder(encodeVideoContext, encodeAudioContext);
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
-    decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Frame& frame) {
+    decoder.decode(demuxer, [&](av::MEDIA_TYPE type, av::Packet& packet, av::Frame& frame) {
         if (type == av::MEDIA_TYPE::VIDEO) {
-            encoder.encode(type, muxer, frame, &result);
+            encoder.encode(muxer, type, frame, &result);
             ASSERT_TRUE(result.isSuccess());
         }
     }, &result);   

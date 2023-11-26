@@ -17,13 +17,13 @@ public:
     virtual ~Decoder();
 
 public:
-    bool decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Frame&)> func, AVResult* result);
+    bool decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Packet&, Frame&)> func, AVResult* result);
     
 private:
     bool decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* frame, AVResult* result);
 
 private:
-    std::function<void(MEDIA_TYPE, Frame&)> func;
+    std::function<void(MEDIA_TYPE, Packet&, Frame&)> func;
 
     CodecContextPtr videoContext;
     CodecContextPtr audioContext;

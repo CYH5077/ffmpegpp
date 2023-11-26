@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AVType.hpp"
-
+#include "Rational.hpp"
 
 namespace av {
 
@@ -17,14 +17,20 @@ public:
 
 public:
     void unref();
+    
+public: // getter setter
+    Rational getTimeBase();
 
-    void printDump();
-    
+    void setTimeBase(Rational& timebase);
+
 public: // Raw pointer
-    AVFrame* getRawFrame();
-    
+    AVFrame*  getRawFrame();
+
 private:
     AVFrame* frame;
+
+    // Decoder 에서 저장됨
+    Rational timebase;
 };
 
 };

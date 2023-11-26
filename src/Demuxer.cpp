@@ -133,6 +133,14 @@ AVStream* Demuxer::getRawStream(int index) {
     return this->formatContext->streams[index];
 }
 
+AVStream* Demuxer::getRawVideoStream() {
+    return this->formatContext->streams[this->videoStreamIndex];
+}
+
+AVStream* Demuxer::getRawAudioStream() {
+    return this->formatContext->streams[this->audioStreamIndex];
+}
+
 bool Demuxer::createFormatContext(AVResult* result) {
     if (this->formatContext != nullptr) {
         this->close();

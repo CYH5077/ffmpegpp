@@ -47,6 +47,8 @@ public: // Raw Pointer
     AVCodecParameters* getRawAudioCodecParameters();
 
     AVStream* getRawStream(int index);
+    AVStream* getRawVideoStream();
+    AVStream* getRawAudioStream();
 
 private:
     bool createFormatContext(AVResult* result);

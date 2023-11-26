@@ -7,6 +7,7 @@ namespace av {
 class Rational {
 public:
     explicit Rational();
+    explicit Rational(AVRational rational);
     explicit Rational(int num, int den);
     virtual ~Rational();
 

@@ -30,10 +30,11 @@ public:
     
 public: // Raw pointer
     AVFormatContext* getRawFormatContext();
-
+    AVStream* getRawStream(MEDIA_TYPE type);
+    
 private:
     bool copyPacketsFrom(Demuxer& demuxer, AVResult* result);
-
+    
 private:
     AVFormatContext* formatContext;    
 

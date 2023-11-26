@@ -10,6 +10,11 @@ Rational::Rational() {
 
 }
 
+Rational::Rational(AVRational rational) {
+    this->num = rational.num;
+    this->den = rational.den;
+}
+
 Rational::Rational(int num, int den) {
     this->num = num;
     this->den = den;

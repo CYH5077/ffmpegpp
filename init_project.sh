@@ -38,6 +38,10 @@ function thirdparty_build {
                 --enable-libfdk-aac               \
                 --enable-libx264 --enable-libx265 \
                 --disable-debug
+    if [ $? -ne 0 ]; then
+        exit -1
+    fi 
+    
     make -j$(grep -c processor /proc/cpuinfo)
     make install
     cd $root_thirdparty_path

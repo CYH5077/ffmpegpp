@@ -79,7 +79,7 @@ bool Muxer::copyStreamsFrom(Demuxer& demuxer, AVResult* result) {
 
     int streamIndex = 0;
     this->streamsMapper.resize(demuxer.getStreamCount(), 0);
-    for (uint i = 0; i < demuxer.getStreamCount(); i++) {
+    for (unsigned int i = 0; i < demuxer.getStreamCount(); i++) {
         AVCodecParameters* demuxerCodecParameter = demuxer.getRawStream(i)->codecpar;
         if (demuxerCodecParameter->codec_type != AVMEDIA_TYPE_VIDEO &&
             demuxerCodecParameter->codec_type != AVMEDIA_TYPE_AUDIO &&

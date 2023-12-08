@@ -99,7 +99,7 @@ int Demuxer::getAudioStreamIndex() {
     return this->audioStreamIndex;
 }
 
-uint Demuxer::getStreamCount() {
+unsigned int Demuxer::getStreamCount() {
     return this->formatContext->nb_streams;
 }
 

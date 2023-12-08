@@ -1,5 +1,5 @@
-set(FFMPEG_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg/build/include)
-set(FFMPEG_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg/build/lib)
+set(FFMPEG_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/thirdparty/${OS_TYPE}/ffmpeg/build/include)
+set(FFMPEG_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/thirdparty/${OS_TYPE}/ffmpeg/build/lib)
 
 find_library(FFMPEG_LIBAVCODEC avcodec REQUIRED HINTS ${FFMPEG_LIBRARY_PATH})
 find_library(FFMPEG_LIBAVDEVICE avdevice REQUIRED HINTS ${FFMPEG_LIBRARY_PATH})

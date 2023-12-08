@@ -34,7 +34,7 @@ public: // getter setter
     int getVideoStreamIndex();
     int getAudioStreamIndex();
     
-    uint getStreamCount();
+    unsigned int getStreamCount();
 
     bool isVideoCodecParameters();
     bool isAudioCodecParameters();

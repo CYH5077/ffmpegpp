@@ -1,7 +1,7 @@
 #!/bin/bash
 
 root_path=$(pwd)
-root_thirdparty_path=$root_path/thirdparty
+root_thirdparty_path=$root_path/thirdparty/linux
 
 function thirdparty_clone {
     ###################################################### move thirdparty

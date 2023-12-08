@@ -8,20 +8,23 @@ call :sample_video_download
 call :thirdparty_install
 
 :submodule_update
-git submodule init
-git submodule update
+echo "submodule update"
+git lfs update 
 git lfs pull
 exit /b 
 
 :thirdparty_install
+echo "install gtest"
 cd %root_thirdparty_path%/gtest
 tar xf gtest.tar
+echo "install ffmpeg"
 cd %root_thirdparty_path%/ffmpeg
 tar xf ffmpeg.tar
 cd %root_path%
 exit /b
 
 :sample_video_download
+echo "sample video download"
 mkdir build
 cd build
 mkdir bin

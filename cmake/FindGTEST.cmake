@@ -1,5 +1,10 @@
-set(GTEST_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/thirdparty/${OS_TYPE}/gtest/googletest/include)
-set(GTEST_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/thirdparty/${OS_TYPE}/gtest/build/lib)
+if (WIN32)
+    set(GTEST_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/thirdparty/windows/gtest/include)
+    set(GTEST_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/thirdparty/windows/gtest/lib)
+else ()
+    set(GTEST_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/thirdparty/gtest/googletest/include)
+    set(GTEST_LIBRARY_PATH ${CMAKE_SOURCE_DIR}/thirdparty/gtest/build/lib)
+endif()
 
 find_library(GTEST_LIBGMOCK NAMES gmock REQUIRED HINTS ${GTEST_LIBRARY_PATH})
 find_library(GTEST_LIBGMOCKMAIN NAMES gmock_main REQUIRED HINTS ${GTEST_LIBRARY_PATH})

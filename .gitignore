@@ -8,7 +8,14 @@ sample.mkv
 output.mp4
 test.pgm
 video_transcoding.mp4
+*.dll
 
+# windows library
+thirdparty/windows/ffmpeg/include
+thirdparty/windows/ffmpeg/bin
+thirdparty/windows/ffmpeg/lib
+thirdparty/windows/gtest/include
+thirdparty/windows/gtest/lib
 
 ## ffmpeg example temp directory ##
 ffmpegexample

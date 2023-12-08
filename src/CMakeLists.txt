@@ -18,8 +18,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include
 target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARIES})
 
-
-set(INSTALL_DIR ${CMAKE_SOURCE_DIR}/build)
 set(HEADER_DIR ${CMAKE_SOURCE_DIR}/include)
 
 install(TARGETS ${PROJECT_NAME}
@@ -27,3 +25,9 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY ${HEADER_DIR} 
         DESTINATION ${INSTALL_DIR} 
         FILES_MATCHING PATTERN "*.hpp")
+if (WIN32)
+        set(FFMPEG_DLL_DIR ${CMAKE_SOURCE_DIR}/thirdparty/windows/ffmpeg/bin)
+        install(DIRECTORY ${FFMPEG_DLL_DIR} 
+                DESTINATION ${INSTALL_DIR}
+                FILES_MATCHING PATTERN "*.dll")
+endif()

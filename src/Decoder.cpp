@@ -26,10 +26,8 @@ bool Decoder::decode(Demuxer& demuxer, DecoderCallbackFunc func, AVResult* resul
     while (demuxer.read(&packet, result)) {
         bool decodeResult;
         if (packet.getStreamIndex() == demuxer.getVideoStreamIndex()) {
-            packet.setMediaType(this->videoContext->getMediaType());
             decodeResult = this->decodePacket(this->videoContext->getRawCodecContext(), packet.getRawPacket(), func, result);
         } else if (packet.getStreamIndex() == demuxer.getAudioStreamIndex()) {
-            packet.setMediaType(this->audioContext->getMediaType());
             decodeResult = this->decodePacket(this->audioContext->getRawCodecContext(), packet.getRawPacket(), func, result);
         }
         packet.unref();
@@ -44,9 +42,11 @@ bool Decoder::decode(Demuxer& demuxer, DecoderCallbackFunc func, AVResult* resul
     }
 
     // flush AVCodecContext
-    if (this->videoContext->isVaildContext()) { // AVCodecContext not nullptr
+    if (this->videoContext != nullptr && 
+        this->videoContext->isVaildContext()) { // AVCodecContext not nullptr
         this->decodePacket(this->videoContext->getRawCodecContext(), nullptr, func, result);
-    } else if (this->audioContext->isVaildContext()) { // AVCodecContext not nullptr
+    } else if (this->audioContext != nullptr && 
+               this->audioContext->isVaildContext()) { // AVCodecContext not nullptr
         this->decodePacket(this->audioContext->getRawCodecContext(), nullptr, func, result);
     }
 
@@ -77,6 +77,7 @@ bool Decoder::decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, D
         }
 
         Packet packet(avPacket);
+        packet.setMediaType(av::AVMediaTypeToMediaType(avCodecContext->codec->type));
         func(packet, frame);
         // callback에 Packet을 넘겨줘야해서 Packet 생성자를 이용했으나 소멸자에서 해제가 되는것을 막기위함임... 
         // 어떻게하지

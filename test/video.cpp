@@ -101,6 +101,9 @@ TEST(Encoder, Encoder_encode) {
     ASSERT_TRUE(result.isSuccess());
     muxer.createNewStream(encodeVideoCodecContext, &result);
     ASSERT_TRUE(result.isSuccess());
+    // 디코딩된 패킷을 그냥 쓰기때문에 디코딩시 사용된 AVCodecContext를 그냥 사용해서 작성
+    muxer.createNewStream(decodeAudioCodecContext, &result); 
+    ASSERT_TRUE(result.isSuccess());
     muxer.writeHeader(&result);
     ASSERT_TRUE(result.isSuccess());
 
@@ -114,6 +117,10 @@ TEST(Encoder, Encoder_encode) {
                 muxer.writePacket(encodePacket, &result);
                 ASSERT_TRUE(result.isSuccess());
             }, &result);
+            ASSERT_TRUE(result.isSuccess());
+        } else if (packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
+            muxer.writePacket(packet, &result);
+            ASSERT_TRUE(result.isSuccess());
         }
     }, &result);   
 

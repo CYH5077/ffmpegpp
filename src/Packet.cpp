@@ -8,10 +8,12 @@ namespace av {
 
 Packet::Packet() {
     this->packet = av_packet_alloc();
+    this->mediaType = MEDIA_TYPE::UNKNOWN;
 }
 
 Packet::Packet(AVPacket* packet) {
     this->packet = packet;
+    this->mediaType = MEDIA_TYPE::UNKNOWN;
 }
 
 Packet::~Packet() {

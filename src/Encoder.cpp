@@ -33,13 +33,15 @@ bool Encoder::flush(AVResult* result) {
         return false;
     }
 
-    if (this->videoContext->isVaildContext()) { // AVCodecContext not nullptr 
+    if (this->videoContext != nullptr &&
+        this->videoContext->isVaildContext()) { // AVCodecContext not nullptr 
         if (this->encodeFrame(this->videoContext->getRawCodecContext(), nullptr, result) == false) {
             return result->isSuccess();
         }
     }
     
-    if (this->audioContext->isVaildContext()) { // AVCodecContext not nullptr 
+    if (this->audioContext != nullptr &&
+        this->audioContext->isVaildContext()) { // AVCodecContext not nullptr 
         if (this->encodeFrame(this->audioContext->getRawCodecContext(), nullptr, result) == false) {
             return result->isSuccess();
         }

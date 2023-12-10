@@ -5,7 +5,7 @@
 #include "AVType.hpp"
 #include "AVResult.hpp"
 #include "Demuxer.hpp"
-#include "EncodeParameter.hpp"
+#include "VideoEncodeParameter.hpp"
 #include "Rational.hpp"
 
 namespace av {
@@ -46,9 +46,13 @@ CodecContextPtr createVideoDecodeContext(Demuxer& demuxer, AVResult* result);
 CodecContextPtr createAudioDecodeContext(Demuxer& demuxer, AVResult* result);
 CodecContextPtr createDecodeContext(int codecID, AVCodecParameters* codecParameters, AVResult* result);
 
-// Encode AVCodecContext
-CodecContextPtr createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, AVResult* result);
-CodecContextPtr createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, AVResult* result);
-CodecContextPtr createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, AVResult* result);
+// Video Encode AVCodecContext
+CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameter& encodeParameter, AVResult* result);
+CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameter& encodeParameter, AVResult* result);
+CodecContextPtr createVideoEncodeContext(const AVCodec* codec, VideoEncodeParameter& encodeParameter, AVResult* result);
+
+// Audio Encode AVCodecContext
+
+
 };
 

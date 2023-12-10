@@ -10,7 +10,7 @@
 #include "Packet.hpp"
 #include "Frame.hpp"
 #include "Muxer.hpp"
-#include "EncodeParameter.hpp"
+#include "VideoEncodeParameter.hpp"
 #include "Encoder.hpp"
 
 TEST(Demuxer, Demuxer_Open) {
@@ -106,18 +106,19 @@ TEST(Encoder, Encoder_encode) {
     auto decodeAudioCodecContext = av::createAudioDecodeContext(demuxer, &result);
     ASSERT_TRUE(result.isSuccess());
 
-    av::EncodeParameter encodeParameter;
-    encodeParameter.setBitrate(500000);
-    encodeParameter.setWidth(demuxer.getWidth());
-    encodeParameter.setHeight(demuxer.getHeight());
-    encodeParameter.setTimeBase(demuxer.getTimeBase());
-    encodeParameter.setFrameRate(demuxer.getFrameRate());
-    encodeParameter.setGOPSize(10);
-    encodeParameter.setMaxBFrames(0);
-    encodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
+    av::VideoEncodeParameter videoEncodeParameter;
+    videoEncodeParameter.setBitrate(500000);
+    videoEncodeParameter.setWidth(demuxer.getWidth());
+    videoEncodeParameter.setHeight(demuxer.getHeight());
+    videoEncodeParameter.setTimeBase(demuxer.getTimeBase());
+    videoEncodeParameter.setFrameRate(demuxer.getFrameRate());
+    videoEncodeParameter.setGOPSize(10);
+    videoEncodeParameter.setMaxBFrames(0);
+    videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
+    videoEncodeParameter.setThreadCount(10);
 
     av::CodecContextPtr encodeAudioContext = nullptr;
-    av::CodecContextPtr encodeVideoContext = av::createEncodeContext(av::CODEC_ID::H264, encodeParameter, &result);
+    av::CodecContextPtr encodeVideoContext = av::createVideoEncodeContext(av::CODEC_ID::H264, videoEncodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;

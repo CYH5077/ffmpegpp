@@ -28,6 +28,18 @@
             "dependsOn":["CMake build"]
         },
         {
+            "label": "Make install",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "install",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "dependsOn": ["Make build"],
+        },
+        {
             "label": "Project build",
             "type": "shell",
             "options": {
@@ -37,7 +49,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": ["Make build"]
+            "dependsOn": ["Make install"]
         }
     ],
     "version": "2.0.0"

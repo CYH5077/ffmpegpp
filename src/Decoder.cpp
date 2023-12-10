@@ -28,12 +28,8 @@ bool Decoder::decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Packet&, F
     while (demuxer.read(&packet, result)) {
         bool decodeResult;
         if (packet.getStreamIndex() == demuxer.getVideoStreamIndex()) {
-            Rational videoTimeBase(demuxer.getRawVideoStream()->time_base);
-            frame.setTimeBase(videoTimeBase);
             decodeResult = this->decodePacket(this->videoContext, packet, &frame, result);
         } else if (packet.getStreamIndex() == demuxer.getAudioStreamIndex()) {
-            Rational audioTimeBase(demuxer.getRawAudioStream()->time_base);
-            frame.setTimeBase(audioTimeBase);
             decodeResult = this->decodePacket(this->audioContext, packet, &frame, result);
         }
         packet.unref();
@@ -70,7 +66,8 @@ bool Decoder::decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* 
             return result->avFailed(ret);
         }
 
-        this->func(av::AVMediaTypeToMediaType((int)codecContext->getRawCodecContext()->codec->type), packet, *frame);
+        MEDIA_TYPE mediaType = av::AVMediaTypeToMediaType((int)codecContext->getRawCodecContext()->codec->type);
+        this->func(mediaType, packet, *frame);
         
         frame->unref();
     }

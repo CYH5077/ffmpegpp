@@ -125,7 +125,7 @@ CodecContextPtr createDecodeContext(int codecID, AVCodecParameters* codecParamet
     return codecContext;
 }
 
-CodecContextPtr createEncodeContext(const std::string& codecName, EncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameter& encodeParameter, AVResult* result) {
     if (result == nullptr) {
         return nullptr;
     }
@@ -136,10 +136,10 @@ CodecContextPtr createEncodeContext(const std::string& codecName, EncodeParamete
         return nullptr;
     }
     
-    return createEncodeContext(codec, encodeParameter, result);
+    return createVideoEncodeContext(codec, encodeParameter, result);
 }
 
-CodecContextPtr createEncodeContext(CODEC_ID codecID, EncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameter& encodeParameter, AVResult* result) {
     if (result == nullptr) {
         return nullptr;
     }
@@ -150,10 +150,10 @@ CodecContextPtr createEncodeContext(CODEC_ID codecID, EncodeParameter& encodePar
         return nullptr;
     }
 
-    return createEncodeContext(codec, encodeParameter, result);
+    return createVideoEncodeContext(codec, encodeParameter, result);
 }
 
-CodecContextPtr createEncodeContext(const AVCodec* codec, EncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(const AVCodec* codec, VideoEncodeParameter& encodeParameter, AVResult* result) {
     CodecContextPtr codecContext;
     try {
         codecContext = std::make_shared<CodecContext>();
@@ -175,6 +175,7 @@ CodecContextPtr createEncodeContext(const AVCodec* codec, EncodeParameter& encod
     encodeCodecContext->gop_size     = encodeParameter.getGOPSize();
     encodeCodecContext->max_b_frames = encodeParameter.getMaxBFrames();
     encodeCodecContext->pix_fmt      = (AVPixelFormat)av::pixelFormatToAVPixelFormat(encodeParameter.getPixelFormat());
+    encodeCodecContext->thread_count = encodeParameter.getThreadCount();
     if (codec->id == AV_CODEC_ID_H264) {
         av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
     }

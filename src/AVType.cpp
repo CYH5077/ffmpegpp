@@ -43,6 +43,7 @@ MEDIA_TYPE AVMediaTypeToMediaType(int type) {
 
 int pixelFormatToAVPixelFormat(PIXEL_FORMAT format) {
     switch (format) {
+    case PIXEL_FORMAT::NONE:    return AV_PIX_FMT_NONE;
     case PIXEL_FORMAT::YUV420P: return AV_PIX_FMT_YUV420P;
     }
 

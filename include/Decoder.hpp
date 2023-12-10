@@ -11,20 +11,24 @@
 
 namespace av {
 
+typedef std::function<void(Packet&, Frame&)> DecoderCallbackFunc;
+
 class Decoder {
 public:
     explicit Decoder(CodecContextPtr videoContext, CodecContextPtr audioContext);
     virtual ~Decoder();
 
+public: // 이동 생성자 제거
+    Decoder(const Decoder&) = delete;
+    Decoder& operator=(const Decoder&) = delete;
+
 public:
-    bool decode(Demuxer& demuxer, std::function<void(MEDIA_TYPE, Packet&, Frame&)> func, AVResult* result);
+    bool decode(Demuxer& demuxer, DecoderCallbackFunc func, AVResult* result);
     
 private:
-    bool decodePacket(CodecContextPtr codecContext, Packet& packet, Frame* frame, AVResult* result);
+    bool decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result);
 
 private:
-    std::function<void(MEDIA_TYPE, Packet&, Frame&)> func;
-
     CodecContextPtr videoContext;
     CodecContextPtr audioContext;
 };

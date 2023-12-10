@@ -14,10 +14,10 @@ public: // getter setter
     unsigned long getBitrate();
     int getWidth();
     int getHeight();
-    const Rational& getTimeBase();
-    const Rational& getFrameRate();
     int getGOPSize();
     int getMaxBFrames();
+    const Rational& getTimeBase();
+    const Rational& getFrameRate();
     PIXEL_FORMAT getPixelFormat();
     int getThreadCount();
 
@@ -37,11 +37,12 @@ private:
     int width;
     int height;
 
+    int gopSize;
+    int maxBFrames;
+
     Rational timebase;
     Rational framerate;
 
-    int gopSize;
-    int maxBFrames;
 
     PIXEL_FORMAT pixelFormat;
 

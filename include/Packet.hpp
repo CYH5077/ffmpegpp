@@ -5,6 +5,7 @@
 
 #include "AVType.hpp"
 #include "AVResult.hpp"
+#include "Rational.hpp"
 
 
 namespace av {
@@ -22,19 +23,29 @@ public:
 public:
     void unref();
 
+    void rescalePTS(const Rational&& preTimebase, const Rational&& targetTimebase);
+
 public: // getter setter
+    bool isValidPacket();
+
     int64_t getPTS();
     int64_t getDTS();
     int     getSize();
     int     getStreamIndex();
+    MEDIA_TYPE getMediaType();
 
     void setPos(int pos);
     void setStreamIndex(int streamIndex);
+    void setMediaType(MEDIA_TYPE mediaType);
     
 public: // Raw pointer
     AVPacket* getRawPacket();
 
+    void setRawPacket(AVPacket* packet);
+    
 private:
+    MEDIA_TYPE mediaType;
+
     AVPacket* packet;
 };
 

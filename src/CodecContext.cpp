@@ -14,11 +14,6 @@ CodecContext::CodecContext() {
     this->codecContext = nullptr;
 }
 
-CodecContext::CodecContext(CodecContext&& other) {
-    this->codecContext = other.codecContext;
-    other.codecContext = nullptr;
-}
-
 CodecContext::CodecContext(AVCodecContext* codecContext) {
     this->codecContext = codecContext;
 }
@@ -39,6 +34,10 @@ Rational CodecContext::getFrameRate() {
     return Rational(framerate.num, framerate.den);
 }
 
+MEDIA_TYPE CodecContext::getMediaType() {
+    return av::AVMediaTypeToMediaType((int)this->codecContext->codec->type);
+}
+
 bool CodecContext::isVaildContext() {
     if (this->codecContext == nullptr) {
         return false;
@@ -53,18 +52,6 @@ void CodecContext::setAVCodecContext(AVCodecContext* codecContext) {
 AVCodecContext* CodecContext::getRawCodecContext() {
     return this->codecContext;
 }
-
-CodecContext& CodecContext::operator=(CodecContext&& other) {
-    if (this != &other) {
-        this->codecContext = other.codecContext;
-        other.codecContext = nullptr;
-    }
-    return *this;
-}
-
-
-
-
 
 
 

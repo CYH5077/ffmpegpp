@@ -17,7 +17,11 @@ public:
     virtual ~Muxer();
 
 public:
-    bool mux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result);
+    Muxer(const Muxer&) = delete;
+    Muxer& operator=(const Muxer&) = delete;
+
+public:
+    bool transMux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result);
 
     bool open(const std::string& fileName, AVResult* result);
     void close();
@@ -28,6 +32,8 @@ public:
     bool writeHeader(AVResult* result);
     bool writePacket(Packet& packet, AVResult* result);
     
+    Rational getTimebase();
+    
 public: // Raw pointer
     AVFormatContext* getRawFormatContext();
     AVStream* getRawStream(MEDIA_TYPE type);
@@ -35,8 +41,13 @@ public: // Raw pointer
 private:
     bool copyPacketsFrom(Demuxer& demuxer, AVResult* result);
     
+    void clear();
+
 private:
     AVFormatContext* formatContext;    
+
+    AVStream* videoStream;
+    AVStream* audioStream;
 
     std::vector<int> streamsMapper;
 };

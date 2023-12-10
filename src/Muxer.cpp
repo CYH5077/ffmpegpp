@@ -10,14 +10,14 @@ extern "C" {
 namespace av {
 
 Muxer::Muxer() {
-    this->formatContext = nullptr;
+    this->clear();
 }
 
 Muxer::~Muxer() {
     this->close();
 }
 
-bool Muxer::mux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result) {
+bool Muxer::transMux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result) {
     if (result == nullptr) {
         return false;
     }
@@ -69,7 +69,8 @@ void Muxer::close() {
         }
         avformat_free_context(this->formatContext);
     }
-    this->formatContext = nullptr;
+
+    this->clear();
 }
 
 bool Muxer::copyStreamsFrom(Demuxer& demuxer, AVResult* result) {
@@ -117,6 +118,9 @@ bool Muxer::createNewStream(CodecContextPtr codecContext, AVResult* result) {
         return result->avFailed(ret);
     }
 
+    this->videoStream = this->getRawStream(MEDIA_TYPE::VIDEO);
+    this->audioStream = this->getRawStream(MEDIA_TYPE::AUDIO);
+
     return result->success();
 }
 
@@ -139,6 +143,17 @@ bool Muxer::writePacket(Packet& packet, AVResult* result) {
         return result->avFailed(ret);
     }
     return result->success();
+}
+
+Rational Muxer::getTimebase() {
+    AVRational timebase;
+    if (this->videoStream != nullptr) {
+        timebase = this->videoStream->time_base;
+    } else if (this->audioStream != nullptr) {
+        timebase = this->audioStream->time_base;
+    }
+
+    return Rational(timebase.num, timebase.den);
 }
 
 AVFormatContext* Muxer::getRawFormatContext() {
@@ -181,4 +196,12 @@ bool Muxer::copyPacketsFrom(Demuxer& demuxer, AVResult* result) {
     return result->success();
 }
 
+void Muxer::clear() {
+    this->formatContext = nullptr;
+
+    this->videoStream = nullptr;
+    this->audioStream = nullptr;
+
+    this->streamsMapper.clear();
+}
 };

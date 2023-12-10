@@ -15,6 +15,10 @@ public:
     virtual ~Demuxer();
 
 public:
+    Demuxer(const Demuxer&) = delete;
+    Demuxer& operator=(const Demuxer&) = delete;
+
+public:
     bool open(const std::string& fileName, AVResult* result);
     void close();
 
@@ -23,7 +27,7 @@ public:
     void printDump();
 
 public: // getter setter
-    Rational getTimeBase();
+    Rational getTimebase();
     Rational getFrameRate();
     int getWidth();
     int getHeight();
@@ -58,6 +62,8 @@ private:
     int  findBestStream(MEDIA_TYPE type);
 
     bool readPacket(Packet* packet, AVResult* result);
+
+    void clear();
 
 private:
     AVFormatContext* formatContext;

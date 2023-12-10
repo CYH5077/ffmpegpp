@@ -8,7 +8,17 @@ extern "C" {
 namespace av {
 
 VideoEncodeParameter::VideoEncodeParameter() {
+    this->bitrate = 0;
 
+    this->width  = 0;
+    this->height = 0;
+
+    this->gopSize = 0;
+    this->maxBFrames = 0;
+
+    this->pixelFormat = PIXEL_FORMAT::NONE;
+
+    this->threadCount = 1;
 }
 
 VideoEncodeParameter::~VideoEncodeParameter() {

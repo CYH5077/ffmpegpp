@@ -13,7 +13,6 @@ namespace av {
 class CodecContext {
 public:
     explicit CodecContext();
-    explicit CodecContext(CodecContext&& other);
     explicit CodecContext(AVCodecContext* codecContext);
     virtual ~CodecContext();
 
@@ -22,24 +21,22 @@ public:
     CodecContext& operator=(const CodecContext&) = delete;
 
 public: // getter setter
-    Rational getTimeBase();
-    Rational getFrameRate();
+    Rational   getTimeBase();
+    Rational   getFrameRate();
+    MEDIA_TYPE getMediaType();
 
-    bool isVaildContext();
-    
     void setAVCodecContext(AVCodecContext* codecContext);
-
+    
+    bool isVaildContext();
     
 public: // Raw pointer
     AVCodecContext* getRawCodecContext();
-
-public: // operator
-    CodecContext& operator=(CodecContext&& other);
 
 private:
     AVCodecContext* codecContext;
 };
 typedef std::shared_ptr<CodecContext> CodecContextPtr;
+
 
 // Decode AVCodecContext
 CodecContextPtr createVideoDecodeContext(Demuxer& demuxer, AVResult* result);

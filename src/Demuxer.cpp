@@ -7,10 +7,7 @@ extern "C" {
 namespace av {
 
 Demuxer::Demuxer() {
-    this->formatContext = nullptr;
-
-    this->videoCodecParameter = nullptr;
-    this->audioCodecParameter = nullptr;
+    this->clear();
 }
 
 Demuxer::~Demuxer() {
@@ -39,14 +36,14 @@ void Demuxer::close() {
     if (this->formatContext != nullptr) {
         avformat_close_input(&this->formatContext);
     }
-    this->formatContext = nullptr;
+    this->clear();
 }
 
 bool Demuxer::read(Packet* packet, AVResult* result) {
     if (packet == nullptr ||
         result == nullptr) {
-            return false;
-        }
+        return false;
+    }
 
     return this->readPacket(packet, result);
 }
@@ -59,8 +56,14 @@ void Demuxer::printDump() {
     av_dump_format(this->formatContext, 0, nullptr, 0);
 }
 
-Rational Demuxer::getTimeBase() {
-    AVRational timebase = this->videoStream->time_base;
+Rational Demuxer::getTimebase() {
+    AVRational timebase;
+    if (this->videoStream != nullptr) {
+        timebase = this->videoStream->time_base;
+    } else if (this->audioStream != nullptr) {
+        timebase = this->audioStream->time_base;
+    }
+
     return Rational(timebase.num, timebase.den);
 }
 
@@ -195,4 +198,16 @@ bool Demuxer::readPacket(Packet* packet, AVResult* result) {
     return result->success();
 }
 
+void Demuxer::clear() {
+    this->formatContext = nullptr;
+
+    this->videoStreamIndex = -1;
+    this->audioStreamIndex = -1;
+
+    this->videoStream = nullptr;
+    this->audioStream = nullptr;
+
+    this->videoCodecParameter = nullptr;
+    this->audioCodecParameter = nullptr;
+}
 };

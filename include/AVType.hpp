@@ -34,6 +34,7 @@ int mediaTypeToAVMediaType(MEDIA_TYPE type);
 MEDIA_TYPE AVMediaTypeToMediaType(int type);
 
 enum class PIXEL_FORMAT {
+    NONE,
     YUV420P
 };
 int pixelFormatToAVPixelFormat(PIXEL_FORMAT format);

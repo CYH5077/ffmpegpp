@@ -25,6 +25,7 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY ${HEADER_DIR} 
         DESTINATION ${INSTALL_DIR} 
         FILES_MATCHING PATTERN "*.hpp")
+        
 if (WIN32)
         set(FFMPEG_DLL_DIR ${CMAKE_SOURCE_DIR}/thirdparty/windows/ffmpeg/bin)
         install(DIRECTORY ${FFMPEG_DLL_DIR} 

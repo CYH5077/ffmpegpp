@@ -68,7 +68,8 @@
         "forward_list": "cpp",
         "fstream": "cpp",
         "span": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "xlocale": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

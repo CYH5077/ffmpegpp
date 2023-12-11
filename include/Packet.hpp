@@ -23,7 +23,7 @@ public:
 public:
     void unref();
 
-    void rescalePTS(const Rational&& preTimebase, const Rational&& targetTimebase);
+    void rescaleTS(const Rational&& preTimebase, const Rational&& targetTimebase);
 
 public: // getter setter
     bool isValidPacket();
@@ -33,7 +33,10 @@ public: // getter setter
     int     getSize();
     int     getStreamIndex();
     MEDIA_TYPE getMediaType();
+    double  getPTSTimeToSecond(const Rational&& timebase);
 
+    void setPTS(int64_t pts);
+    void setDTS(int64_t dts);
     void setPos(int pos);
     void setStreamIndex(int streamIndex);
     void setMediaType(MEDIA_TYPE mediaType);

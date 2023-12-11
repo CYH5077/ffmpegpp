@@ -1,5 +1,7 @@
 set(SOURCES main.cpp
-            video.cpp)
+            transmuxing.cpp
+            transcode.cpp
+            split_video.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 #enable_testing() # build/test 폴더 생성됨

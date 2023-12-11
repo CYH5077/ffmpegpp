@@ -4,7 +4,7 @@
 #include "AVResult.hpp"
 #include "Packet.hpp"
 #include "Rational.hpp"
-
+#include "Stream.hpp"
 
 namespace av {
 
@@ -27,8 +27,9 @@ public:
     void printDump();
 
 public: // getter setter
-    Rational getTimebase();
-    Rational getFrameRate();
+    const Stream& getVideoStream();
+    const Stream& getAudioStream();
+    
     int getWidth();
     int getHeight();
 
@@ -40,8 +41,8 @@ public: // getter setter
     
     unsigned int getStreamCount();
 
-    bool isVideoCodecParameters();
-    bool isAudioCodecParameters();
+    bool isValidVideoCodecParameters();
+    bool isValidAudioCodecParameters();
     
     
 public: // Raw Pointer
@@ -71,8 +72,8 @@ private:
     int videoStreamIndex;
     int audioStreamIndex;
 
-    AVStream* videoStream;
-    AVStream* audioStream;
+    Stream videoStream;
+    Stream audioStream;
     
     AVCodecParameters* videoCodecParameter;
     AVCodecParameters* audioCodecParameter;

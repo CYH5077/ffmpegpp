@@ -56,20 +56,12 @@ void Demuxer::printDump() {
     av_dump_format(this->formatContext, 0, nullptr, 0);
 }
 
-Rational Demuxer::getTimebase() {
-    AVRational timebase;
-    if (this->videoStream != nullptr) {
-        timebase = this->videoStream->time_base;
-    } else if (this->audioStream != nullptr) {
-        timebase = this->audioStream->time_base;
-    }
-
-    return Rational(timebase.num, timebase.den);
+const Stream& Demuxer::getVideoStream() {
+    return this->videoStream;
 }
 
-Rational Demuxer::getFrameRate() {
-    AVRational framerate = this->videoStream->avg_frame_rate;
-    return Rational(framerate.num, framerate.den);
+const Stream& Demuxer::getAudioStream() {
+    return this->audioStream;
 }
 
 int Demuxer::getWidth() {
@@ -106,14 +98,14 @@ unsigned int Demuxer::getStreamCount() {
     return this->formatContext->nb_streams;
 }
 
-bool Demuxer::isVideoCodecParameters() {
+bool Demuxer::isValidVideoCodecParameters() {
     if (this->videoCodecParameter == nullptr) {
         return false;
     }
     return true;
 }
 
-bool Demuxer::isAudioCodecParameters() {
+bool Demuxer::isValidAudioCodecParameters() {
     if (this->audioCodecParameter == nullptr) {
         return false;
     }
@@ -134,14 +126,6 @@ AVCodecParameters* Demuxer::getRawAudioCodecParameters() {
 
 AVStream* Demuxer::getRawStream(int index) {
     return this->formatContext->streams[index];
-}
-
-AVStream* Demuxer::getRawVideoStream() {
-    return this->formatContext->streams[this->videoStreamIndex];
-}
-
-AVStream* Demuxer::getRawAudioStream() {
-    return this->formatContext->streams[this->audioStreamIndex];
 }
 
 bool Demuxer::createFormatContext(AVResult* result) {
@@ -176,13 +160,13 @@ void Demuxer::findCodecParameters() {
     this->audioStreamIndex = this->findBestStream(MEDIA_TYPE::AUDIO);
 
     if (this->videoStreamIndex >= 0) {
-        this->videoStream = this->formatContext->streams[this->videoStreamIndex];
-        this->videoCodecParameter = this->videoStream->codecpar;
+        this->videoStream = Stream(this->formatContext->streams[this->videoStreamIndex]);
+        this->videoCodecParameter = this->videoStream.getRawCodecParameters();
     }
 
     if (this->audioStreamIndex >= 0) {
-        this->audioStream = this->formatContext->streams[this->audioStreamIndex];
-        this->audioCodecParameter = this->audioStream->codecpar;
+        this->audioStream = Stream(this->formatContext->streams[this->audioStreamIndex]);
+        this->audioCodecParameter = this->audioStream.getRawCodecParameters();
     }
 }
 
@@ -195,6 +179,13 @@ bool Demuxer::readPacket(Packet* packet, AVResult* result) {
     if (avResult < 0) {
         return result->failed(avResult, "File EOF");
     }
+
+    if (packet->getStreamIndex() == this->getVideoStreamIndex()) {
+        packet->setMediaType(MEDIA_TYPE::VIDEO);
+    } else if (packet->getStreamIndex() == this->getAudioStreamIndex()) {
+        packet->setMediaType(MEDIA_TYPE::AUDIO);
+    } 
+
     return result->success();
 }
 
@@ -204,10 +195,8 @@ void Demuxer::clear() {
     this->videoStreamIndex = -1;
     this->audioStreamIndex = -1;
 
-    this->videoStream = nullptr;
-    this->audioStream = nullptr;
-
     this->videoCodecParameter = nullptr;
     this->audioCodecParameter = nullptr;
 }
+
 };

@@ -64,6 +64,8 @@ bool Encoder::encodeFrame(AVCodecContext* avCodecContext, AVFrame* avFrame, AVRe
             break;
         }
         
+        MEDIA_TYPE mediaType = av::AVMediaTypeToMediaType(avCodecContext->codec->type);
+        packet.setMediaType(mediaType);
         this->func(packet);
 
         packet.unref();

@@ -8,7 +8,8 @@ set (SOURCES AVResult.cpp
              VideoEncodeParameter.cpp
              Rational.cpp
              AVType.cpp
-             Encoder.cpp)
+             Encoder.cpp
+             Stream.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

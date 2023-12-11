@@ -30,7 +30,7 @@ void Packet::unref() {
     av_packet_unref(this->packet);
 }
 
-void Packet::rescalePTS(const Rational&& preTimebase, const Rational&& targetTimebase) {
+void Packet::rescaleTS(const Rational&& preTimebase, const Rational&& targetTimebase) {
     AVRational avPreTimebase    { preTimebase.getNum()   , preTimebase.getDen() };
     AVRational avTargetTimebase { targetTimebase.getNum(), targetTimebase.getDen() };
 
@@ -62,6 +62,20 @@ int Packet::getStreamIndex() {
 
 MEDIA_TYPE Packet::getMediaType() {
     return this->mediaType;
+}
+
+double Packet::getPTSTimeToSecond(const Rational&& timebase) {
+    AVRational avTimebase {timebase.getNum(), timebase.getDen()};
+    double ptsTime = this->getPTS() * av_q2d(avTimebase);
+    return ptsTime;
+}
+
+void Packet::setPTS(int64_t pts) {
+    this->packet->pts = pts;
+}
+
+void Packet::setDTS(int64_t dts) {
+    this->packet->dts = dts;
 }
 
 void Packet::setPos(int pos) {

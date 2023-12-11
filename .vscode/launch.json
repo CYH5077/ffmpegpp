@@ -4,10 +4,10 @@
             "name": "C/C++: g++ 활성 파일 빌드 및 디버그",
             "type": "cppdbg",
             "request": "launch",
-            "program": "D:\\Project\\ffmpegpp\\build\\bin\\ffmpegpp_test.exe",
+            "program": "${workspaceFolder}/build/bin/ffmpegpp_test.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "D:\\Project\\ffmpegpp\\build\\bin",
+            "cwd": "${workspaceFolder}/build/bin",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -24,7 +24,7 @@
                 }
             ],
             "preLaunchTask": "Project build",
-            "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"
+            //"miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"
         }
     ],
     "version": "2.0.0"

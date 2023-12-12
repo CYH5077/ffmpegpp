@@ -24,6 +24,10 @@ CodecContext::~CodecContext() {
     }
 }
 
+int64_t CodecContext::getBitrate() {
+    return this->codecContext->bit_rate;
+}
+
 Rational CodecContext::getTimeBase() {
     AVRational timebase = this->codecContext->time_base;
     return Rational(timebase.num, timebase.den);
@@ -112,7 +116,7 @@ CodecContextPtr createDecodeContext(int codecID, AVCodecParameters* codecParamet
     return codecContext;
 }
 
-CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameters& encodeParameter, AVResult* result) {
     if (result == nullptr) {
         return nullptr;
     }
@@ -126,7 +130,7 @@ CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEnco
     return createVideoEncodeContext(codec, encodeParameter, result);
 }
 
-CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result) {
     if (result == nullptr) {
         return nullptr;
     }
@@ -140,7 +144,7 @@ CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameter&
     return createVideoEncodeContext(codec, encodeParameter, result);
 }
 
-CodecContextPtr createVideoEncodeContext(const AVCodec* codec, VideoEncodeParameter& encodeParameter, AVResult* result) {
+CodecContextPtr createVideoEncodeContext(const AVCodec* codec, VideoEncodeParameters& encodeParameter, AVResult* result) {
     CodecContextPtr codecContext;
     try {
         codecContext = std::make_shared<CodecContext>();

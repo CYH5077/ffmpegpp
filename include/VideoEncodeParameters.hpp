@@ -5,10 +5,10 @@
 
 namespace av {
 
-class VideoEncodeParameter {
+class VideoEncodeParameters {
 public:
-    explicit VideoEncodeParameter();
-    virtual ~VideoEncodeParameter();
+    explicit VideoEncodeParameters();
+    virtual ~VideoEncodeParameters();
 
 public: // getter setter
     unsigned long getBitrate();
@@ -21,7 +21,7 @@ public: // getter setter
     PIXEL_FORMAT getPixelFormat();
     int getThreadCount();
 
-    void setBitrate(unsigned long bitrate);
+    void setBitrate(long long bitrate);
     void setWidth(int width);
     void setHeight(int height);
     void setTimeBase(const Rational&& timebase);
@@ -32,7 +32,7 @@ public: // getter setter
     void setThreadCount(int threadCount);
 
 private:
-    unsigned long bitrate;
+    long long bitrate;
 
     int width;
     int height;

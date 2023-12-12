@@ -9,6 +9,7 @@ namespace av {
 int codecIDToAVCodecID(CODEC_ID codecID) {
     switch (codecID) {
     case CODEC_ID::H264: return AV_CODEC_ID_H264;
+    case CODEC_ID::H265: return AV_CODEC_ID_H265;
     case CODEC_ID::AAC : return AV_CODEC_ID_AAC;
     }
     return AV_CODEC_ID_NONE;
@@ -50,4 +51,13 @@ int pixelFormatToAVPixelFormat(PIXEL_FORMAT format) {
     return AV_PIX_FMT_NONE;
 }
 
+int sampleFormatToAVSampleFormat(SAMPLE_FORMAT format) {
+    switch (format) {
+    case SAMPLE_FORMAT::NONE: return AV_SAMPLE_FMT_NONE;
+    case SAMPLE_FORMAT::S16:  return AV_SAMPLE_FMT_S16;
+    case SAMPLE_FORMAT::S16P: return AV_SAMPLE_FMT_S16P;  
+    }
+
+    return AV_SAMPLE_FMT_NONE;
+}
 };

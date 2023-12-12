@@ -15,6 +15,7 @@ namespace av {
 
 enum class CODEC_ID {
     H264,
+    H265,
     
     AAC,
 };
@@ -33,10 +34,19 @@ enum class MEDIA_TYPE {
 int mediaTypeToAVMediaType(MEDIA_TYPE type);
 MEDIA_TYPE AVMediaTypeToMediaType(int type);
 
+
 enum class PIXEL_FORMAT {
     NONE,
     YUV420P
 };
 int pixelFormatToAVPixelFormat(PIXEL_FORMAT format);
+
+
+enum class SAMPLE_FORMAT {
+    NONE,
+    S16,
+    S16P,
+}
+int sampleFormatToAVSampleFormat(SAMPLE_FORMAT format);
 
 };

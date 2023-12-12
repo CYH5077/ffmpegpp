@@ -5,7 +5,7 @@ set (SOURCES AVResult.cpp
              Decoder.cpp
              Frame.cpp
              Muxer.cpp
-             VideoEncodeParameter.cpp
+             VideoEncodeParameters.cpp
              Rational.cpp
              AVType.cpp
              Encoder.cpp

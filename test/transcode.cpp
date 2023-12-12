@@ -22,8 +22,8 @@ TEST(TRANS_CODE, TRANS_CODE) {
 
 
     const av::Stream& demuxerVideoStream = demuxer.getVideoStream();
-    av::VideoEncodeParameter videoEncodeParameter;
-    videoEncodeParameter.setBitrate(500000);
+    av::VideoEncodeParameters videoEncodeParameter;
+    videoEncodeParameter.setBitrate(decodeVideoCodecContext->getBitrate() * 2);
     videoEncodeParameter.setWidth(demuxer.getWidth());
     videoEncodeParameter.setHeight(demuxer.getHeight());
     videoEncodeParameter.setTimeBase(demuxerVideoStream.getTimebase());
@@ -34,7 +34,7 @@ TEST(TRANS_CODE, TRANS_CODE) {
     videoEncodeParameter.setThreadCount(10);
 
     av::CodecContextPtr encodeAudioCodecContext = nullptr;
-    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H264, videoEncodeParameter, &result);
+    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H265, videoEncodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;
@@ -42,7 +42,7 @@ TEST(TRANS_CODE, TRANS_CODE) {
     ASSERT_TRUE(result.isSuccess());
     muxer.createNewStream(encodeVideoCodecContext, &result);
     ASSERT_TRUE(result.isSuccess());
-    // 디코딩된 패킷을 그냥 쓰기때문에 디코딩시 사용된 AVCodecContext를 그냥 사용해서 작성
+    // 인코딩된 패킷을 그냥 쓰기때문에 디코딩시 사용된 AVCodecContext를 그냥 사용해서 작성
     muxer.createNewStream(decodeAudioCodecContext, &result); 
     ASSERT_TRUE(result.isSuccess());
     muxer.writeHeader(&result);

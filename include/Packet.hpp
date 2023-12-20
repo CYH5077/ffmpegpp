@@ -9,48 +9,45 @@
 
 
 namespace av {
+    class Packet {
+    public:
+        explicit Packet();
+        explicit Packet(AVPacket* packet, MEDIA_TYPE mediaType);
+        virtual ~Packet();
 
-class Packet {
-public:
-    explicit Packet();
-    explicit Packet(AVPacket* packet);
-    virtual ~Packet();
+    public:
+        Packet(const Packet&) = delete;
+        Packet& operator=(const Packet&) = delete;
 
-public:
-    Packet(const Packet&) = delete;
-    Packet& operator=(const Packet&) = delete;
+    public:
+        void unref();
 
-public:
-    void unref();
+        void rescaleTS(const Rational& preTimebase, const Rational& targetTimebase);
 
-    void rescaleTS(const Rational&& preTimebase, const Rational&& targetTimebase);
+    public: // getter setter
+        bool isValidPacket();
 
-public: // getter setter
-    bool isValidPacket();
+        int64_t getPTS();
+        int64_t getDTS();
+        int     getSize();
+        int     getStreamIndex();
+        MEDIA_TYPE getMediaType();
+        double  getPTSTimeToSecond(const Rational&& timebase);
 
-    int64_t getPTS();
-    int64_t getDTS();
-    int     getSize();
-    int     getStreamIndex();
-    MEDIA_TYPE getMediaType();
-    double  getPTSTimeToSecond(const Rational&& timebase);
+        void setPTS(int64_t pts);
+        void setDTS(int64_t dts);
+        void setPos(int pos);
+        void setStreamIndex(int streamIndex);
+        void setMediaType(MEDIA_TYPE mediaType);
 
-    void setPTS(int64_t pts);
-    void setDTS(int64_t dts);
-    void setPos(int pos);
-    void setStreamIndex(int streamIndex);
-    void setMediaType(MEDIA_TYPE mediaType);
-    
-public: // Raw pointer
-    AVPacket* getRawPacket();
+    public: // Raw pointer
+        AVPacket* getRawPacket();
 
-    void setRawPacket(AVPacket* packet);
-    
-private:
-    MEDIA_TYPE mediaType;
+        void setRawPacket(AVPacket* packet);
 
-    AVPacket* packet;
-};
+    private:
+        MEDIA_TYPE mediaType;
 
-
+        AVPacket* packet;
+    };
 };

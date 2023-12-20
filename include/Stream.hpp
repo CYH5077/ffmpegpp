@@ -4,28 +4,28 @@
 #include "Rational.hpp"
 
 namespace av {
+    class Stream {
+    public:
+        explicit Stream();
+        explicit Stream(AVStream* stream);
+        virtual ~Stream();
 
-class Stream {
-public:
-    explicit Stream();
-    explicit Stream(AVStream* stream);
-    virtual ~Stream();
+    public: // getter setter
+        bool isValidStream() const;
 
-public: // getter setter
-    bool isValidStream() const;
-    
-    Rational getTimebase() const;
-    Rational getFramerate() const;
+        const Rational& getTimebase() const;
+        const Rational& getFramerate() const;
 
-public: // Raw pointer
-    AVStream* getRawStream();
-    AVCodecParameters* getRawCodecParameters();
-    
-    void setRawStream(AVStream* stream);
+    public: // Raw pointer
+        AVStream* getRawStream();
+        AVCodecParameters* getRawCodecParameters();
 
-private:
-    AVStream* stream;
-};
+        void setRawStream(AVStream* stream);
 
+    private:
+        AVStream* stream;
 
+        Rational timebase;
+        Rational framerate;
+    };
 };

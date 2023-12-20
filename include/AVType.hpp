@@ -18,6 +18,7 @@ enum class CODEC_ID {
     H265,
     
     AAC,
+    AC3,
 };
 int codecIDToAVCodecID(CODEC_ID codecID);
 
@@ -46,7 +47,8 @@ enum class SAMPLE_FORMAT {
     NONE,
     S16,
     S16P,
-}
+    FLTP,
+};
 int sampleFormatToAVSampleFormat(SAMPLE_FORMAT format);
 
 };

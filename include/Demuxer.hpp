@@ -5,79 +5,62 @@
 #include "Packet.hpp"
 #include "Rational.hpp"
 #include "Stream.hpp"
+#include "CodecParameters.hpp"
 
 namespace av {
+    class Demuxer {
+    public:
+        explicit Demuxer();
+        virtual ~Demuxer();
 
+    public:
+        Demuxer(const Demuxer&) = delete;
+        Demuxer& operator=(const Demuxer&) = delete;
 
-class Demuxer {
-public:
-    explicit Demuxer();
-    virtual ~Demuxer();
+    public:
+        bool open(const std::string& fileName, AVResult* result);
+        void close();
 
-public:
-    Demuxer(const Demuxer&) = delete;
-    Demuxer& operator=(const Demuxer&) = delete;
+        bool read(Packet* packet, AVResult* result);
 
-public:
-    bool open(const std::string& fileName, AVResult* result);
-    void close();
+    public: // getter setter
+        const Stream& getVideoStream();
+        const Stream& getAudioStream();
 
-    bool read(Packet* packet, AVResult* result);
+        const CodecParameters& getVideoCodecParameters();
+        const CodecParameters& getAudioCodecParameters();
 
-    void printDump();
+        int getVideoStreamIndex();
+        int getAudioStreamIndex();
 
-public: // getter setter
-    const Stream& getVideoStream();
-    const Stream& getAudioStream();
-    
-    int getWidth();
-    int getHeight();
+        unsigned int getStreamCount();
 
-    int getVideoAVCodecID();
-    int getAudioAVCodecID();
+    public: // Raw Pointer
+        AVFormatContext* getRawFormatContext();
 
-    int getVideoStreamIndex();
-    int getAudioStreamIndex();
-    
-    unsigned int getStreamCount();
+        AVStream* getRawStream(int index);
 
-    bool isValidVideoCodecParameters();
-    bool isValidAudioCodecParameters();
-    
-    
-public: // Raw Pointer
-    AVFormatContext* getRawFormatContext();
+    private:
+        bool createFormatContext(AVResult* result);
+        bool openFormatContext(const std::string& fileName, AVResult* result);
 
-    AVCodecParameters* getRawVideoCodecParameters();
-    AVCodecParameters* getRawAudioCodecParameters();
+        void findCodecParameters();
+        int  findBestStream(MEDIA_TYPE type);
 
-    AVStream* getRawStream(int index);
-    AVStream* getRawVideoStream();
-    AVStream* getRawAudioStream();
+        bool readPacket(Packet* packet, AVResult* result);
 
-private:
-    bool createFormatContext(AVResult* result);
-    bool openFormatContext(const std::string& fileName, AVResult* result);
-    
-    void findCodecParameters();
-    int  findBestStream(MEDIA_TYPE type);
+        void clear();
 
-    bool readPacket(Packet* packet, AVResult* result);
+    private:
+        AVFormatContext* formatContext;
 
-    void clear();
+        int videoStreamIndex;
+        int audioStreamIndex;
 
-private:
-    AVFormatContext* formatContext;
+        Stream videoStream;
+        Stream audioStream;
 
-    int videoStreamIndex;
-    int audioStreamIndex;
-
-    Stream videoStream;
-    Stream audioStream;
-    
-    AVCodecParameters* videoCodecParameter;
-    AVCodecParameters* audioCodecParameter;
-};
-
-
+        CodecParameters videoCodecParameter;
+        CodecParameters audioCodecParameter;
+    };
 };

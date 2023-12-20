@@ -4,33 +4,31 @@
 #include "Rational.hpp"
 
 namespace av {
+    class Frame {
+    public:
+        explicit Frame();
+        explicit Frame(AVFrame* frame);
+        virtual ~Frame();
 
-class Frame {
-public:
-    explicit Frame();
-    explicit Frame(AVFrame* frame);
-    virtual ~Frame();
+    public:
+        Frame(const Frame&) = delete;
+        Frame& operator=(const Frame&) = delete;
 
-public:
-    Frame(const Frame&) = delete;
-    Frame& operator=(const Frame&) = delete;
+    public:
+        void unref();
 
-public:
-    void unref();
-    
-public: // getter setter
-    Rational getTimeBase();
+    public: // getter setter
+        Rational getTimeBase();
 
-    void setTimeBase(Rational& timebase);
+        void setTimeBase(Rational& timebase);
 
-public: // Raw pointer
-    AVFrame*  getRawFrame();
+    public: // Raw pointer
+        AVFrame*  getRawFrame();
 
-private:
-    AVFrame* frame;
+    private:
+        AVFrame* frame;
 
-    // Decoder 에서 저장됨
-    Rational timebase;
-};
-
+        // Decoder 에서 저장됨
+        Rational timebase;
+    };
 };

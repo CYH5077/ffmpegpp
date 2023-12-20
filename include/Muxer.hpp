@@ -8,48 +8,49 @@
 #include "Demuxer.hpp"
 #include "CodecContext.hpp"
 #include "Packet.hpp"
+#include "Stream.hpp"
 
 namespace av {
+    class Muxer {
+    public:
+        explicit Muxer();
+        virtual ~Muxer();
 
-class Muxer {
-public:
-    explicit Muxer();
-    virtual ~Muxer();
+    public:
+        Muxer(const Muxer&) = delete;
+        Muxer& operator=(const Muxer&) = delete;
 
-public:
-    Muxer(const Muxer&) = delete;
-    Muxer& operator=(const Muxer&) = delete;
+    public:
+        bool transMux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result);
 
-public:
-    bool transMux(Demuxer& demuxer, const std::string& saveFileName, AVResult* result);
+        bool open(const std::string& fileName, AVResult* result);
+        void close();
 
-    bool open(const std::string& fileName, AVResult* result);
-    void close();
+        bool copyStreamsFrom(Demuxer& demuxer, AVResult* result);
+        bool createNewStream(CodecContextPtr codecContext, AVResult* result);
 
-    bool copyStreamsFrom(Demuxer& demuxer, AVResult* result);
-    bool createNewStream(CodecContextPtr codecContext, AVResult* result);
-    
-    bool writeHeader(AVResult* result);
-    bool writePacket(Packet& packet, AVResult* result);
-    
-    Rational getTimebase();
-    
-public: // Raw pointer
-    AVFormatContext* getRawFormatContext();
-    AVStream* getRawStream(MEDIA_TYPE type);
-    
-private:
-    bool copyPacketsFrom(Demuxer& demuxer, AVResult* result);
-    
-    void clear();
+        bool writeHeader(AVResult* result);
+        bool writePacket(Packet& packet, AVResult* result);
 
-private:
-    AVFormatContext* formatContext;    
+    public: // getter setter
+        const Stream& getVideoStream();
+        const Stream& getAudioStream();
 
-    AVStream* videoStream;
-    AVStream* audioStream;
+    public: // Raw pointer
+        AVFormatContext* getRawFormatContext();
+        AVStream* getRawStream(MEDIA_TYPE type);
 
-    std::vector<int> streamsMapper;
-};
+    private:
+        bool copyPacketsFrom(Demuxer& demuxer, AVResult* result);
 
+        void clear();
+
+    private:
+        AVFormatContext* formatContext;
+
+        Stream videoStream;
+        Stream audioStream;
+
+        std::vector<int> streamsMapper;
+    };
 };

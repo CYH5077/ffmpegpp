@@ -1,57 +1,56 @@
 #include "Stream.hpp"
 
 extern "C" {
-    #include "libavformat/avformat.h"
+#include "libavformat/avformat.h"
 }
 
 namespace av {
 
-Stream::Stream() {
-    this->stream = nullptr;
-}
-
-Stream::Stream(AVStream* stream) {
-    this->stream = stream;
-}
-
-Stream::~Stream() {
-
-}
-
-bool Stream::isValidStream() const {
-    if (this->stream == nullptr) {
-        return false;
+    Stream::Stream() {
+        this->stream = nullptr;
     }
-    return true;
-}
 
-// RVO
-Rational Stream::getTimebase() const {
-    if (this->isValidStream() == false) {
-        return Rational();
-    }    
-    AVRational timebase = this->stream->time_base;
-    return Rational(timebase);
-}
-
-Rational Stream::getFramerate() const {
-    if (this->isValidStream() == false) {
-        return Rational();
+    Stream::Stream(AVStream* stream) {
+        this->setRawStream(stream);
     }
-    AVRational framerate = this->stream->avg_frame_rate;
-    return Rational(framerate);
-}
 
-AVStream* Stream::getRawStream() {
-    return this->stream;
-}
+    Stream::~Stream() {
 
-AVCodecParameters* Stream::getRawCodecParameters() {
-    return this->stream->codecpar;
-}
+    }
 
-void Stream::setRawStream(AVStream* stream) {
-    this->stream = stream;
-}
+    bool Stream::isValidStream() const {
+        if (this->stream == nullptr) {
+            return false;
+        }
+        return true;
+    }
+
+    // RVO
+   const Rational& Stream::getTimebase() const {
+        return this->timebase;
+    }
+
+   const Rational& Stream::getFramerate() const {
+        return this->framerate;
+    }
+
+    AVStream* Stream::getRawStream() {
+        return this->stream;
+    }
+
+    AVCodecParameters* Stream::getRawCodecParameters() {
+        return this->stream->codecpar;
+    }
+
+    void Stream::setRawStream(AVStream* avStream) {
+        if (avStream == nullptr) {
+            return;
+        }
+
+        this->stream = avStream;
+
+        this->timebase  = Rational(this->stream->time_base);
+        this->framerate = Rational(this->stream->avg_frame_rate);
+    }
 
 };

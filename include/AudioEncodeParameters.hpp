@@ -4,12 +4,25 @@
 #include "Rational.hpp"
 
 namespace av {
-public:
-    explicit AudioEncodeParameters();
-    virtual ~AudioEncodeParameters();
+    class AudioEncodeParameters {
+    public:
+        explicit AudioEncodeParameters();
+        virtual ~AudioEncodeParameters();
 
-public: // getter setter
+    public:
+        long long       getBitrate();
+        SAMPLE_FORMAT   getSampleFormat();
+        const Rational& getTimebase();
 
-private:
+        void setBitrate(long long bitrate);
+        void setSampleFormat(SAMPLE_FORMAT sampleFormat);
+        void setTimebase(const Rational& timebase);
 
+    private:
+        long long bitrate;
+
+        SAMPLE_FORMAT sampleFormat;
+
+        Rational timebase;
+    };
 };

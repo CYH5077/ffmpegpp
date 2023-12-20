@@ -6,10 +6,13 @@ set (SOURCES AVResult.cpp
              Frame.cpp
              Muxer.cpp
              VideoEncodeParameters.cpp
+             AudioEncodeParameters.cpp
              Rational.cpp
              AVType.cpp
              Encoder.cpp
-             Stream.cpp)
+             Stream.cpp
+             CodecParameters.cpp
+)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 

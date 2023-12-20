@@ -21,20 +21,30 @@ TEST(TRANS_CODE, TRANS_CODE) {
     ASSERT_TRUE(result.isSuccess());
 
 
+    const av::CodecParameters demuxerVideoCodecParameters = demuxer.getVideoCodecParameters();
     const av::Stream& demuxerVideoStream = demuxer.getVideoStream();
     av::VideoEncodeParameters videoEncodeParameter;
-    videoEncodeParameter.setBitrate(decodeVideoCodecContext->getBitrate() * 2);
-    videoEncodeParameter.setWidth(demuxer.getWidth());
-    videoEncodeParameter.setHeight(demuxer.getHeight());
+    videoEncodeParameter.setBitrate(demuxerVideoCodecParameters.getBitrate());
+    videoEncodeParameter.setWidth(demuxerVideoCodecParameters.getWidth());
+    videoEncodeParameter.setHeight(demuxerVideoCodecParameters.getHeight());
     videoEncodeParameter.setTimeBase(demuxerVideoStream.getTimebase());
     videoEncodeParameter.setFrameRate(demuxerVideoStream.getFramerate());
-    videoEncodeParameter.setGOPSize(10);
+    videoEncodeParameter.setGOPSize(150);
     videoEncodeParameter.setMaxBFrames(0);
     videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
     videoEncodeParameter.setThreadCount(10);
 
-    av::CodecContextPtr encodeAudioCodecContext = nullptr;
-    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H265, videoEncodeParameter, &result);
+    const av::CodecParameters demuxerAudioCodecParameters = demuxer.getAudioCodecParameters();
+    const av::Stream& demuxerAudioStream = demuxer.getAudioStream();
+    av::AudioEncodeParameters audioEncodeParameter;
+    audioEncodeParameter.setBitrate(demuxerAudioCodecParameters.getBitrate());
+    audioEncodeParameter.setTimebase(demuxerAudioStream.getTimebase());
+    audioEncodeParameter.setSampleFormat(av::SAMPLE_FORMAT::FLTP);
+
+    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H264, videoEncodeParameter, &result);
+    ASSERT_TRUE(result.isSuccess());
+    av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::CODEC_ID::AAC, audioEncodeParameter, &result);
+    //av::CodecContextPtr  encodeAudioCodecContext = nullptr;
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;
@@ -42,29 +52,32 @@ TEST(TRANS_CODE, TRANS_CODE) {
     ASSERT_TRUE(result.isSuccess());
     muxer.createNewStream(encodeVideoCodecContext, &result);
     ASSERT_TRUE(result.isSuccess());
-    // 인코딩된 패킷을 그냥 쓰기때문에 디코딩시 사용된 AVCodecContext를 그냥 사용해서 작성
-    muxer.createNewStream(decodeAudioCodecContext, &result); 
+    muxer.createNewStream(encodeAudioCodecContext, &result);
     ASSERT_TRUE(result.isSuccess());
     muxer.writeHeader(&result);
     ASSERT_TRUE(result.isSuccess());
 
+    const av::Stream& encodeVideoStream = muxer.getVideoStream();
+    const av::Stream& encodeAudioStream = muxer.getAudioStream();
 
     av::Encoder encoder(encodeVideoCodecContext, encodeAudioCodecContext);
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
     decoder.decode(demuxer, [&](av::Packet& packet, av::Frame& decodeFrame) {
-        if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO) {
-            encoder.encode(packet.getMediaType(), decodeFrame, [&](av::Packet& encodePacket){
-                encodePacket.rescaleTS(demuxerVideoStream.getTimebase(), muxer.getTimebase());
+        if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO || packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
+            encoder.encode(packet.getMediaType(), decodeFrame, [&](av::Packet &encodePacket) {
+                if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO) {
+                    encodePacket.rescaleTS(demuxerVideoStream.getTimebase(), encodeVideoStream.getTimebase());
+                    encodePacket.setStreamIndex(demuxer.getVideoStreamIndex());
+                } else if (packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
+                    encodePacket.rescaleTS(demuxerAudioStream.getTimebase(), encodeAudioStream.getTimebase());
+                    encodePacket.setStreamIndex(demuxer.getAudioStreamIndex());
+                }
                 muxer.writePacket(encodePacket, &result);
                 ASSERT_TRUE(result.isSuccess());
             }, &result);
             ASSERT_TRUE(result.isSuccess());
-        } else if (packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
-            muxer.writePacket(packet, &result);
-            ASSERT_TRUE(result.isSuccess());
         }
-    }, &result);   
-
+    }, &result);
     encoder.flush(&result);
     ASSERT_TRUE(result.isSuccess());
 }

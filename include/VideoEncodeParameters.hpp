@@ -18,7 +18,7 @@ namespace av {
         const Rational& getTimeBase();
         const Rational& getFrameRate();
         PIXEL_FORMAT getPixelFormat();
-        int getThreadCount();
+        int getEncodeThreadCount();
 
         void setBitrate(long long bitrate);
         void setWidth(int width);
@@ -28,7 +28,7 @@ namespace av {
         void setGOPSize(int gopSize);
         void setMaxBFrames(int maxBFrames);
         void setPixelFormat(PIXEL_FORMAT pixelFormat);
-        void setThreadCount(int threadCount);
+        void setEncodeThreadCount(int threadCount);
 
     private:
         long long bitrate;
@@ -44,6 +44,6 @@ namespace av {
 
         PIXEL_FORMAT pixelFormat;
 
-        int threadCount;
+        int encodeThreadCount;
     };
 };

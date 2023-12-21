@@ -9,7 +9,7 @@
 #include "CodecContext.hpp"
 
 namespace av {
-    typedef std::function<void(Packet&)> EncoderCallbackFunc;
+    typedef std::function<void(Packet&, AVResult*)> EncoderCallbackFunc;
 
     class Encoder {
     public:

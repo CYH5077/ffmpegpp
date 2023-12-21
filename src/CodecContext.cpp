@@ -150,7 +150,7 @@ namespace av {
         encodeCodecContext->gop_size     = encodeParameter.getGOPSize();
         encodeCodecContext->max_b_frames = encodeParameter.getMaxBFrames();
         encodeCodecContext->pix_fmt      = (AVPixelFormat)av::pixelFormatToAVPixelFormat(encodeParameter.getPixelFormat());
-        encodeCodecContext->thread_count = encodeParameter.getThreadCount();
+        encodeCodecContext->thread_count = encodeParameter.getEncodeThreadCount();
         if (codec->id == AV_CODEC_ID_H264) {
             av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
         }

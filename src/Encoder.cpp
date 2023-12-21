@@ -40,13 +40,6 @@ namespace av {
             }
         }
 
-//        if (this->audioContext != nullptr &&
-//            this->audioContext->isVaildContext()) { // AVCodecContext not nullptr
-//            if (this->encodeFrame(this->audioContext->getRawCodecContext(), nullptr, result) == false) {
-//                return result->isSuccess();
-//            }
-//        }
-
         return result->success();
     }
 
@@ -72,9 +65,11 @@ namespace av {
                 break;
             }
 
-            MEDIA_TYPE mediaType = av::AVMediaTypeToMediaType(avCodecContext->codec->type);
-            packet.setMediaType(mediaType);
-            this->func(packet);
+            packet.setMediaType(av::AVMediaTypeToMediaType(avCodecContext->codec->type));
+            this->func(packet, result);
+            if (result->isSuccess() == false) {
+                return result->isSuccess();
+            }
 
             packet.unref();
         }

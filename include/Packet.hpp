@@ -46,8 +46,8 @@ namespace av {
         void setRawPacket(AVPacket* packet);
 
     private:
-        MEDIA_TYPE mediaType;
-
         AVPacket* packet;
+
+        MEDIA_TYPE mediaType;
     };
 };

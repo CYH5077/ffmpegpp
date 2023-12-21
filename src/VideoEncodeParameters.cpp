@@ -18,7 +18,7 @@ namespace av {
 
         this->pixelFormat = PIXEL_FORMAT::NONE;
 
-        this->threadCount = 1;
+        this->encodeThreadCount = 1;
     }
 
     VideoEncodeParameters::~VideoEncodeParameters() {
@@ -57,8 +57,8 @@ namespace av {
         return this->pixelFormat;
     }
 
-    int VideoEncodeParameters::getThreadCount() {
-        return this->threadCount;
+    int VideoEncodeParameters::getEncodeThreadCount() {
+        return this->encodeThreadCount;
     }
 
     void VideoEncodeParameters::setBitrate(long long bitrate) {
@@ -93,8 +93,8 @@ namespace av {
         this->pixelFormat = pixelFormat;
     }
 
-    void VideoEncodeParameters::setThreadCount(int threadCount) {
-        this->threadCount = threadCount;
+    void VideoEncodeParameters::setEncodeThreadCount(int threadCount) {
+        this->encodeThreadCount = threadCount;
     }
 
 };

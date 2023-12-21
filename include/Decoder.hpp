@@ -10,7 +10,7 @@
 #include "CodecContext.hpp"
 
 namespace av {
-    typedef std::function<void(Packet&, Frame&)> DecoderCallbackFunc;
+    typedef std::function<void(Packet&, Frame&, AVResult*)> DecoderCallbackFunc;
 
     class Decoder {
     public:
@@ -24,11 +24,18 @@ namespace av {
     public:
         bool decode(Demuxer& demuxer, DecoderCallbackFunc func, AVResult* result);
 
+        void play();
+        void pause();
+        void stop();
+
     private:
         bool decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result);
 
     private:
         CodecContextPtr videoContext;
         CodecContextPtr audioContext;
+
+        bool isPause;
+        bool isStop;
     };
 };

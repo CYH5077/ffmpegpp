@@ -32,7 +32,7 @@ TEST(TRANS_CODE, TRANS_CODE) {
     videoEncodeParameter.setGOPSize(150);
     videoEncodeParameter.setMaxBFrames(0);
     videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
-    videoEncodeParameter.setThreadCount(10);
+    videoEncodeParameter.setEncodeThreadCount(10);
 
     const av::CodecParameters demuxerAudioCodecParameters = demuxer.getAudioCodecParameters();
     const av::Stream& demuxerAudioStream = demuxer.getAudioStream();
@@ -46,7 +46,6 @@ TEST(TRANS_CODE, TRANS_CODE) {
     av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H264, videoEncodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
     av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::CODEC_ID::AAC, audioEncodeParameter, &result);
-    //av::CodecContextPtr  encodeAudioCodecContext = nullptr;
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;
@@ -64,8 +63,11 @@ TEST(TRANS_CODE, TRANS_CODE) {
 
     av::Encoder encoder(encodeVideoCodecContext, encodeAudioCodecContext);
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
-    decoder.decode(demuxer, [&](av::Packet& packet, av::Frame& decodeFrame) {
-        encoder.encode(packet.getMediaType(), decodeFrame, [&](av::Packet &encodePacket) {
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
+    decoder.decode(demuxer, [&](av::Packet& packet, av::Frame& decodeFrame, av::AVResult* decodeReuslt) {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode
+        encoder.encode(packet.getMediaType(), decodeFrame, [&](av::Packet &encodePacket, av::AVResult* encodeResult) {
             if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO) {
                 encodePacket.rescaleTS(demuxerVideoStream.getTimebase(), encodeVideoStream.getTimebase());
                 encodePacket.setStreamIndex(demuxer.getVideoStreamIndex());
@@ -73,11 +75,12 @@ TEST(TRANS_CODE, TRANS_CODE) {
                 encodePacket.rescaleTS(demuxerAudioStream.getTimebase(), encodeAudioStream.getTimebase());
                 encodePacket.setStreamIndex(demuxer.getAudioStreamIndex());
             }
-            muxer.writePacket(encodePacket, &result);
-            //ASSERT_TRUE(result.isSuccess());
+            muxer.writePacket(encodePacket, encodeResult);
         }, &result);
-        //ASSERT_TRUE(result.isSuccess());
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode
     }, &result);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
+
     encoder.flush(&result);
     ASSERT_TRUE(result.isSuccess());
 }

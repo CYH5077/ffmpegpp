@@ -5,12 +5,16 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+#include <chrono>
+#include <thread>
+
 namespace av {
 
     Decoder::Decoder(CodecContextPtr videoContext, CodecContextPtr audioContext)
     : videoContext(videoContext)
     , audioContext(audioContext) {
-
+        this->isPause = false;
+        this->isStop  = false;
     }
 
     Decoder::~Decoder() {
@@ -23,7 +27,7 @@ namespace av {
         }
 
         Packet packet;
-        while (demuxer.read(&packet, result)) {
+        while (demuxer.read(&packet, result) && this->isStop == false) {
             bool decodeResult;
             if (packet.getStreamIndex() == demuxer.getVideoStreamIndex()) {
                 decodeResult = this->decodePacket(this->videoContext->getRawCodecContext(), packet.getRawPacket(), func, result);
@@ -53,6 +57,18 @@ namespace av {
         return result->success();
     }
 
+    void Decoder::play() {
+        this->isPause = false;
+    }
+
+    void Decoder::pause() {
+        this->isPause = true;
+    }
+
+    void Decoder::stop() {
+        this->isStop = true;
+    }
+
     bool Decoder::decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result) {
         if (avCodecContext == nullptr) {
             return true;
@@ -67,6 +83,11 @@ namespace av {
 
         Frame frame;
         while (ret >= 0) {
+            if (this->isPause == true) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                continue;
+            }
+
             ret = avcodec_receive_frame(avCodecContext, frame.getRawFrame());
             if (ret < 0) {
                 if (ret == AVERROR_EOF ||
@@ -76,9 +97,11 @@ namespace av {
                 return result->avFailed(ret);
             }
 
-            MEDIA_TYPE mediaType = av::AVMediaTypeToMediaType(avCodecContext->codec->type);
-            Packet packet(avPacket, mediaType);
-            func(packet, frame);
+            Packet packet(avPacket, AVMediaTypeToMediaType(avCodecContext->codec->type));
+            func(packet, frame, result);
+            if (result->isSuccess() == false) {
+                return result->isSuccess();
+            }
 
             frame.unref();
         }

@@ -10,6 +10,7 @@ struct AVStream;
 struct AVFrame;
 struct AVFormatContext;
 struct AVPacket;
+struct AVChannelLayout;
 
 namespace av {
 

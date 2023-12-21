@@ -21,9 +21,9 @@ namespace av {
         CodecContext& operator=(const CodecContext&) = delete;
 
     public: // getter setter
+        const Rational& getTimebase();
+        const Rational& getFramerate();
         int64_t    getBitrate();
-        Rational   getTimeBase();
-        Rational   getFrameRate();
         MEDIA_TYPE getMediaType();
 
         void setAVCodecContext(AVCodecContext* codecContext);
@@ -31,10 +31,15 @@ namespace av {
         bool isVaildContext();
 
     public: // Raw pointer
+        void setRawCodeContext(AVCodecContext* codecContext);
+
         AVCodecContext* getRawCodecContext();
 
     private:
         AVCodecContext* codecContext;
+
+        Rational timebase;
+        Rational framerate;
     };
     typedef std::shared_ptr<CodecContext> CodecContextPtr;
 

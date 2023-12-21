@@ -9,7 +9,7 @@
 #include "Demuxer.hpp"
 #include "Packet.hpp"
 #include "CodecContext.hpp"
-
+/*
 static void openAndWriteHeader(av::Muxer& muxer, const std::string& fileName, av::Demuxer& demuxer, av::AVResult* result) {
     av::CodecContextPtr videoCodecContext = av::createVideoDecodeContext(demuxer, result);
     if (result->isSuccess() == false) {
@@ -31,6 +31,7 @@ static void openAndWriteHeader(av::Muxer& muxer, const std::string& fileName, av
         return;
     }
 }
+*/
 
 // Split 2 videos
 TEST(SPLIT_VIDEO, SPLIT_VIDEO) {

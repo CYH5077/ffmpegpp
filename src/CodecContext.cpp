@@ -15,7 +15,7 @@ namespace av {
     }
 
     CodecContext::CodecContext(AVCodecContext* codecContext) {
-        this->codecContext = codecContext;
+        this->setRawCodeContext(codecContext);
     }
 
     CodecContext::~CodecContext() {
@@ -28,14 +28,12 @@ namespace av {
         return this->codecContext->bit_rate;
     }
 
-    Rational CodecContext::getTimeBase() {
-        AVRational timebase = this->codecContext->time_base;
-        return Rational(timebase.num, timebase.den);
+    const Rational& CodecContext::getTimebase() {
+        return this->timebase;
     }
 
-    Rational CodecContext::getFrameRate() {
-        AVRational framerate = this->codecContext->framerate;
-        return Rational(framerate.num, framerate.den);
+    const Rational& CodecContext::getFramerate() {
+        return this->framerate;
     }
 
     MEDIA_TYPE CodecContext::getMediaType() {
@@ -53,6 +51,11 @@ namespace av {
         this->codecContext = codecContext;
     }
 
+    void CodecContext::setRawCodeContext(AVCodecContext *codecContext) {
+        this->codecContext = codecContext;
+        this->timebase     = Rational(codecContext->time_base.num, codecContext->time_base.den);
+        this->framerate    = Rational(codecContext->framerate.num, codecContext->framerate.den);
+    }
     AVCodecContext* CodecContext::getRawCodecContext() {
         return this->codecContext;
     }
@@ -224,7 +227,7 @@ namespace av {
         }
         return bestSamplerate;
     }
-
+/*
     static int copyChannelLayout(const AVCodec* codec, AVChannelLayout* dst) {
         const AVChannelLayout* p;
         const AVChannelLayout* bestChannelLayout;
@@ -247,7 +250,7 @@ namespace av {
 
         return av_channel_layout_copy(dst, bestChannelLayout);
     }
-
+*/
     static CodecContextPtr createAVAudioEncodeContext(const AVCodec* codec, AudioEncodeParameters& encodeParameters, AVResult* result) {
         CodecContextPtr codecContext;
         try {
@@ -269,20 +272,21 @@ namespace av {
             result->failed(-1, "Not support SAMPLE_FORMAT");
         }
 
-        int ret = 0;
-
+        ChannelLayout channelLayout = encodeParameters.getChannelLayout();
+        int             samplerate  = encodeParameters.getSamplerate();
+        const Rational& timebase    = encodeParameters.getTimebase();
+        encodeCodecContext->time_base   = AVRational {timebase.getNum(), timebase.getDen()};
         encodeCodecContext->bit_rate    = encodeParameters.getBitrate();
         encodeCodecContext->sample_fmt  = (AVSampleFormat)av::sampleFormatToAVSampleFormat(encodeParameters.getSampleFormat());
-        encodeCodecContext->sample_rate = getBestSamplerate(codec);
-        const Rational& timebase = encodeParameters.getTimebase();
-        encodeCodecContext->time_base   = AVRational {timebase.getNum(), timebase.getDen()};
-        ret = copyChannelLayout(codec, &encodeCodecContext->ch_layout);
+        encodeCodecContext->sample_rate = samplerate > 0 ? samplerate : getBestSamplerate(codec);
+        encodeCodecContext->ch_layout = *channelLayout.getRawChannelLayout();
+        /*int ret = copyChannelLayout(codec, &encodeCodecContext->ch_layout);
         if (ret < 0) {
             result->avFailed(ret);
             return nullptr;
-        }
+        }*/
 
-        ret = avcodec_open2(encodeCodecContext, codec, nullptr);
+        int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
         if (ret < 0) {
             result->avFailed(ret);
             return nullptr;

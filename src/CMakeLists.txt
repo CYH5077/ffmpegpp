@@ -12,6 +12,8 @@ set (SOURCES AVResult.cpp
              Encoder.cpp
              Stream.cpp
              CodecParameters.cpp
+        ../include/ChannelLayout.hpp
+        ChannelLayout.cpp
 )
 
 add_library(${PROJECT_NAME} ${SOURCES})

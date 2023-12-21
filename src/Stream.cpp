@@ -4,6 +4,8 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
+#include <iostream>
+
 namespace av {
 
     Stream::Stream() {

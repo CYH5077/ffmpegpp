@@ -43,9 +43,9 @@ TEST(TRANS_CODE, TRANS_CODE) {
     audioEncodeParameter.setSamplerate(demuxerAudioCodecParameters.getSamplerate());
     audioEncodeParameter.setChannelLayout(demuxerAudioCodecParameters.getChannelLayout());
 
-    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::CODEC_ID::H264, videoEncodeParameter, &result);
+    av::CodecContextPtr encodeVideoCodecContext = av::createVideoEncodeContext(av::VIDEO_CODEC_ID::H264, videoEncodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
-    av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::CODEC_ID::AAC, audioEncodeParameter, &result);
+    av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::AUDIO_CODEC_ID::AAC, audioEncodeParameter, &result);
     ASSERT_TRUE(result.isSuccess());
 
     av::Muxer muxer;

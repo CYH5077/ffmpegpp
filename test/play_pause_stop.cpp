@@ -51,6 +51,9 @@ TEST(PLAY_STOP_TEST, PLAY_STOP_TEST) {
     av::CodecContextPtr decodeAudioCodecContext = av::createAudioDecodeContext(demuxer, &result);
     ASSERT_TRUE(result.isSuccess());
 
+    int packetCount = demuxer.getPacketCount(&result);
+    ASSERT_TRUE(result.isSuccess());
+
     int decodeCount = 0;
     av::AVResult decodeResult;
     av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
@@ -65,8 +68,10 @@ TEST(PLAY_STOP_TEST, PLAY_STOP_TEST) {
     std::this_thread::sleep_for(std::chrono::seconds(2));
     decoder.play();
 
+    std::cout << "PLAY_STOP_TEST totalCount : " << packetCount << std::endl;
     std::cout << "PLAY_STOP_TEST decodeCount: " << decodeCount << std::endl;
 
     thread.join();
+    ASSERT_TRUE(packetCount > decodeCount);
     ASSERT_TRUE(decodeResult.isSuccess());
 }

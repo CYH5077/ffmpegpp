@@ -22,6 +22,9 @@ namespace av {
         void close();
 
         bool read(Packet* packet, AVResult* result);
+        bool seekToFirstFrame(AVResult* result);
+        bool seekVideo(double seconds, AVResult* result);
+        bool seekAudio(double seconds, AVResult* result);
 
     public: // getter setter
         const Stream& getVideoStream();
@@ -32,6 +35,9 @@ namespace av {
 
         int getVideoStreamIndex();
         int getAudioStreamIndex();
+
+        // 내부에서 Packet을 전부 읽어들이고 다시 AVFormatContext의 인덱스를 처음으로 되돌림.
+        int getPacketCount(AVResult* result);
 
         unsigned int getStreamCount();
 
@@ -49,6 +55,7 @@ namespace av {
 
         bool readPacket(Packet* packet, AVResult* result);
 
+        bool seek(int streamIndex,  long long timestamp, AVResult* result);
         void clear();
 
     private:

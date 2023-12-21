@@ -21,6 +21,13 @@ namespace av {
         return this->result;
     }
 
+    bool AVResult::isFileEOF() {
+        if (this->getErrorCode() == AVERROR_EOF) {
+            return true;
+        }
+        return false;
+    }
+
     int AVResult::getErrorCode() {
         return this->errorCode;
     }
@@ -30,22 +37,31 @@ namespace av {
     }
 
     bool AVResult::success() {
-        this->result = true;
-        this->errorCode = 0;
+        return this->success(0);
+    }
+
+    bool AVResult::success(int avErrorCode) {
+        this->result    = true;
+        this->errorCode = avErrorCode;
 
         return this->result;
+    }
+
+    bool AVResult::avFailedFileEOF() {
+        return this->failed(AVERROR_EOF, "FILE EOF");
     }
 
     bool AVResult::avFailed(int avErrorCode) {
         char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
         av_strerror(avErrorCode, avErrorMessage, sizeof(avErrorMessage));
-        std::cout << avErrorMessage << std::endl;
+        std::cout << "ffmpeg error message: " << avErrorMessage << std::endl;
+
         return this->failed(avErrorCode, avErrorMessage);
     }
 
     bool AVResult::failed(int avErrorCode, std::string&& errorMessage) {
-        this->result = false;
-        this->errorCode = errorCode;
+        this->result       = false;
+        this->errorCode    = avErrorCode;
         this->errorMessage = errorMessage;
 
         return this->result;

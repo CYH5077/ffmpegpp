@@ -45,12 +45,19 @@ namespace av {
             }
         }
 
+        if (result->isSuccess() == false &&
+            result->isFileEOF() == false) {
+            return result->isSuccess();
+        }
+
         // flush AVCodecContext
         if (this->videoContext != nullptr &&
             this->videoContext->isVaildContext()) { // AVCodecContext not nullptr
             this->decodePacket(this->videoContext->getRawCodecContext(), nullptr, func, result);
-        } else if (this->audioContext != nullptr &&
-                   this->audioContext->isVaildContext()) { // AVCodecContext not nullptr
+        }
+
+        if (this->audioContext != nullptr &&
+            this->audioContext->isVaildContext()) { // AVCodecContext not nullptr
             this->decodePacket(this->audioContext->getRawCodecContext(), nullptr, func, result);
         }
 
@@ -92,7 +99,7 @@ namespace av {
             if (ret < 0) {
                 if (ret == AVERROR_EOF ||
                     ret == AVERROR(EAGAIN)) {
-                    return result->success();
+                    return result->success(AVERROR_EOF);
                 }
                 return result->avFailed(ret);
             }

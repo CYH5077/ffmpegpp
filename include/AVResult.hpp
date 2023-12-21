@@ -10,10 +10,13 @@ namespace av {
 
     public:
         bool        isSuccess();
+        bool        isFileEOF();
         int         getErrorCode();
         std::string getErrorMessage();
 
         bool success();
+        bool success(int avErrorCode);
+        bool avFailedFileEOF();
         bool avFailed(int avErrorCode);
         bool failed(int errorCode, std::string&& errorMessage);
 

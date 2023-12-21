@@ -14,15 +14,17 @@ struct AVChannelLayout;
 
 namespace av {
 
-enum class CODEC_ID {
+enum class VIDEO_CODEC_ID {
     H264,
     H265,
-    
+};
+int videoCodecIDToAVCodecID(VIDEO_CODEC_ID codecID);
+
+enum class AUDIO_CODEC_ID {
     AAC,
     AC3,
 };
-int codecIDToAVCodecID(CODEC_ID codecID);
-
+int audioCodecIDToAVCodecID(AUDIO_CODEC_ID audioCodecId);
 
 enum class MEDIA_TYPE {
     UNKNOWN = -1,

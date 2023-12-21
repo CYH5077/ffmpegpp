@@ -48,6 +48,22 @@ namespace av {
         return this->readPacket(packet, result);
     }
 
+    bool Demuxer::seekToFirstFrame(AVResult* result) {
+        return this->seek(-1, 0, result);
+    }
+
+    bool Demuxer::seekVideo(double seconds, AVResult* result) {
+        Rational timebase = this->videoStream.getTimebase();
+        int64_t timestamp = seconds / av_q2d(AVRational {timebase.getNum(), timebase.getDen()});
+        return this->seek(this->videoStreamIndex, timestamp, result);
+    }
+
+    bool Demuxer::seekAudio(double seconds, av::AVResult *result) {
+        Rational timebase = this->audioStream.getTimebase();
+        int64_t timestamp = seconds / av_q2d(AVRational {timebase.getNum(), timebase.getDen()});
+        return this->seek(this->audioStreamIndex, timestamp, result);
+    }
+
     const Stream& Demuxer::getVideoStream() {
         return this->videoStream;
     }
@@ -70,6 +86,27 @@ namespace av {
 
     int Demuxer::getAudioStreamIndex() {
         return this->audioStreamIndex;
+    }
+
+    int Demuxer::getPacketCount(AVResult* result) {
+        int ret = 0;
+
+        Packet packet;
+        while (this->read(&packet, result)) {
+            ret++;
+        }
+
+        if (result->isSuccess() == false &&
+            result->isFileEOF() == false) {
+            return -1;
+        }
+
+        // 다시 시작 지점으로 되돌림
+        if (this->seekToFirstFrame(result) == false) {
+            return result->isSuccess();
+        }
+
+        return ret;
     }
 
     unsigned int Demuxer::getStreamCount() {
@@ -133,6 +170,9 @@ namespace av {
     bool Demuxer::readPacket(Packet* packet, AVResult* result) {
         int avResult = av_read_frame(this->formatContext, packet->getRawPacket());
         if (avResult < 0) {
+            if (avResult == AVERROR_EOF || avio_feof(this->formatContext->pb)) {
+                return result->avFailedFileEOF();
+            }
             return result->failed(avResult, "File EOF");
         }
 
@@ -140,6 +180,15 @@ namespace av {
             packet->setMediaType(MEDIA_TYPE::VIDEO);
         } else if (packet->getStreamIndex() == this->getAudioStreamIndex()) {
             packet->setMediaType(MEDIA_TYPE::AUDIO);
+        }
+
+        return result->success();
+    }
+
+    bool Demuxer::seek(int streamIndex, long long timestamp, av::AVResult *result) {
+        int ret = av_seek_frame(this->formatContext, streamIndex, timestamp, AVSEEK_FLAG_BACKWARD);
+        if (ret < 0) {
+            return result->avFailed(ret);
         }
 
         return result->success();

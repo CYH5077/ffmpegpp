@@ -50,10 +50,10 @@ namespace av {
 
     // Video Encode AVCodecContext
     CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameters& encodeParameter, AVResult* result);
-    CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result);
+    CodecContextPtr createVideoEncodeContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result);
 
     // Audio Encode AVCodecContext
     CodecContextPtr createAudioEncodeContext(const std::string codecName, AudioEncodeParameters& encodeParameter, AVResult* result);
-    CodecContextPtr createAudioEncodeContext(CODEC_ID codecID, AudioEncodeParameters& encodeParameters, AVResult* result);
+    CodecContextPtr createAudioEncodeContext(AUDIO_CODEC_ID codecID, AudioEncodeParameters& encodeParameters, AVResult* result);
 
 };

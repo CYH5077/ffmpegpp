@@ -193,6 +193,11 @@ namespace av {
             }
         }
 
+        if (result->isSuccess() == false &&
+            result->isFileEOF() == false) {
+            return result->isSuccess();
+        }
+
         return result->success();
     }
 

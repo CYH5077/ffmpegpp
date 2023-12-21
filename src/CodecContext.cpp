@@ -37,7 +37,7 @@ namespace av {
     }
 
     MEDIA_TYPE CodecContext::getMediaType() {
-        return av::AVMediaTypeToMediaType((int)this->codecContext->codec->type);
+        return AVMediaTypeToMediaType((int)this->codecContext->codec->type);
     }
 
     bool CodecContext::isVaildContext() {
@@ -149,7 +149,7 @@ namespace av {
         encodeCodecContext->framerate = AVRational{encodeParameter.getFrameRate().getNum(), encodeParameter.getFrameRate().getDen()};
         encodeCodecContext->gop_size     = encodeParameter.getGOPSize();
         encodeCodecContext->max_b_frames = encodeParameter.getMaxBFrames();
-        encodeCodecContext->pix_fmt      = (AVPixelFormat)av::pixelFormatToAVPixelFormat(encodeParameter.getPixelFormat());
+        encodeCodecContext->pix_fmt      = (AVPixelFormat)pixelFormatToAVPixelFormat(encodeParameter.getPixelFormat());
         encodeCodecContext->thread_count = encodeParameter.getEncodeThreadCount();
         if (codec->id == AV_CODEC_ID_H264) {
             av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
@@ -180,12 +180,12 @@ namespace av {
         return createAVVideoEncodeContext(codec, encodeParameter, result);
     }
 
-    CodecContextPtr createVideoEncodeContext(CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result) {
+    CodecContextPtr createVideoEncodeContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result) {
         if (result == nullptr) {
             return nullptr;
         }
 
-        const AVCodec* codec = avcodec_find_encoder((AVCodecID)av::codecIDToAVCodecID(codecID));
+        const AVCodec* codec = avcodec_find_encoder((AVCodecID)videoCodecIDToAVCodecID(codecID));
         if (codec == nullptr) {
             result->failed(-1, "Codec not found");
             return nullptr;
@@ -200,7 +200,7 @@ namespace av {
 
 
     static bool isValidSampleFormat(const AVCodec* codec, SAMPLE_FORMAT sampleFormat) {
-        enum AVSampleFormat avSampleFormat = (enum AVSampleFormat)av::sampleFormatToAVSampleFormat(sampleFormat);
+        enum AVSampleFormat avSampleFormat = (enum AVSampleFormat)sampleFormatToAVSampleFormat(sampleFormat);
         const enum AVSampleFormat* p = codec->sample_fmts;
         while (*p != AV_SAMPLE_FMT_NONE) {
             if (*p == avSampleFormat) {
@@ -277,7 +277,7 @@ namespace av {
         const Rational& timebase    = encodeParameters.getTimebase();
         encodeCodecContext->time_base   = AVRational {timebase.getNum(), timebase.getDen()};
         encodeCodecContext->bit_rate    = encodeParameters.getBitrate();
-        encodeCodecContext->sample_fmt  = (AVSampleFormat)av::sampleFormatToAVSampleFormat(encodeParameters.getSampleFormat());
+        encodeCodecContext->sample_fmt  = (AVSampleFormat)sampleFormatToAVSampleFormat(encodeParameters.getSampleFormat());
         encodeCodecContext->sample_rate = samplerate > 0 ? samplerate : getBestSamplerate(codec);
         encodeCodecContext->ch_layout = *channelLayout.getRawChannelLayout();
         /*int ret = copyChannelLayout(codec, &encodeCodecContext->ch_layout);
@@ -311,12 +311,12 @@ namespace av {
 
     }
 
-    CodecContextPtr createAudioEncodeContext(CODEC_ID codecID, AudioEncodeParameters& encodeParameters, AVResult* result) {
+    CodecContextPtr createAudioEncodeContext(AUDIO_CODEC_ID codecID, AudioEncodeParameters& encodeParameters, AVResult* result) {
         if (result == nullptr) {
             return nullptr;
         }
 
-        const AVCodec* codec = avcodec_find_encoder((AVCodecID)av::codecIDToAVCodecID(codecID));
+        const AVCodec* codec = avcodec_find_encoder((AVCodecID)audioCodecIDToAVCodecID(codecID));
         if (codec == nullptr) {
             result->failed(-1, "Codec not found");
             return nullptr;

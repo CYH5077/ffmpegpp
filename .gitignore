@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c++,visualstudiocode
 
 ## test app ##
+.idea
 ffmpegpp_test
 sample.mp4
 sample.mkv

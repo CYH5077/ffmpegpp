@@ -25,14 +25,15 @@ namespace av {
         if (result == nullptr) {
             return false;
         }
+        this->func = func;
 
         Packet packet;
         while (demuxer.read(&packet, result) && this->isStop == false) {
             bool decodeResult;
             if (packet.getStreamIndex() == demuxer.getVideoStreamIndex()) {
-                decodeResult = this->decodePacket(this->videoContext->getRawCodecContext(), packet.getRawPacket(), func, result);
+                decodeResult = this->decodePacket(this->videoContext->getRawCodecContext(), packet.getRawPacket(), this->func, result);
             } else if (packet.getStreamIndex() == demuxer.getAudioStreamIndex()) {
-                decodeResult = this->decodePacket(this->audioContext->getRawCodecContext(), packet.getRawPacket(), func, result);
+                decodeResult = this->decodePacket(this->audioContext->getRawCodecContext(), packet.getRawPacket(), this->func, result);
             }
             packet.unref();
 
@@ -50,6 +51,29 @@ namespace av {
             return result->isSuccess();
         }
 
+        this->flush(result);
+
+        return result->success();
+    }
+
+    bool Decoder::decode(Packet& packet, DecoderCallbackFunc func, AVResult *result) {
+        if (result == nullptr) {
+            return false;
+        }
+        this->func = func;
+
+        switch (packet.getMediaType()) {
+            case MEDIA_TYPE::VIDEO:
+                return this->decodePacket(this->videoContext->getRawCodecContext(), packet.getRawPacket(), this->func, result);
+            case MEDIA_TYPE::AUDIO:
+                return this->decodePacket(this->audioContext->getRawCodecContext(), packet.getRawPacket(), this->func, result);
+            default:
+                return result->failed(-1, "MEDIA_TYPE is NONE");
+        }
+        return result->success();
+    }
+
+    bool Decoder::flush(AVResult* result) {
         // flush AVCodecContext
         if (this->videoContext != nullptr &&
             this->videoContext->isVaildContext()) { // AVCodecContext not nullptr

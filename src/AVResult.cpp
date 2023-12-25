@@ -18,6 +18,10 @@ namespace av {
     }
 
     bool AVResult::isSuccess() {
+        if (this->result      == false &&
+            this->isFileEOF() == true) {
+            return true;
+        }
         return this->result;
     }
 
@@ -43,6 +47,7 @@ namespace av {
     bool AVResult::success(int avErrorCode) {
         this->result    = true;
         this->errorCode = avErrorCode;
+        this->errorMessage = "";
 
         return this->result;
     }

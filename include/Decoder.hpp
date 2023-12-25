@@ -23,6 +23,8 @@ namespace av {
 
     public:
         bool decode(Demuxer& demuxer, DecoderCallbackFunc func, AVResult* result);
+        bool decode(Packet& packet, DecoderCallbackFunc func, AVResult* result);
+        bool flush(AVResult* result);
 
         void play();
         void pause();
@@ -32,6 +34,8 @@ namespace av {
         bool decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result);
 
     private:
+        DecoderCallbackFunc func;
+
         CodecContextPtr videoContext;
         CodecContextPtr audioContext;
 

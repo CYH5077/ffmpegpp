@@ -10,6 +10,11 @@ output.mp4
 test.pgm
 video_transcoding.mp4
 *.dll
+cmake_build
+cmake-build-debug
+build
+transcoding.mp4
+transmuxing.mkv
 
 # windows library
 thirdparty/windows/ffmpeg/include

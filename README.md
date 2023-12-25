@@ -3,20 +3,18 @@ ffmpeg c++ wrapper
 examples, refer to the test folder.<br>
 linux, windows support
 
+<h1> Build </h1>
+<h2> - Show build in example script</h2>
+<h3>first run init_project script</h3>
+<pre>init_project.sh or init_project.bat</pre>
+<pre>build_example_command.sh or build_example_command.bat</pre>
+
+
 <h1> Linux Build </h1>
 <h2> - Package install </h2>
-<pre> $ sudo apt-get install </pre>
+<pre> $ sudo apt-get install cmake make g++ </pre>
 
-<h2> - Initialize Project </h2>
-<pre> $ ./init_project.sh </pre>
-
-<h2> - Debug Build </h2>
-<pre> $ ./debug_build.sh </pre>
-
-<h2> - Release Build </h2>
-<pre> $ ./release_build.sh </pre>
-
-<br> <br> 
+<br>
 <h1> Windows Build </h1>
 <h2> - Install tools (CMake) </h2>
 <pre><a href="https://cmake.org/download/"> https://cmake.org/download/ </a></pre> 
@@ -27,11 +25,3 @@ linux, windows support
 <h2> - Install tools (MinGW g++) </h2>
 <pre><a href=""> https://sourceforge.net/projects/mingw-w64/files/ </a></pre>
 
-<h2> - Initialize Project  </h2>
-<pre> $ init_project.bat </pre>
-
-<h2> - Debug Build  </h2>
-<pre> $ debug_build.bat </pre>
-
-<h2> - Release Build  </h2>
-<pre> $ release_build.bat </pre>

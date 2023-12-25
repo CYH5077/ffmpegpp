@@ -11,14 +11,13 @@ function submodule_update {
 function sample_video_download {
     mkdir build
     cd build
-    mkdir bin
-    cd bin
+    mkdir test
+    cd test
     # sample video download
-    wget --directory-prefix=./build/test -O sample.mp4 https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4
+    wget -O sample.mp4 https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4
     if [ $? -ne 0 ]; then
         exit -1
     fi
-
     cd $root_path
 }
 

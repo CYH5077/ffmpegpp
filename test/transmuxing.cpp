@@ -2,9 +2,7 @@
 
 #include "TEST_DEFINE.hpp"
 
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "Muxer.hpp"
+#include "ffmpegpp.hpp"
 
 
 TEST(TRANS_MUXING, TRANS_MUXING) {

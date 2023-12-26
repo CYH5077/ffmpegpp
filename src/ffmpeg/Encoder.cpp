@@ -1,5 +1,5 @@
-#include "Encoder.hpp"
-#include "Rational.hpp"
+#include "ffmpeg/Encoder.hpp"
+#include "ffmpeg/Rational.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

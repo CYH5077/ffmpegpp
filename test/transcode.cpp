@@ -2,12 +2,7 @@
 
 #include "TEST_DEFINE.hpp"
 
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "Muxer.hpp"
-#include "CodecContext.hpp"
-#include "Encoder.hpp"
-#include "Decoder.hpp"
+#include "ffmpegpp.hpp"
 
 TEST(TRANS_CODE, TRANS_CODE_1) {
     av::AVResult result;

@@ -1,4 +1,4 @@
-#include "ChannelLayout.hpp"
+#include "ffmpeg/ChannelLayout.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

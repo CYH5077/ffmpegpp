@@ -33,6 +33,8 @@ namespace av {
     private:
         bool decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result);
 
+        bool callDecoderCallbackFunc(Packet& encodePacket, Frame& decodeFrame, DecoderCallbackFunc func, AVResult* result);
+
     private:
         DecoderCallbackFunc func;
 
@@ -41,5 +43,7 @@ namespace av {
 
         bool isPause;
         bool isStop;
+
+        bool isCUDADecode;
     };
 };

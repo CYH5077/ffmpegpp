@@ -1,4 +1,4 @@
-#include "Stream.hpp"
+#include "ffmpeg/Stream.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

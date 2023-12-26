@@ -24,6 +24,7 @@ namespace av {
 
     public: // Raw pointer
         AVFrame*  getRawFrame();
+        int       getRawPixelFormat();
 
     private:
         AVFrame* frame;

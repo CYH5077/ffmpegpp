@@ -1,4 +1,4 @@
-#include "Decoder.hpp"
+#include "ffmpeg/Decoder.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -15,6 +15,8 @@ namespace av {
     , audioContext(audioContext) {
         this->isPause = false;
         this->isStop  = false;
+
+        this->isCUDADecode = this->videoContext->isCUDAContext();
     }
 
     Decoder::~Decoder() {
@@ -113,6 +115,7 @@ namespace av {
         }
 
         Frame frame;
+        Frame swFrame; // HW Decoding 시 사용
         while (ret >= 0) {
             if (this->isPause == true) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -129,13 +132,36 @@ namespace av {
             }
 
             Packet packet(avPacket, AVMediaTypeToMediaType(avCodecContext->codec->type));
-            func(packet, frame, result);
-            if (result->isSuccess() == false) {
+            if (this->callDecoderCallbackFunc(packet, frame, func, result) == false) {
                 return result->isSuccess();
             }
 
             frame.unref();
         }
+        return result->success();
+    }
+
+    bool Decoder::callDecoderCallbackFunc(Packet& encodePacket, av::Frame& decodeFrame, av::DecoderCallbackFunc func, AVResult* result) {
+        // CUDA 사용할 경우
+        if (this->isCUDADecode              == true &&
+            decodeFrame.getRawPixelFormat() == this->videoContext->getRawHWFormat()) {
+            Frame swFrame;
+            int ret = av_hwframe_transfer_data(swFrame.getRawFrame(), decodeFrame.getRawFrame(), 0);
+            if (ret < 0) {
+                return result->avFailed(ret);
+            }
+
+            func(encodePacket, swFrame, result);
+            if (result->isSuccess() == false) {
+                return result->isSuccess();
+            }
+        } else {
+            func(encodePacket, decodeFrame, result);
+            if (result->isSuccess() == false) {
+                return result->isSuccess();
+            }
+        }
+
         return result->success();
     }
 

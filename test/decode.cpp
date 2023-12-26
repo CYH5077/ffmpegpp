@@ -2,10 +2,7 @@
 
 #include "TEST_DEFINE.hpp"
 
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "CodecContext.hpp"
-#include "Decoder.hpp"
+#include "ffmpegpp.hpp"
 
 TEST(DECODE, DECODE_1) {
     av::AVResult result;

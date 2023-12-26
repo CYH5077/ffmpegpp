@@ -1,4 +1,4 @@
-#include "Frame.hpp"
+#include "ffmpeg/Frame.hpp"
 
 
 extern "C" {
@@ -40,6 +40,10 @@ namespace av {
 
     AVFrame* Frame::getRawFrame() {
         return this->frame;
+    }
+
+    int Frame::getRawPixelFormat() {
+        return this->frame->format;
     }
 
 };

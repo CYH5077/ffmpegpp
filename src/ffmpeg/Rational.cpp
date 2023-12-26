@@ -1,4 +1,4 @@
-#include "Rational.hpp"
+#include "ffmpeg/Rational.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

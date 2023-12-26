@@ -1,4 +1,4 @@
-#include "CodecParameters.hpp"
+#include "ffmpeg/CodecParameters.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

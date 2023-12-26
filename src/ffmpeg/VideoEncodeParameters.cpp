@@ -1,4 +1,4 @@
-#include "VideoEncodeParameters.hpp"
+#include "ffmpeg/VideoEncodeParameters.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

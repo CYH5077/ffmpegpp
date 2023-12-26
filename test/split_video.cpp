@@ -4,11 +4,8 @@
 
 #include "TEST_DEFINE.hpp"
 
-#include "AVResult.hpp"
-#include "Muxer.hpp"
-#include "Demuxer.hpp"
-#include "Packet.hpp"
-#include "CodecContext.hpp"
+#include "ffmpegpp.hpp"
+
 /*
 static void openAndWriteHeader(av::Muxer& muxer, const std::string& fileName, av::Demuxer& demuxer, av::AVResult* result) {
     av::CodecContextPtr videoCodecContext = av::createVideoDecodeContext(demuxer, result);

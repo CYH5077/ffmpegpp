@@ -1,9 +1,10 @@
-#include "CodecContext.hpp"
+#include "ffmpeg/CodecContext.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "libavutil/opt.h"
+#include "libavutil/hwcontext.h"
 }
 
 #include <utility>
@@ -47,6 +48,18 @@ namespace av {
         return true;
     }
 
+    bool CodecContext::isCUDAContext() {
+        const AVCodecHWConfig* codecHwConfig = nullptr;
+        for (int i = 0; (codecHwConfig = avcodec_get_hw_config(this->codecContext->codec, i)); i++) {
+            if (codecHwConfig->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX &&
+                codecHwConfig->device_type == AV_HWDEVICE_TYPE_CUDA) {
+                this->cudaDecodeHWFormat = (int)codecHwConfig->pix_fmt;
+                return true;
+            }
+        }
+        return false;
+    }
+
     void CodecContext::setAVCodecContext(AVCodecContext* codecContext) {
         this->codecContext = codecContext;
     }
@@ -56,14 +69,19 @@ namespace av {
         this->timebase     = Rational(codecContext->time_base.num, codecContext->time_base.den);
         this->framerate    = Rational(codecContext->framerate.num, codecContext->framerate.den);
     }
+
     AVCodecContext* CodecContext::getRawCodecContext() {
         return this->codecContext;
+    }
+
+    int CodecContext::getRawHWFormat() {
+        return this->cudaDecodeHWFormat;
     }
 
 
     ////////////////////////////   Create Decode Context
 
-    static CodecContextPtr createAVDecodeContext(int codecID, AVCodecParameters* codecParameters, AVResult* result) {
+    static CodecContextPtr createAVDecodeContext(int codecID, AVCodecParameters* codecParameters, bool cudaEnable, AVResult* result) {
         CodecContextPtr codecContext;
         try {
             codecContext = std::make_shared<CodecContext>();
@@ -90,7 +108,17 @@ namespace av {
         // 실패시 decodeCodecContext 를 해제하기 위함.
         codecContext->setAVCodecContext(decodeCodecContext);
 
-        int ret = avcodec_parameters_to_context(decodeCodecContext, codecParameters);
+        int ret = 0;
+        if (cudaEnable == true) {
+            AVBufferRef* hwDeviceCtx = nullptr;
+            ret = av_hwdevice_ctx_create(&decodeCodecContext->hw_device_ctx, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
+            if (ret < 0) {
+                result->avFailed(ret);
+                return nullptr;
+            }
+        }
+
+        ret = avcodec_parameters_to_context(decodeCodecContext, codecParameters);
         if (ret < 0) {
             result->avFailed(ret);
             return nullptr;
@@ -112,7 +140,7 @@ namespace av {
         }
 
         CodecParameters codecParameters = demuxer.getVideoCodecParameters();
-        return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), result);
+        return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), false, result);
     }
 
     CodecContextPtr createAudioDecodeContext(Demuxer& demuxer, AVResult* result) {
@@ -121,14 +149,14 @@ namespace av {
         }
 
         CodecParameters codecParameters = demuxer.getAudioCodecParameters();
-        return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), result);
+        return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), false, result);
     }
 
 
     //////////////////////////////////// Create Video Encode Context
 
 
-    static CodecContextPtr createAVVideoEncodeContext(const AVCodec* codec, VideoEncodeParameters& encodeParameter, AVResult* result) {
+    static CodecContextPtr createAVVideoEncodeContext(const AVCodec* codec, VideoEncodeParameters& encodeParameter, bool cudaEnable, AVResult* result) {
         CodecContextPtr codecContext;
         try {
             codecContext = std::make_shared<CodecContext>();
@@ -166,7 +194,7 @@ namespace av {
         return codecContext;
     }
 
-    CodecContextPtr createVideoEncodeContext(const std::string& codecName, VideoEncodeParameters& encodeParameter, AVResult* result) {
+    CodecContextPtr createVideoEncodeContext(const std::string&& codecName, VideoEncodeParameters& encodeParameter, AVResult* result) {
         if (result == nullptr) {
             return nullptr;
         }
@@ -177,7 +205,7 @@ namespace av {
             return nullptr;
         }
 
-        return createAVVideoEncodeContext(codec, encodeParameter, result);
+        return createAVVideoEncodeContext(codec, encodeParameter, false, result);
     }
 
     CodecContextPtr createVideoEncodeContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameter, AVResult* result) {
@@ -191,7 +219,7 @@ namespace av {
             return nullptr;
         }
 
-        return createAVVideoEncodeContext(codec, encodeParameter, result);
+        return createAVVideoEncodeContext(codec, encodeParameter, false, result);
     }
 
 
@@ -227,30 +255,7 @@ namespace av {
         }
         return bestSamplerate;
     }
-/*
-    static int copyChannelLayout(const AVCodec* codec, AVChannelLayout* dst) {
-        const AVChannelLayout* p;
-        const AVChannelLayout* bestChannelLayout;
 
-        if (codec->ch_layouts == nullptr) {
-            *dst = AV_CHANNEL_LAYOUT_STEREO;
-            return 0;
-        }
-
-        int bestNBChannels = 0;
-        p = codec->ch_layouts;
-        while (p->nb_channels) {
-            int nbChannels = p->nb_channels;
-            if (nbChannels > bestNBChannels) {
-                bestChannelLayout = p;
-                bestNBChannels = nbChannels;
-            }
-            p++;
-        }
-
-        return av_channel_layout_copy(dst, bestChannelLayout);
-    }
-*/
     static CodecContextPtr createAVAudioEncodeContext(const AVCodec* codec, AudioEncodeParameters& encodeParameters, AVResult* result) {
         CodecContextPtr codecContext;
         try {
@@ -296,7 +301,7 @@ namespace av {
         return codecContext;
     }
 
-    CodecContextPtr  createAudioEncodeContext(const std::string codecName, AudioEncodeParameters& encodeParameter, AVResult* result) {
+    CodecContextPtr  createAudioEncodeContext(const std::string&& codecName, AudioEncodeParameters& encodeParameter, AVResult* result) {
         if (result == nullptr) {
             return nullptr;
         }
@@ -323,6 +328,30 @@ namespace av {
         }
 
         return createAVAudioEncodeContext(codec, encodeParameters, result);
+    }
+
+
+    CodecContextPtr createVideoCUDADecodeContext(Demuxer& demuxer, AVResult* result) {
+        if (result == nullptr) {
+            return nullptr;
+        }
+
+        CodecParameters codecParameters = demuxer.getVideoCodecParameters();
+        return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), true, result);
+    }
+
+    CodecContextPtr createVideoCUDAEncoderContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameters, AVResult* result) {
+        if (result == nullptr) {
+            return nullptr;
+        }
+
+        const AVCodec* codec = avcodec_find_encoder((AVCodecID)videoCodecIDToAVCodecID(codecID));
+        if (codec == nullptr) {
+            result->failed(-1, "Codec not found");
+            return nullptr;
+        }
+
+        return createAVVideoEncodeContext(codec, encodeParameters, true, result);
     }
 
 };

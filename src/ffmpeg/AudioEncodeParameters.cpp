@@ -1,4 +1,4 @@
-#include "AudioEncodeParameters.hpp"
+#include "ffmpeg/AudioEncodeParameters.hpp"
 
 namespace av {
     AudioEncodeParameters::AudioEncodeParameters() {

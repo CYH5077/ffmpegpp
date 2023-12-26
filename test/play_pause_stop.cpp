@@ -2,9 +2,7 @@
 
 #include "TEST_DEFINE.hpp"
 
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "Decoder.hpp"
+#include "ffmpegpp.hpp"
 
 #include <thread>
 #include <chrono>

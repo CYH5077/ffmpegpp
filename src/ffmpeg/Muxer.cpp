@@ -1,6 +1,6 @@
-#include "Muxer.hpp"
+#include "ffmpeg/Muxer.hpp"
 
-#include "CodecContext.hpp"
+#include "ffmpeg/CodecContext.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"

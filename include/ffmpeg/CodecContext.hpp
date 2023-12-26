@@ -64,5 +64,5 @@ namespace av {
     // Video HW Decoder Encoder
     // Decoder
     CodecContextPtr createVideoCUDADecodeContext(Demuxer& demuxer, AVResult* result);
-    CodecContextPtr createVideoCUDAEncoderContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameters, AVResult* result);
+    CodecContextPtr createVideoCUDAEncoderContext(VIDEO_HW_CODEC_ID codecID, VideoEncodeParameters& encodeParameters, AVResult* result);
 };

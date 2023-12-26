@@ -1,5 +1,6 @@
-    #pragma once
+#pragma once
 
+#include <string>
 
 struct AVRational;
 struct AVCodec;
@@ -19,6 +20,11 @@ enum class VIDEO_CODEC_ID {
     H265,
 };
 int videoCodecIDToAVCodecID(VIDEO_CODEC_ID codecID);
+
+enum class VIDEO_HW_CODEC_ID {
+    H264
+};
+std::string videoHWCodecIDToString(VIDEO_HW_CODEC_ID codecID);
 
 enum class AUDIO_CODEC_ID {
     AAC,

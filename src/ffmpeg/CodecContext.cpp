@@ -110,7 +110,6 @@ namespace av {
 
         int ret = 0;
         if (cudaEnable == true) {
-            AVBufferRef* hwDeviceCtx = nullptr;
             ret = av_hwdevice_ctx_create(&decodeCodecContext->hw_device_ctx, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
             if (ret < 0) {
                 result->avFailed(ret);
@@ -183,6 +182,10 @@ namespace av {
             av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
         }
         codecContext->setAVCodecContext(encodeCodecContext);
+
+        if (cudaEnable == true) {
+
+        }
 
         int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
         if (ret < 0) {
@@ -340,12 +343,12 @@ namespace av {
         return createAVDecodeContext(codecParameters.getCodecID(), codecParameters.getRawCodecParameters(), true, result);
     }
 
-    CodecContextPtr createVideoCUDAEncoderContext(VIDEO_CODEC_ID codecID, VideoEncodeParameters& encodeParameters, AVResult* result) {
+    CodecContextPtr createVideoCUDAEncoderContext(VIDEO_HW_CODEC_ID codecID, VideoEncodeParameters& encodeParameters, AVResult* result) {
         if (result == nullptr) {
             return nullptr;
         }
 
-        const AVCodec* codec = avcodec_find_encoder((AVCodecID)videoCodecIDToAVCodecID(codecID));
+        const AVCodec* codec = avcodec_find_encoder_by_name(videoHWCodecIDToString(codecID).c_str());
         if (codec == nullptr) {
             result->failed(-1, "Codec not found");
             return nullptr;

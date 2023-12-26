@@ -5,6 +5,7 @@ set(SOURCES main.cpp
             play_pause_stop.cpp
             decode.cpp
             cuda_support.cpp
+            cuda_hw_encode.cpp
             cuda_hw_decode.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)

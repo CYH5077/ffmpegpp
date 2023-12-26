@@ -14,6 +14,13 @@ namespace av {
         return AV_CODEC_ID_NONE;
     }
 
+    std::string videoHWCodecIDToString(VIDEO_HW_CODEC_ID codecID) {
+        switch (codecID) {
+            case VIDEO_HW_CODEC_ID::H264: return "h264_nvenc";
+        }
+        return "";
+    }
+
     int audioCodecIDToAVCodecID(AUDIO_CODEC_ID audioCodecId) {
         switch (audioCodecId) {
             case AUDIO_CODEC_ID::AAC: return AV_CODEC_ID_AAC;

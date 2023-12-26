@@ -9,4 +9,6 @@ namespace TEST{
     static const std::string TRANSCODING_MP4_FILE_2 = "./transcoding_2.mp4";
     static const std::string SPLIT_1_MP4_FILE = "./split_1.mp4";
     static const std::string SPLIT_2_MP4_FILE = "./split_2.mp4";
+    static const std::string CUDA_TRANSCODING_MP4_FILE_1 = "./cuda_transcoding_1.mp4";
+    static const std::string CUDA_TRANSCODING_MP4_FILE_2 = "./cuda_transcoding_2.mp4";
 };

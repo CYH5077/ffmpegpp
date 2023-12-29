@@ -30,7 +30,7 @@ namespace av {
         }
     }
 
-    Rational Frame::getTimeBase() {
+    const Rational& Frame::getTimeBase() {
         return this->timebase;
     }
 

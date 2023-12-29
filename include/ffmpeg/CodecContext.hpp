@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include "AVType.hpp"
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "VideoEncodeParameters.hpp"
-#include "AudioEncodeParameters.hpp"
-#include "Rational.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/AVResult.hpp"
+#include "ffmpeg/Demuxer.hpp"
+#include "ffmpeg/VideoEncodeParameters.hpp"
+#include "ffmpeg/AudioEncodeParameters.hpp"
+#include "ffmpeg/Rational.hpp"
 
 namespace av {
     class CodecContext {

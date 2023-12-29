@@ -16,7 +16,9 @@ set(SOURCES
         ChannelLayout.cpp
         AVUtils.cpp
         HWDecoderList.cpp
-        HWEncoderList.cpp)
+        HWEncoderList.cpp
+        VideoStreamInfo.cpp
+        AudioStreamInfo.cpp)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "AVType.hpp"
-#include "Rational.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/Rational.hpp"
 
 namespace av {
     class Frame {
@@ -18,7 +18,8 @@ namespace av {
         void unref();
 
     public: // getter setter
-        Rational getTimeBase();
+        const Rational& getTimeBase();
+
 
         void setTimeBase(Rational& timebase);
 

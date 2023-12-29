@@ -3,8 +3,8 @@
 #include <vector>
 #include <string>
 
-#include "HWDecoderList.hpp"
-#include "HWEncoderList.hpp"
+#include "ffmpeg/HWDecoderList.hpp"
+#include "ffmpeg/HWEncoderList.hpp"
 
 namespace av {
     bool isCudaVideoEncodingDecodingAvailable();

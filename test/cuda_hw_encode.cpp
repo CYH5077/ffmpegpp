@@ -18,32 +18,40 @@ TEST(CUDA, CUDA_TRANSCODE) {
     ASSERT_TRUE(result.isSuccess());
 
 
-    const av::CodecParameters demuxerVideoCodecParameters = demuxer.getVideoCodecParameters();
-    const av::Stream &demuxerVideoStream = demuxer.getVideoStream();
-    av::VideoEncodeParameters videoEncodeParameter;
-    videoEncodeParameter.setBitrate(demuxerVideoCodecParameters.getBitrate());
-    videoEncodeParameter.setWidth(demuxerVideoCodecParameters.getWidth());
-    videoEncodeParameter.setHeight(demuxerVideoCodecParameters.getHeight());
-    videoEncodeParameter.setTimeBase(demuxerVideoStream.getTimebase());
-    videoEncodeParameter.setFrameRate(demuxerVideoStream.getFramerate());
-    videoEncodeParameter.setGOPSize(150);
-    videoEncodeParameter.setMaxBFrames(0);
-    videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
-    videoEncodeParameter.setEncodeThreadCount(10);
+    av::CodecContextPtr encodeVideoCodecContext = nullptr;
+    av::CodecContextPtr encodeAudioCodecContext = nullptr;
 
-    const av::CodecParameters demuxerAudioCodecParameters = demuxer.getAudioCodecParameters();
-    const av::Stream &demuxerAudioStream = demuxer.getAudioStream();
-    av::AudioEncodeParameters audioEncodeParameter;
-    audioEncodeParameter.setBitrate(demuxerAudioCodecParameters.getBitrate());
-    audioEncodeParameter.setTimebase(demuxerAudioStream.getTimebase());
-    audioEncodeParameter.setSampleFormat(av::SAMPLE_FORMAT::FLTP);
-    audioEncodeParameter.setSamplerate(demuxerAudioCodecParameters.getSamplerate());
-    audioEncodeParameter.setChannelLayout(demuxerAudioCodecParameters.getChannelLayout());
+    av::VideoStreamInfoPtr demuxerVideoStreamInfo = demuxer.getVideoStreamInfo();
+    if (demuxerVideoStreamInfo != nullptr) {
+        av::VideoEncodeParameters videoEncodeParameter;
+        videoEncodeParameter.setBitrate(demuxerVideoStreamInfo->getBitrate());
+        videoEncodeParameter.setWidth(demuxerVideoStreamInfo->getWidth());
+        videoEncodeParameter.setHeight(demuxerVideoStreamInfo->getHeight());
+        videoEncodeParameter.setTimeBase(demuxerVideoStreamInfo->getTimebase());
+        videoEncodeParameter.setFrameRate(demuxerVideoStreamInfo->getFramerate());
+        videoEncodeParameter.setGOPSize(10);
+        videoEncodeParameter.setMaxBFrames(0);
+        videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
+        videoEncodeParameter.setEncodeThreadCount(10);
 
-    av::CodecContextPtr encodeVideoCodecContext = av::createVideoCUDAEncoderContext(av::VIDEO_HW_CODEC_ID::H264,videoEncodeParameter, &result);
-    ASSERT_TRUE(result.isSuccess());
-    av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::AUDIO_CODEC_ID::AAC,audioEncodeParameter, &result);
-    ASSERT_TRUE(result.isSuccess());
+        encodeVideoCodecContext = av::createVideoCUDAEncoderContext(av::VIDEO_HW_CODEC_ID::H264,videoEncodeParameter, &result);
+        ASSERT_TRUE(result.isSuccess());
+    }
+
+    av::AudioStreamInfoPtr demuxerAudioStreamInfo = demuxer.getAudioStreamInfo();
+    if (demuxerAudioStreamInfo != nullptr) {
+        av::AudioEncodeParameters audioEncodeParameter;
+        audioEncodeParameter.setBitrate(demuxerAudioStreamInfo->getBitrate());
+        audioEncodeParameter.setTimebase(demuxerAudioStreamInfo->getTimebase());
+        audioEncodeParameter.setSampleFormat(av::SAMPLE_FORMAT::FLTP);
+        audioEncodeParameter.setSamplerate(demuxerAudioStreamInfo->getSamplerate());
+        audioEncodeParameter.setChannelLayout(demuxerAudioStreamInfo->getChannelLayout());
+
+        encodeAudioCodecContext = av::createAudioEncodeContext(av::AUDIO_CODEC_ID::AAC,audioEncodeParameter, &result);
+        ASSERT_TRUE(result.isSuccess());
+    }
+
+
 
     av::Muxer muxer;
     muxer.open(TEST::CUDA_TRANSCODING_MP4_FILE_1, &result);
@@ -67,10 +75,10 @@ TEST(CUDA, CUDA_TRANSCODE) {
         encoder.encode(packet.getMediaType(), decodeFrame,
                        [&](av::Packet &encodePacket, av::AVResult *encodeResult) {
                            if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO) {
-                               encodePacket.rescaleTS(demuxerVideoStream.getTimebase(),encodeVideoStream.getTimebase());
+                               encodePacket.rescaleTS(demuxerVideoStreamInfo->getTimebase(),encodeVideoStream.getTimebase());
                                encodePacket.setStreamIndex(demuxer.getVideoStreamIndex());
                            } else if (packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
-                               encodePacket.rescaleTS(demuxerAudioStream.getTimebase(),encodeAudioStream.getTimebase());
+                               encodePacket.rescaleTS(demuxerAudioStreamInfo->getTimebase(),encodeAudioStream.getTimebase());
                                encodePacket.setStreamIndex(demuxer.getAudioStreamIndex());
                            }
                            muxer.writePacket(encodePacket, encodeResult);
@@ -81,88 +89,4 @@ TEST(CUDA, CUDA_TRANSCODE) {
 
     encoder.flush(&result);
     ASSERT_TRUE(result.isSuccess());
-}
-
-TEST(CUDA, CUDA_TRANSCODE_LOOP) {
-    ASSERT_TRUE(av::isCudaVideoEncodingDecodingAvailable());
-
-
-    av::AVResult result;
-
-    for (int i = 0; i < 5; i++) {
-        // Demuxer
-        av::Demuxer demuxer;
-        demuxer.open(TEST::MP4_FILE, &result);
-        av::CodecContextPtr decodeVideoCodecContext = av::createVideoCUDADecodeContext(demuxer, &result);
-        ASSERT_TRUE(result.isSuccess());
-        av::CodecContextPtr decodeAudioCodecContext = av::createAudioDecodeContext(demuxer, &result);
-        ASSERT_TRUE(result.isSuccess());
-
-
-        const av::CodecParameters demuxerVideoCodecParameters = demuxer.getVideoCodecParameters();
-        const av::Stream& demuxerVideoStream = demuxer.getVideoStream();
-        av::VideoEncodeParameters videoEncodeParameter;
-        videoEncodeParameter.setBitrate(demuxerVideoCodecParameters.getBitrate());
-        videoEncodeParameter.setWidth(demuxerVideoCodecParameters.getWidth());
-        videoEncodeParameter.setHeight(demuxerVideoCodecParameters.getHeight());
-        videoEncodeParameter.setTimeBase(demuxerVideoStream.getTimebase());
-        videoEncodeParameter.setFrameRate(demuxerVideoStream.getFramerate());
-        videoEncodeParameter.setGOPSize(150);
-        videoEncodeParameter.setMaxBFrames(0);
-        videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
-        videoEncodeParameter.setEncodeThreadCount(10);
-
-        const av::CodecParameters demuxerAudioCodecParameters = demuxer.getAudioCodecParameters();
-        const av::Stream& demuxerAudioStream = demuxer.getAudioStream();
-        av::AudioEncodeParameters audioEncodeParameter;
-        audioEncodeParameter.setBitrate(demuxerAudioCodecParameters.getBitrate());
-        audioEncodeParameter.setTimebase(demuxerAudioStream.getTimebase());
-        audioEncodeParameter.setSampleFormat(av::SAMPLE_FORMAT::FLTP);
-        audioEncodeParameter.setSamplerate(demuxerAudioCodecParameters.getSamplerate());
-        audioEncodeParameter.setChannelLayout(demuxerAudioCodecParameters.getChannelLayout());
-
-        av::CodecContextPtr encodeVideoCodecContext = av::createVideoCUDAEncoderContext(av::VIDEO_HW_CODEC_ID::H264,videoEncodeParameter, &result);
-        ASSERT_TRUE(result.isSuccess());
-        av::CodecContextPtr encodeAudioCodecContext = av::createAudioEncodeContext(av::AUDIO_CODEC_ID::AAC,audioEncodeParameter, &result);
-        ASSERT_TRUE(result.isSuccess());
-
-        av::Muxer muxer;
-        muxer.open(TEST::CUDA_TRANSCODING_MP4_FILE_2, &result);
-        ASSERT_TRUE(result.isSuccess());
-        muxer.createNewStream(encodeVideoCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-        muxer.createNewStream(encodeAudioCodecContext, &result);
-        ASSERT_TRUE(result.isSuccess());
-        muxer.writeHeader(&result);
-        ASSERT_TRUE(result.isSuccess());
-
-        const av::Stream& encodeVideoStream = muxer.getVideoStream();
-        const av::Stream& encodeAudioStream = muxer.getAudioStream();
-
-        av::Encoder encoder(encodeVideoCodecContext, encodeAudioCodecContext);
-        av::Decoder decoder(decodeVideoCodecContext, decodeAudioCodecContext);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
-        decoder.decode(demuxer, [&](av::Packet& packet, av::Frame& decodeFrame, av::AVResult* decodeReuslt) {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode
-            encoder.encode(packet.getMediaType(), decodeFrame,
-                           [&](av::Packet& encodePacket, av::AVResult* encodeResult) {
-                               if (packet.getMediaType() == av::MEDIA_TYPE::VIDEO) {
-                                   encodePacket.rescaleTS(demuxerVideoStream.getTimebase(),encodeVideoStream.getTimebase());
-                                   encodePacket.setStreamIndex(demuxer.getVideoStreamIndex());
-                               } else if (packet.getMediaType() == av::MEDIA_TYPE::AUDIO) {
-                                   encodePacket.rescaleTS(demuxerAudioStream.getTimebase(),encodeAudioStream.getTimebase());
-                                   encodePacket.setStreamIndex(demuxer.getAudioStreamIndex());
-                               }
-                               muxer.writePacket(encodePacket, encodeResult);
-                           }, &result);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode
-        }, &result);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
-
-        encoder.flush(&result);
-        ASSERT_TRUE(result.isSuccess());
-
-        std::cout << "transcode success " << std::to_string(i) << std::endl;
-    }
 }

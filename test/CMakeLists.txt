@@ -1,8 +1,7 @@
 set(SOURCES main.cpp
             transmuxing.cpp
             transcode.cpp
-            split_video.cpp
-            play_pause_stop.cpp
+        play_pause_stop.cpp
             decode.cpp
             cuda_support.cpp
             cuda_hw_encode.cpp

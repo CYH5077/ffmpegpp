@@ -6,6 +6,10 @@
 #include "Rational.hpp"
 #include "Stream.hpp"
 #include "CodecParameters.hpp"
+#include "VideoEncodeParameters.hpp"
+#include "AudioEncodeParameters.hpp"
+#include "VideoStreamInfo.hpp"
+#include "AudioStreamInfo.hpp"
 
 namespace av {
     class Demuxer {
@@ -27,6 +31,9 @@ namespace av {
         bool seekAudio(double seconds, AVResult* result);
 
     public: // getter setter
+        VideoStreamInfoPtr getVideoStreamInfo();
+        AudioStreamInfoPtr getAudioStreamInfo();
+
         const Stream& getVideoStream();
         const Stream& getAudioStream();
 

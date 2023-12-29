@@ -1,7 +1,7 @@
 #pragma once
 
-#include "AVType.hpp"
-#include "Rational.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/Rational.hpp"
 
 namespace av {
     class Stream {

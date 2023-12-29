@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AVType.hpp"
-#include "AVResult.hpp"
-#include "ChannelLayout.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/AVResult.hpp"
+#include "ffmpeg/ChannelLayout.hpp"
 
 namespace av {
     class CodecParameters {

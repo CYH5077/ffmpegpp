@@ -3,9 +3,9 @@
 #include <iostream>
 #include <memory>
 
-#include "AVType.hpp"
-#include "AVResult.hpp"
-#include "Rational.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/AVResult.hpp"
+#include "ffmpeg/Rational.hpp"
 
 
 namespace av {
@@ -31,14 +31,16 @@ namespace av {
         int64_t getDTS();
         int     getSize();
         int     getStreamIndex();
-        MEDIA_TYPE getMediaType();
         double  getPTSTimeToSecond(const Rational&& timebase);
+        MEDIA_TYPE getMediaType();
+        long long  getFrameNumber();
 
         void setPTS(int64_t pts);
         void setDTS(int64_t dts);
         void setPos(int pos);
         void setStreamIndex(int streamIndex);
         void setMediaType(MEDIA_TYPE mediaType);
+        void setFrameNumber(long long frameNumber);
 
     public: // Raw pointer
         AVPacket* getRawPacket();
@@ -49,5 +51,7 @@ namespace av {
         AVPacket* packet;
 
         MEDIA_TYPE mediaType;
+
+        long long frameNumber;
     };
 };

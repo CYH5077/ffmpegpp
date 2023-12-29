@@ -2,11 +2,11 @@
 
 #include <functional>
 
-#include "AVType.hpp"
-#include "AVResult.hpp"
-#include "Muxer.hpp"
-#include "Frame.hpp"
-#include "CodecContext.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/AVResult.hpp"
+#include "ffmpeg/Muxer.hpp"
+#include "ffmpeg/Frame.hpp"
+#include "ffmpeg/CodecContext.hpp"
 
 namespace av {
     typedef std::function<void(Packet&, AVResult*)> EncoderCallbackFunc;

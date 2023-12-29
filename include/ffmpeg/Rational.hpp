@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AVType.hpp"
+#include "ffmpeg/AVType.hpp"
 
 namespace av {
     class Rational {

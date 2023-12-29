@@ -63,13 +63,11 @@ TEST(PLAY_STOP_TEST, PLAY_STOP_TEST) {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     decoder.stop();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    decoder.play();
+    thread.join();
 
     std::cout << "PLAY_STOP_TEST totalCount : " << packetCount << std::endl;
     std::cout << "PLAY_STOP_TEST decodeCount: " << decodeCount << std::endl;
 
-    thread.join();
     ASSERT_TRUE(packetCount > decodeCount);
     ASSERT_TRUE(decodeResult.isSuccess());
 }

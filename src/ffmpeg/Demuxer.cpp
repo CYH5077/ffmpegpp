@@ -64,6 +64,14 @@ namespace av {
         return this->seek(this->audioStreamIndex, timestamp, result);
     }
 
+    VideoStreamInfoPtr Demuxer::getVideoStreamInfo() {
+        return VideoStreamInfo::createVideoStreamInfo(this->videoStream, this->videoCodecParameter);
+    }
+
+    AudioStreamInfoPtr Demuxer::getAudioStreamInfo() {
+        return AudioStreamInfo::createAudioStreamInfo(this->audioStream, this->audioCodecParameter);
+    }
+
     const Stream& Demuxer::getVideoStream() {
         return this->videoStream;
     }

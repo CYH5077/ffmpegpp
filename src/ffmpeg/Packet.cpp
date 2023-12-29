@@ -7,14 +7,18 @@ extern "C" {
 namespace av {
 
     Packet::Packet() {
-        this->packet = av_packet_alloc();
-        this->mediaType = MEDIA_TYPE::UNKNOWN;
+        this->packet      = av_packet_alloc();
+        this->mediaType   = MEDIA_TYPE::UNKNOWN;
+        this->frameNumber = 0;
     }
 
     Packet::Packet(AVPacket* packet, MEDIA_TYPE mediaType) {
         this->packet = av_packet_alloc();
-        av_packet_ref(this->packet, packet);
-        this->mediaType = mediaType;
+        if (packet != nullptr) {
+            av_packet_ref(this->packet, packet);
+        }
+        this->mediaType   = mediaType;
+        this->frameNumber = 0;
     }
 
     Packet::~Packet() {
@@ -35,7 +39,15 @@ namespace av {
         AVRational avPreTimebase    { preTimebase.getNum()   , preTimebase.getDen() };
         AVRational avTargetTimebase { targetTimebase.getNum(), targetTimebase.getDen() };
 
-        av_packet_rescale_ts(this->packet, avPreTimebase, avTargetTimebase);
+        if (this->packet->pts != AV_NOPTS_VALUE) {
+            av_packet_rescale_ts(this->packet, avPreTimebase, avTargetTimebase);
+        } else {
+            if (this->packet->dts != AV_NOPTS_VALUE) {
+                this->packet->pts = packet->dts;
+            } else {
+                this->packet->dts = this->packet->pts = av_rescale_q(this->frameNumber, avPreTimebase, avTargetTimebase);
+            }
+        }
     }
 
     bool Packet::isValidPacket() {
@@ -65,6 +77,10 @@ namespace av {
         return this->mediaType;
     }
 
+    long long Packet::getFrameNumber() {
+        return this->frameNumber;
+    }
+
     double Packet::getPTSTimeToSecond(const Rational&& timebase) {
         AVRational avTimebase {timebase.getNum(), timebase.getDen()};
         double ptsTime = this->getPTS() * av_q2d(avTimebase);
@@ -89,6 +105,10 @@ namespace av {
 
     void Packet::setMediaType(MEDIA_TYPE mediaType) {
         this->mediaType = mediaType;
+    }
+
+    void Packet::setFrameNumber(long long frameNumber) {
+        this->frameNumber = frameNumber;
     }
 
     AVPacket* Packet::getRawPacket() {

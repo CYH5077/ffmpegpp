@@ -3,12 +3,12 @@
 #include <string>
 #include <vector>
 
-#include "AVType.hpp"
-#include "AVResult.hpp"
-#include "Demuxer.hpp"
-#include "CodecContext.hpp"
-#include "Packet.hpp"
-#include "Stream.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/AVResult.hpp"
+#include "ffmpeg/Demuxer.hpp"
+#include "ffmpeg/CodecContext.hpp"
+#include "ffmpeg/Packet.hpp"
+#include "ffmpeg/Stream.hpp"
 
 namespace av {
     class Muxer {

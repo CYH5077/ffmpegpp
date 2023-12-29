@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AVType.hpp"
-#include "Rational.hpp"
-#include "ChannelLayout.hpp"
+#include "ffmpeg/AVType.hpp"
+#include "ffmpeg/Rational.hpp"
+#include "ffmpeg/ChannelLayout.hpp"
 
 namespace av {
     class AudioEncodeParameters {

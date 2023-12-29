@@ -56,6 +56,11 @@ namespace av {
             }
         }
 
+        if (avCodecContext->codec_type == AVMEDIA_TYPE_VIDEO && avFrame != nullptr) {
+            std::cout << "Encoder frame pts: " << avFrame->pts << std::endl;
+        }
+
+
         Packet packet;
         ret = avcodec_send_frame(avCodecContext, avFrame);
         while (ret >= 0) {
@@ -65,6 +70,7 @@ namespace av {
                 break;
             }
 
+            packet.setFrameNumber(avCodecContext->frame_num);
             packet.setMediaType(av::AVMediaTypeToMediaType(avCodecContext->codec->type));
             this->func(packet, result);
             if (result->isSuccess() == false) {

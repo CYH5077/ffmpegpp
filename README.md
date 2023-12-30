@@ -1,4 +1,4 @@
-# ffmpegpp
+# ffmpegpp 6.1
 ffmpeg c++ wrapper
 examples, refer to the test folder.<br>
 linux, windows support

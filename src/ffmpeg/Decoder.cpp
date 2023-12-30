@@ -115,7 +115,6 @@ namespace av {
         }
 
         Frame frame;
-        Frame swFrame; // HW Decoding 시 사용
         while (ret >= 0) {
             if (this->isPause == true) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -131,6 +130,8 @@ namespace av {
                 return result->avFailed(ret);
             }
 
+            AVFrame* avFrame = frame.getRawFrame();
+            avFrame->pts = avFrame->best_effort_timestamp;
             Packet packet(avPacket, AVMediaTypeToMediaType(avCodecContext->codec->type));
             if (this->callDecoderCallbackFunc(packet, frame, func, result) == false) {
                 return result->isSuccess();

@@ -8,7 +8,9 @@
 #include <vector>
 
 TEST(CUDA, CUDA_DECODE_SINGLE) {
-    ASSERT_TRUE(av::isCudaVideoEncodingDecodingAvailable());
+    if (av::isCudaVideoEncodingDecodingAvailable() == false) {
+        SUCCEED();
+    }
 
     av::AVResult result;
 

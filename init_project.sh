@@ -14,7 +14,7 @@ function sample_video_download {
     mkdir test
     cd test
     # sample video download
-    wget -O sample.mp4 https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4
+    wget -O sample.mp4 https://www.dwsamplefiles.com/?dl_id=351
     if [ $? -ne 0 ]; then
         exit -1
     fi

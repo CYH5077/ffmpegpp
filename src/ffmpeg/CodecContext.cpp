@@ -29,14 +29,6 @@ namespace av {
         return this->codecContext->bit_rate;
     }
 
-    const Rational& CodecContext::getTimebase() {
-        return this->timebase;
-    }
-
-    const Rational& CodecContext::getFramerate() {
-        return this->framerate;
-    }
-
     MEDIA_TYPE CodecContext::getMediaType() {
         return AVMediaTypeToMediaType((int)this->codecContext->codec->type);
     }
@@ -172,8 +164,8 @@ namespace av {
         encodeCodecContext->bit_rate = encodeParameter.getBitrate();
         encodeCodecContext->width    = encodeParameter.getWidth();
         encodeCodecContext->height   = encodeParameter.getHeight();
-        encodeCodecContext->time_base = AVRational{encodeParameter.getTimeBase().getNum() , encodeParameter.getTimeBase().getDen()};
-        encodeCodecContext->framerate = AVRational{encodeParameter.getFrameRate().getNum(), encodeParameter.getFrameRate().getDen()};
+        encodeCodecContext->time_base = AVRational {encodeParameter.getTimeBase().getNum() , encodeParameter.getTimeBase().getDen()};
+        encodeCodecContext->framerate = av_inv_q(encodeCodecContext->time_base);
         encodeCodecContext->gop_size     = encodeParameter.getGOPSize();
         encodeCodecContext->max_b_frames = encodeParameter.getMaxBFrames();
         encodeCodecContext->pix_fmt      = (AVPixelFormat)pixelFormatToAVPixelFormat(encodeParameter.getPixelFormat());
@@ -183,9 +175,6 @@ namespace av {
         }
         codecContext->setAVCodecContext(encodeCodecContext);
 
-        if (cudaEnable == true) {
-
-        }
 
         int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
         if (ret < 0) {

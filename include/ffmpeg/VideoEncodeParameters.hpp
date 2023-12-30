@@ -15,16 +15,14 @@ namespace av {
         int getHeight();
         int getGOPSize();
         int getMaxBFrames();
-        const Rational& getTimeBase();
-        const Rational& getFrameRate();
-        PIXEL_FORMAT getPixelFormat();
         int getEncodeThreadCount();
+        PIXEL_FORMAT    getPixelFormat();
+        const Rational& getTimeBase();
 
         void setBitrate(long long bitrate);
         void setWidth(int width);
         void setHeight(int height);
         void setTimeBase(const Rational& timebase);
-        void setFrameRate(const Rational& framerate);
         void setGOPSize(int gopSize);
         void setMaxBFrames(int maxBFrames);
         void setPixelFormat(PIXEL_FORMAT pixelFormat);
@@ -40,7 +38,6 @@ namespace av {
         int maxBFrames;
 
         Rational timebase;
-        Rational framerate;
 
         PIXEL_FORMAT pixelFormat;
 

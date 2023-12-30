@@ -107,22 +107,18 @@ namespace av {
     }
 
     bool Muxer::createNewStream(CodecContextPtr codecContext, AVResult* result) {
-        const AVCodec* codec = codecContext->getRawCodecContext()->codec;
-        AVStream* stream = avformat_new_stream(this->formatContext, codec);
+        AVCodecContext* avCodecContext = codecContext->getRawCodecContext();
+
+        AVStream* stream = avformat_new_stream(this->formatContext, nullptr);
         if (stream == nullptr) {
             return result->avFailed(AVERROR(ENOMEM));
         }
-        stream->time_base = codecContext->getRawCodecContext()->time_base;
+        stream->time_base = avCodecContext->time_base;
 
-        int ret = avcodec_parameters_from_context(stream->codecpar, codecContext->getRawCodecContext());
+        int ret = avcodec_parameters_from_context(stream->codecpar, avCodecContext);
         if (ret < 0) {
             return result->avFailed(ret);
         }
-
-        AVStream* avVideoStream = this->getRawStream(MEDIA_TYPE::VIDEO);
-        AVStream* avAudioStream = this->getRawStream(MEDIA_TYPE::AUDIO);
-        this->videoStream.setRawStream(avVideoStream);
-        this->audioStream.setRawStream(avAudioStream);
 
         return result->success();
     }
@@ -136,6 +132,11 @@ namespace av {
         if (ret < 0) {
             return result->avFailed(ret);
         }
+
+        AVStream* avVideoStream = this->getRawStream(MEDIA_TYPE::VIDEO);
+        AVStream* avAudioStream = this->getRawStream(MEDIA_TYPE::AUDIO);
+        this->videoStream.setRawStream(avVideoStream);
+        this->audioStream.setRawStream(avAudioStream);
 
         return result->success();
     }

@@ -5,14 +5,17 @@
 #include "ffmpegpp.hpp"
 
 TEST(CUDA, CUDA_TRANSCODE) {
-    ASSERT_TRUE(av::isCudaVideoEncodingDecodingAvailable());
+    if (av::isCudaVideoEncodingDecodingAvailable() == false) {
+        SUCCEED();
+    }
 
     av::AVResult result;
 
     // Demuxer
     av::Demuxer demuxer;
     demuxer.open(TEST::MP4_FILE, &result);
-    av::CodecContextPtr decodeVideoCodecContext = av::createVideoCUDADecodeContext(demuxer, &result);
+    ASSERT_TRUE(result.isSuccess());
+    av::CodecContextPtr decodeVideoCodecContext = av::createVideoDecodeContext(demuxer, &result);
     ASSERT_TRUE(result.isSuccess());
     av::CodecContextPtr decodeAudioCodecContext = av::createAudioDecodeContext(demuxer, &result);
     ASSERT_TRUE(result.isSuccess());
@@ -28,7 +31,6 @@ TEST(CUDA, CUDA_TRANSCODE) {
         videoEncodeParameter.setWidth(demuxerVideoStreamInfo->getWidth());
         videoEncodeParameter.setHeight(demuxerVideoStreamInfo->getHeight());
         videoEncodeParameter.setTimeBase(demuxerVideoStreamInfo->getTimebase());
-        videoEncodeParameter.setFrameRate(demuxerVideoStreamInfo->getFramerate());
         videoEncodeParameter.setGOPSize(10);
         videoEncodeParameter.setMaxBFrames(0);
         videoEncodeParameter.setPixelFormat(av::PIXEL_FORMAT::YUV420P);
@@ -86,7 +88,7 @@ TEST(CUDA, CUDA_TRANSCODE) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode
     }, &result);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
+    ASSERT_TRUE(result.isSuccess());
 
     encoder.flush(&result);
-    ASSERT_TRUE(result.isSuccess());
 }

@@ -41,10 +41,6 @@ namespace av {
         return this->timebase;
     }
 
-    const Rational& VideoEncodeParameters::getFrameRate() {
-        return this->framerate;
-    }
-
     int VideoEncodeParameters::getGOPSize() {
         return this->gopSize;
     }
@@ -75,10 +71,6 @@ namespace av {
 
     void VideoEncodeParameters::setTimeBase(const Rational& timebase) {
         this->timebase = timebase;
-    }
-
-    void VideoEncodeParameters::setFrameRate(const Rational& framerate) {
-        this->framerate = framerate;
     }
 
     void VideoEncodeParameters::setGOPSize(int gopSize) {

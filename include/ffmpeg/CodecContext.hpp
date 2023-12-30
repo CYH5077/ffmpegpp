@@ -21,8 +21,6 @@ namespace av {
         CodecContext& operator=(const CodecContext&) = delete;
 
     public: // getter setter
-        const Rational& getTimebase();
-        const Rational& getFramerate();
         int64_t    getBitrate();
         MEDIA_TYPE getMediaType();
 
@@ -36,6 +34,7 @@ namespace av {
 
         AVCodecContext* getRawCodecContext();
         int             getRawHWFormat();
+
     private:
         AVCodecContext* codecContext;
 

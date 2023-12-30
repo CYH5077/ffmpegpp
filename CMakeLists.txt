@@ -15,8 +15,11 @@ set(FFMPEG_LIBRARY_DIR "" CACHE PATH "Path to FFMPEG library directory")
 set(INSTALL_DIR ${CMAKE_SOURCE_DIR}/build)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/googletest/include)
-file(GLOB FFMPEG_LIBRARYS "${FFMPEG_LIBRARY_DIR}/*.a")
-
+if (WIN32)
+	file(GLOB FFMPEG_LIBRARYS "${FFMPEG_LIBRARY_DIR}/*.a")
+else()
+	file(GLOB FFMPEG_LIBRARYS "${FFMPEG_LIBRARY_DIR}/*.so")
+endif()
 include_directories(${INCLUDE_DIR}
                     ${GTEST_INCLUDE_DIR}
                     ${FFMPEG_INCLUDE_DIR})

@@ -1,27 +1,20 @@
-# ffmpegpp 6.1
-ffmpeg c++ wrapper
-examples, refer to the test folder.<br>
+# ffmpegpp
+ffmpeg 6.1 c++ wrapper<br>
 linux, windows support
 
 <h1> Build </h1>
-<h2> - Show build in example script</h2>
-<h3>first run init_project script</h3>
-<pre>init_project.sh or init_project.bat</pre>
-<pre>build_example_command.sh or build_example_command.bat</pre>
+<pre>$ cmake .</pre>
+<pre>$ make -j10</pre>
+<pre>$ make install</pre>
 
+<h2> Install vcpkg </h2>
+<pre> <a href="https://vcpkg.io/en/">https://vcpkg.io/en/</a></pre>
 
-<h1> Linux Build </h1>
-<h2> - Package install </h2>
-<pre> $ sudo apt-get install cmake make g++ </pre>
+<h2> Windows Build </h2>
+<h3> - Install package </h3>
+<pre> $ vcpkg install gtest:x64-mingw-dynamic ffmpeg[all]:x64-mingw-dynamic </pre>
 
-<br>
-<h1> Windows Build </h1>
-<h2> - Install tools (CMake) </h2>
-<pre><a href="https://cmake.org/download/"> https://cmake.org/download/ </a></pre> 
-<h2> - Install tools (Makefiles) </h2>
-<pre><a href="https://gnuwin32.sourceforge.net/packages/make.htm"> https://gnuwin32.sourceforge.net/packages/make.htm </a></pre>
-<h2> - Install tools (wget) </h2>
-<pre><a href="https://eternallybored.org/misc/wget/"> https://eternallybored.org/misc/wget/ </a></pre>
-<h2> - Install tools (MinGW g++) </h2>
-<pre><a href=""> https://sourceforge.net/projects/mingw-w64/files/ </a></pre>
+<h2> Linux Build </h2>
+<h3> - Install package </h3>
+<pre> $ vcpkg install gtest ffmpeg[all] </pre>
 

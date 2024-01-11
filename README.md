@@ -12,7 +12,7 @@ linux, windows support
 
 <h2> Windows Build </h2>
 <h3> - Install package </h3>
-<pre> $ vcpkg install gtest:x64-mingw-dynamic ffmpeg[all]:x64-mingw-dynamic </pre>
+<pre> $ vcpkg install gtest:x64-mingw-dynamic ffmpeg[all]:x64-windows </pre>
 
 <h2> Linux Build </h2>
 <h3> - Install package </h3>

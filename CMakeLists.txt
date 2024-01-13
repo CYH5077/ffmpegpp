@@ -15,10 +15,10 @@ set(FFMPEGPP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 add_library(${PROJECT_NAME})
 
 find_package(FFMPEG REQUIRED)
-target_include_directories(${PROJECT_NAME} PRIVATE ${FFMPEGPP_INCLUDE_DIR}
+target_include_directories(${PROJECT_NAME} PUBLIC ${FFMPEGPP_INCLUDE_DIR}
 										           ${FFMPEG_INCLUDE_DIRS})
-target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARY_DIRS}) 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${FFMPEG_LIBRARIES})
+target_link_directories(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARY_DIRS}) 
+target_link_libraries(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARIES})
 
 
 add_subdirectory (src)

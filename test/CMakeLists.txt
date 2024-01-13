@@ -18,7 +18,7 @@ target_link_libraries(${FFMPEGPP_TEST} PRIVATE ${PROJECT_NAME}
                                                 GTest::gtest_main
                                                 GTest::gmock
                                                 GTest::gmock_main)
-target_include_directories(${FFMPEGPP_TEST} PRIVATE ${INCLUDE_DIR})
+target_include_directories(${FFMPEGPP_TEST} PRIVATE ${FFMPEGPP_INCLUDE_DIR})
 
 install(TARGETS ${FFMPEGPP_TEST}
-        DESTINATION ${INSTALL_DIR}/test)
+        DESTINATION ${FFMPEGPP_INSTALL_DIR}/test)

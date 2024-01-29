@@ -16,5 +16,5 @@ linux, windows support
 
 <h2> Linux Build </h2>
 <h3> - Install package </h3>
-<pre> $ vcpkg install gtest ffmpeg[all] </pre>
+<pre> $ vcpkg install gtest ffmpeg[x264,x265] </pre>
 

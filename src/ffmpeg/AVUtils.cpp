@@ -3,6 +3,7 @@
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
 #include "libavutil/hwcontext.h"
 }
 
@@ -53,5 +54,31 @@ namespace av {
                 }
             }
         }
+    }
+
+    bool convertFrameSizeWithToRGB(Frame& targetFrame, Frame* convertFrame, int width, int height, AVResult* result) {
+        if (result       == nullptr ||
+            convertFrame == nullptr) {
+            return false;
+        }
+
+        AVFrame* targetRawFrame  = targetFrame.getRawFrame();
+        AVFrame* convertRawFrame = convertFrame->getRawFrame();
+
+        SwsContext* swsContext = sws_getContext(targetRawFrame->width, targetRawFrame->height, (AVPixelFormat)targetRawFrame->format,
+            								    width,                 height,                  AV_PIX_FMT_RGB24,
+            									SWS_BICUBIC, nullptr, nullptr, nullptr);
+        if (swsContext == nullptr) {
+            return result->failed(-1, "sws_context create failed");
+        }
+
+        convertRawFrame->format = AV_PIX_FMT_RGB24;
+        convertRawFrame->width  = width;
+        convertRawFrame->height = height;
+        av_frame_get_buffer(convertRawFrame, 32);
+
+        sws_scale(swsContext, targetRawFrame->data, targetRawFrame->linesize, 0, targetRawFrame->height, convertRawFrame->data, convertRawFrame->linesize);
+        sws_freeContext(swsContext);
+        return result->success();
     }
 };

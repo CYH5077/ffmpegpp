@@ -13,7 +13,7 @@ set(FFMPEGPP_TEST ffmpegpp_test)
 add_executable(${FFMPEGPP_TEST} ${SOURCES})
 
 find_package(GTest CONFIG REQUIRED)
-target_link_libraries(${FFMPEGPP_TEST} PRIVATE ${PROJECT_NAME} 
+target_link_libraries(${FFMPEGPP_TEST} PRIVATE  ${PROJECT_NAME}
                                                 GTest::gtest
                                                 GTest::gtest_main
                                                 GTest::gmock

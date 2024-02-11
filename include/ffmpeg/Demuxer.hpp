@@ -31,6 +31,8 @@ namespace av {
         bool seekAudio(double seconds, AVResult* result);
 
     public: // getter setter
+        int getPlayTimeToSeconds();
+
         VideoStreamInfoPtr getVideoStreamInfo();
         AudioStreamInfoPtr getAudioStreamInfo();
 

@@ -5,7 +5,7 @@ extern "C" {
 }
 
 namespace av {
-
+    
     int videoCodecIDToAVCodecID(VIDEO_CODEC_ID videoCodecID) {
         switch (videoCodecID) {
             case VIDEO_CODEC_ID::H264: return AV_CODEC_ID_H264;

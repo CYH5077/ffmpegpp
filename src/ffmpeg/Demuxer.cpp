@@ -64,6 +64,14 @@ namespace av {
         return this->seek(this->audioStreamIndex, timestamp, result);
     }
 
+    int Demuxer::getPlayTimeToSeconds() {
+        if (this->formatContext == nullptr) {
+            return -1;
+        }
+
+        return this->formatContext->duration / AV_TIME_BASE;
+    }
+
     VideoStreamInfoPtr Demuxer::getVideoStreamInfo() {
         return VideoStreamInfo::createVideoStreamInfo(this->videoStream, this->videoCodecParameter);
     }

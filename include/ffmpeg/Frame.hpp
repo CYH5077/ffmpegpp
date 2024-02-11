@@ -7,11 +7,11 @@ namespace av {
     class Frame {
     public:
         explicit Frame();
+        explicit Frame(const Frame& frame);
         explicit Frame(AVFrame* frame);
         virtual ~Frame();
 
     public:
-        Frame(const Frame&) = delete;
         Frame& operator=(const Frame&) = delete;
 
     public:
@@ -19,9 +19,15 @@ namespace av {
 
     public: // getter setter
         const Rational& getTimeBase();
-
+        unsigned char*  getData(int index);
+        int getWidth();
+        int getHeight();
+        int getLineSize(int index);
+        long long getPTS();
+        
 
         void setTimeBase(Rational& timebase);
+
 
     public: // Raw pointer
         AVFrame*  getRawFrame();

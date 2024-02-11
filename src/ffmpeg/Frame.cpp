@@ -14,6 +14,10 @@ namespace av {
         this->frame = av_frame_alloc();
     }
 
+    Frame::Frame(const Frame& frame) {
+		this->frame = av_frame_clone(frame.frame);
+	}
+
     Frame::Frame(AVFrame* frame) {
         this->frame = frame;
     }
@@ -33,6 +37,26 @@ namespace av {
     const Rational& Frame::getTimeBase() {
         return this->timebase;
     }
+
+    unsigned char* Frame::getData(int index) {
+		return this->frame->data[index];
+	}
+
+    int Frame::getWidth() {
+		return this->frame->width;
+	}
+
+    int Frame::getHeight() {
+        return this->frame->height;
+    }
+
+    int Frame::getLineSize(int index) {
+        return this->frame->linesize[index];
+    }
+
+    long long Frame::getPTS() {
+		return this->frame->pts;
+	}
 
     void Frame::setTimeBase(Rational& timebase) {
         this->timebase = timebase;

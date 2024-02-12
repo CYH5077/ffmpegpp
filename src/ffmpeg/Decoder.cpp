@@ -102,6 +102,10 @@ namespace av {
         this->isStop = true;
     }
 
+    void Decoder::clearFrameBuffer() {
+        avcodec_flush_buffers(this->videoContext->getRawCodecContext());
+    }
+
     bool Decoder::decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result) {
         if (avCodecContext == nullptr) {
             return true;

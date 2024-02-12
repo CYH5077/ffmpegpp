@@ -5,6 +5,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 #include "libavutil/hwcontext.h"
+#include "libavutil/time.h"
 }
 
 namespace av {
@@ -81,4 +82,16 @@ namespace av {
         sws_freeContext(swsContext);
         return result->success();
     }
+
+    long long getLocalTimeMicroseconds() {
+        return av_gettime_relative();
+    }
+
+    long long getPTSTimeToMicroseconds(long long pts, Rational& timebase) {
+        /*
+        double timebaseValue = av_q2d(AVRational{timebase.getNum(), timebase.getDen()});
+        double ptsTime       = pts * timebaseValue;
+        */
+        return av_rescale_q(pts, AVRational{timebase.getNum(), timebase.getDen()}, AV_TIME_BASE_Q);
+	}
 };

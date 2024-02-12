@@ -30,6 +30,8 @@ namespace av {
         void pause();
         void stop();
 
+        void clearFrameBuffer();
+
     private:
         bool decodePacket(AVCodecContext* avCodecContext, AVPacket* avPacket, DecoderCallbackFunc func, AVResult* result);
 

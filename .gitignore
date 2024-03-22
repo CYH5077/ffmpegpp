@@ -17,6 +17,7 @@ transcoding.mp4
 transcoding_1.mp4
 transcoding_2.mp4
 transmuxing.mkv
+out
 
 # windows library
 thirdparty/windows/ffmpeg/include

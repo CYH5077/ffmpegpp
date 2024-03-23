@@ -3,6 +3,6 @@
 #include "ffmpegpp.hpp"
 
 TEST(TEST1, TEST1) {
-    auto formatContext = ff::FFAVFormatContext::create();
-    auto packet = ff::FFAVPacket::create();
+    ff::FFAVFormatContext formatContext;
+    ff::FFAVPacket packet;
 }

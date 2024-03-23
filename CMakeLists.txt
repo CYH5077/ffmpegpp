@@ -4,7 +4,7 @@ project(ffmpegpp)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if (WIN32)
+if (WIN32 AND MSVC)
     set (CMAKE_CXX_FLAGS_RELEASE "/MD /O2 /Ob2 /DNDEBUG")
     set (CMAKE_CXX_FLAGS_DEBUG "/MD /Zi /Ob0 /Od /RTC1")
 elseif (LINUX)
@@ -22,7 +22,7 @@ add_library(${PROJECT_NAME})
 
 find_package(FFMPEG REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${FFMPEGPP_INCLUDE_DIR}
-										           ${FFMPEG_INCLUDE_DIRS})
+										            ${FFMPEG_INCLUDE_DIRS})
 target_link_directories(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARY_DIRS}) 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARIES})
 

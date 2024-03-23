@@ -1,10 +1,13 @@
 set(SOURCES main.cpp
-            )
+            type_test.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 #enable_testing() # build/test 폴더 생성됨
 
-add_executable(${FFMPEGPP_TEST} ${SOURCES} "test_test.cpp")
+add_executable(${FFMPEGPP_TEST} ${SOURCES} )
+
+enable_testing()
+add_test(AllTestsInMain main)
 
 find_package(GTest CONFIG REQUIRED)
 target_link_libraries(${FFMPEGPP_TEST} PRIVATE  ${PROJECT_NAME}

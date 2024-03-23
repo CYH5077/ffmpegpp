@@ -12,9 +12,9 @@ linux, windows support
 
 <h2> Windows Build </h2>
 <h3> - Install package </h3>
-<pre> $ vcpkg install gtest:x64-windows-release ffmpeg[x264,x265]:x64-windows-release </pre>
+<pre> $ vcpkg install ffmpeg[fdk-aac,fontconfig,freetype,fribidi,gpl,mp3lame,nvcodec,vorbis,vpx,webp,x264,x265]:x64-windows-release gtest:x64-windows-release </pre>
 
 <h2> Linux Build </h2>
 <h3> - Install package </h3>
-<pre> $ vcpkg install gtest ffmpeg[x264,x265] </pre>
+<pre> $ ./vcpkg install ffmpeg[fdk-aac,fontconfig,freetype,fribidi,gpl,mp3lame,nvcodec,vorbis,vpx,webp,x264,x265]:x64-linux-release gtest:x64-linux-release </pre>
 

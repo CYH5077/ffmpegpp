@@ -7,14 +7,6 @@ namespace ff {
         this->codecParametersImpl = FFAVCodecParametersImpl::create();
     }
 
-    FFAVCodecParameters::FFAVCodecParameters(FFAVCodecParameters& codecParameters) {
-        this->codecParametersImpl = FFAVCodecParametersImpl::create(codecParameters.codecParametersImpl);
-    }
-
-    FFAVCodecParameters::FFAVCodecParameters(ff::FFAVCodecParametersImplPtr codecParametersImpl) {
-        this->codecParametersImpl = FFAVCodecParametersImpl::create(codecParametersImpl);
-    }
-
     FFAVCodecParameters::~FFAVCodecParameters() {
 
     }

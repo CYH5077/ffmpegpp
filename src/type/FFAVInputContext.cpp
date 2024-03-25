@@ -97,6 +97,22 @@ namespace ff {
         return this->formatContextImpl;
     }
 
+    FFAVCodecParameters FFAVInputContext::getVideoCodecParameters() {
+        return this->videoCodecParameters;
+    }
+
+    FFAVCodecParameters FFAVInputContext::getAudioCodecParameters() {
+        return this->audioCodecParameters;
+    }
+
+    FFAVStream FFAVInputContext::getVideoStream() {
+        return this->videoStream;
+    }
+
+    FFAVStream FFAVInputContext::getAudioStream() {
+        return this->audioStream;
+    }
+
     FFAVInputContextIterator FFAVInputContext::begin() {
         return FFAVInputContextIterator(this);
     }

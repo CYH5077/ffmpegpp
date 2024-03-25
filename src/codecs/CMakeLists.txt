@@ -1,5 +1,6 @@
 set(SOURCES
-        Decoder.cpp)
+        FFAVDecoder.cpp
+        func.cpp)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

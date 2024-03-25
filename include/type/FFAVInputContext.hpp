@@ -43,6 +43,10 @@ namespace ff {
         bool isOpened() const;
 
         FFAVFormatContextImplPtr getImpl();
+        FFAVCodecParameters getVideoCodecParameters();
+        FFAVCodecParameters getAudioCodecParameters();
+        FFAVStream getVideoStream();
+        FFAVStream getAudioStream();
 
     public: // for (auto& packet : inputContext) iterator
         FFAVInputContextIterator begin();

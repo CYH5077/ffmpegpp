@@ -10,15 +10,10 @@ namespace ff {
     class FFAVStreamImpl : public std::enable_shared_from_this<FFAVStreamImpl> {
     public:
         explicit FFAVStreamImpl();
-        explicit FFAVStreamImpl(FFAVStreamImplPtr streamImpl);
-        explicit FFAVStreamImpl(AVStream* stream);
-
         virtual ~FFAVStreamImpl();
 
     public:
         static FFAVStreamImplPtr create();
-        static FFAVStreamImplPtr create(FFAVStreamImplPtr streamImpl);
-        static FFAVStreamImplPtr create(AVStream* stream);
 
     public:
         AVStream* getRaw();

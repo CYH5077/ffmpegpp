@@ -8,9 +8,6 @@ namespace ff {
     class FFAVCodecParameters {
     public:
         explicit FFAVCodecParameters();
-        explicit FFAVCodecParameters(FFAVCodecParameters& codecParameters);
-        explicit FFAVCodecParameters(FFAVCodecParametersImplPtr codecParametersImpl);
-
         virtual ~FFAVCodecParameters();
 
     public:

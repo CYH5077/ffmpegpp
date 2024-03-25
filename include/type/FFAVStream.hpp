@@ -8,9 +8,6 @@ namespace ff {
     class FFAVStream {
     public:
         explicit FFAVStream();
-        explicit FFAVStream(FFAVStream& stream);
-        explicit FFAVStream(FFAVStreamImplPtr streamImpl);
-
         virtual ~FFAVStream();
 
     public:

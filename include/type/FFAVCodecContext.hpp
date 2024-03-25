@@ -1,8 +1,26 @@
-//
-// Created by hun50 on 2024-03-23.
-//
+#pragma once
 
-#ifndef FFMPEGPP_FFAVCODECCONTEXT_HPP
-#define FFMPEGPP_FFAVCODECCONTEXT_HPP
+#include "type/impl/ffavimpl.hpp"
 
-#endif //FFMPEGPP_FFAVCODECCONTEXT_HPP
+#include <memory>
+
+namespace ff {
+    class FFAVCodecContext;
+    typedef std::shared_ptr<FFAVCodecContext> FFAVCodecContextPtr;
+
+    class FFAVCodecContext {
+    public:
+        explicit FFAVCodecContext();
+        virtual ~FFAVCodecContext();
+
+    public:
+        static FFAVCodecContextPtr create();
+
+    public:
+        FFAVCodecContextImplPtr getImpl();
+
+    private:
+        FFAVCodecContextImplPtr codecContextImpl;
+    };
+
+}

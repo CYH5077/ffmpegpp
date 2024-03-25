@@ -1,6 +1,8 @@
 #pragma once
 
 #include "type/FFAVPacket.hpp"
+#include "type/FFAVCodecParameters.hpp"
+#include "type/FFAVStream.hpp"
 
 #include "error/AVError.hpp"
 
@@ -37,18 +39,29 @@ namespace ff {
 
         AVError readFrame(FFAVPacket* packet);
 
-    public: // for (auto& packet : inputContext)
-        FFAVInputContextIterator begin();
-        FFAVInputContextIterator end();
-
     public: // get set
         bool isOpened() const;
 
         FFAVFormatContextImplPtr getImpl();
 
+    public: // for (auto& packet : inputContext) iterator
+        FFAVInputContextIterator begin();
+        FFAVInputContextIterator end();
+
+    private:
+        void findMetaData();
+
     private:
         bool isOpenedFlag = false;
 
         FFAVFormatContextImplPtr formatContextImpl;
+
+        // CodecParameters
+        FFAVCodecParameters videoCodecParameters;
+        FFAVCodecParameters audioCodecParameters;
+
+        // Stream
+        FFAVStream videoStream;
+        FFAVStream audioStream;
     };
 };

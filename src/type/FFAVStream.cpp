@@ -4,7 +4,7 @@
 
 namespace ff {
     FFAVStream::FFAVStream() {
-        this->streamImpl = nullptr;
+        this->streamImpl = FFAVStreamImpl::create();
     }
 
     FFAVStream::FFAVStream(FFAVStream& stream) {

@@ -2,6 +2,8 @@
 #include "type/impl/FFAVFormatContextImpl.hpp"
 
 #include "type/impl/FFAVPacketImpl.hpp"
+#include "type/impl/FFAVCodecParametersImpl.hpp"
+#include "type/impl/FFAVStreamImpl.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -42,8 +44,10 @@ namespace ff {
             return AVError(AV_ERROR_TYPE::AV_ERROR, url + " find stream info failed", ret, "avformat_find_stream_info");
         }
 
+
         this->isOpenedFlag = true;
         this->formatContextImpl->setRaw(formatContext);
+        this->findMetaData();
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
@@ -85,6 +89,14 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
+    bool FFAVInputContext::isOpened() const {
+        return this->isOpenedFlag;
+    }
+
+    FFAVFormatContextImplPtr FFAVInputContext::getImpl() {
+        return this->formatContextImpl;
+    }
+
     FFAVInputContextIterator FFAVInputContext::begin() {
         return FFAVInputContextIterator(this);
     }
@@ -93,14 +105,19 @@ namespace ff {
         return FFAVInputContextIterator();
     }
 
-    bool FFAVInputContext::isOpened() const {
-        return this->formatContextImpl->getRaw() != nullptr;
+    void FFAVInputContext::findMetaData() {
+        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
+        for (unsigned int i = 0; i < formatContext->nb_streams; i++) {
+            AVStream* stream = formatContext->streams[i];
+            if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+                this->videoStream.getImpl()->setRaw(stream);
+                this->videoCodecParameters.getImpl()->setRaw(stream->codecpar);
+            } else if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+                this->audioStream.getImpl()->setRaw(stream);
+                this->audioCodecParameters.getImpl()->setRaw(stream->codecpar);
+            }
+        }
     }
-
-    FFAVFormatContextImplPtr FFAVInputContext::getImpl() {
-        return this->formatContextImpl;
-    }
-
 
 
     //////////////////////// Iterator

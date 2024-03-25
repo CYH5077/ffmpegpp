@@ -1,6 +1,10 @@
 #include "type/impl/FFAVStreamImpl.hpp"
 
 namespace ff {
+    FFAVStreamImplPtr  FFAVStreamImpl::create() {
+        return std::make_shared<FFAVStreamImpl>();
+    }
+
     FFAVStreamImplPtr FFAVStreamImpl::create(FFAVStreamImplPtr streamImpl) {
         return std::make_shared<FFAVStreamImpl>(streamImpl);
     }
@@ -10,6 +14,9 @@ namespace ff {
     }
 
 
+    FFAVStreamImpl::FFAVStreamImpl() {
+        this->stream = nullptr;
+    }
 
     FFAVStreamImpl::FFAVStreamImpl(ff::FFAVStreamImplPtr streamImpl) {
         this->stream = streamImpl->getRaw();

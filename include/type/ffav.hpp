@@ -9,3 +9,4 @@
 #include "type/FFAVPacket.hpp"
 #include "type/FFAVRational.hpp"
 #include "type/FFAVStream.hpp"
+#include "type/FFAVCodecParameters.hpp"

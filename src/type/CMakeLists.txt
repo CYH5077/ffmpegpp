@@ -8,6 +8,9 @@ set(SOURCES
         FFAVOutputContext.cpp
         impl/FFAVFormatContextImpl.cpp
 
+        FFAVCodecParameters.cpp
+        impl/FFAVCodecParametersImpl.cpp
+
         FFAVFrame.cpp
         impl/FFAVFrameImpl.cpp
 

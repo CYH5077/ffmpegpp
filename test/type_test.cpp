@@ -72,11 +72,7 @@ TEST(TYPE_TEST, INPUT_CONTEXT_READ_FRAME_3) {
     // read를 EOF 까지 호출
     int readCount = 0;
     ff::FFAVPacket packet;
-    while (true) {
-        error = inputContext.readFrame(&packet);
-        if (error.getType() == ff::AV_ERROR_TYPE::AV_EOF) {
-            break;
-        }
+    while (inputContext.readFrame(&packet).getType() != ff::AV_ERROR_TYPE::AV_EOF) {
         readCount++;
         EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
     }

@@ -16,11 +16,11 @@ static void freeAVPacket(AVPacket* packet) {
 namespace ff {
 	// Impl »ý¼º
 	FFAVPacketImplPtr FFAVPacketImpl::create() {
-		return std::shared_ptr<FFAVPacketImpl>();
+		return std::make_shared<FFAVPacketImpl>();
 	}
 
 	FFAVPacketImplPtr FFAVPacketImpl::create(FFAVPacketImplPtr packetImpl) {
-		return std::shared_ptr<FFAVPacketImpl>(packetImpl);
+		return std::make_shared<FFAVPacketImpl>(packetImpl);
 	}
 
 

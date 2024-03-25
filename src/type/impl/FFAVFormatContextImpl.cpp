@@ -20,11 +20,11 @@ namespace ff {
 
 	}
 
-	AVFormatContextPtr FFAVFormatContextImpl::getRaw() {
+	AVFormatContext* FFAVFormatContextImpl::getRaw() {
 		return this->formatContext;
 	}
 
-	void FFAVFormatContextImpl::setRaw(AVFormatContextPtr formatContext) {
+	void FFAVFormatContextImpl::setRaw(AVFormatContext* formatContext) {
 		this->formatContext = formatContext;
 	}
 };

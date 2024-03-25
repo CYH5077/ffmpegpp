@@ -3,8 +3,9 @@ set(SOURCES
 
         FFAVPacket.cpp
         impl/FFAVPacketImpl.cpp
- 
-        FFAVFormatContext.cpp
+
+        FFAVInputContext.cpp
+        FFAVOutputContext.cpp
         impl/FFAVFormatContextImpl.cpp
 
         FFAVFrame.cpp

@@ -1,4 +1,4 @@
-#include "codecs/func.hpp"
+#include "codecs/create_decode_context.hpp"
 
 #include "type/impl/FFAVCodecContextImpl.hpp"
 #include "type/impl/FFAVFormatContextImpl.hpp"
@@ -6,31 +6,25 @@
 #include "type/impl/FFAVCodecParametersImpl.hpp"
 
 namespace ff {
-    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters ffavCodecParameters, AVError* error, bool cudaEnable);
+    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters& ffavCodecParameters, AVError* error, bool cudaEnable);
 
-    namespace video {
-        namespace decode {
-            FFAVCodecContextPtr createCodecContext(FFAVInputContext inputContext, AVError* error) {
-                return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, false);
-            }
+    namespace video::decode {
+        FFAVCodecContextPtr createCodecContext(FFAVInputContext& inputContext, AVError* error) {
+            return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, false);
+        }
 
-            FFAVCodecContextPtr createCUDACodecContext(FFAVInputContext inputContext, AVError* error) {
-                return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, true);
-            }
-        };
+        FFAVCodecContextPtr createCUDACodecContext(FFAVInputContext& inputContext, AVError* error) {
+            return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, true);
+        }
     };
 
-
-
-    namespace audio {
-        namespace decode {
-            FFAVCodecContextPtr createCodecContext(FFAVInputContext inputContext, AVError* error) {
-                return createDecodeCodecContext(inputContext.getAudioCodecParameters(), error, false);
-            }
-        };
+    namespace audio::decode {
+        FFAVCodecContextPtr createCodecContext(FFAVInputContext& inputContext, AVError* error) {
+            return createDecodeCodecContext(inputContext.getAudioCodecParameters(), error, false);
+        }
     };
 
-    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters ffavCodecParameters, AVError* error, bool cudaEnable) {
+    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters& ffavCodecParameters, AVError* error, bool cudaEnable) {
         if (error == nullptr) {
             return nullptr;
         }
@@ -62,6 +56,11 @@ namespace ff {
                 error->setError(AV_ERROR_TYPE::AV_ERROR, "av_hwdevice_ctx_create failed", ret, "av_hwdevice_ctx_create");
                 return nullptr;
             }
+
+            if (ffavCodecContext->findCUDAHWFormat() == false) {
+                error->setError(AV_ERROR_TYPE::AV_ERROR, "findCUDAHWFormat failed", AVERROR_DECODER_NOT_FOUND, "findCUDAHWFormat");
+                return nullptr;
+            }
         }
 
         ret = avcodec_parameters_to_context(decodeCodecContext, codecParameters);
@@ -76,6 +75,8 @@ namespace ff {
             return nullptr;
         }
 
+
+        ffavCodecContext->setEnableCuda(cudaEnable);
         *error = AVError(AV_ERROR_TYPE::SUCCESS);
         return ffavCodecContext;
     }

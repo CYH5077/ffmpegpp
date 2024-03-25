@@ -15,6 +15,9 @@ namespace ff {
     FFAVInputContext::FFAVInputContext() {
         this->formatContextImpl = FFAVFormatContextImpl::create();
         this->isOpenedFlag = false;
+
+        this->videoStreamIndex = -1;
+        this->audioStreamIndex = -1;
     }
 
     FFAVInputContext::~FFAVInputContext() {
@@ -97,20 +100,28 @@ namespace ff {
         return this->formatContextImpl;
     }
 
-    FFAVCodecParameters FFAVInputContext::getVideoCodecParameters() {
+    FFAVCodecParameters& FFAVInputContext::getVideoCodecParameters() {
         return this->videoCodecParameters;
     }
 
-    FFAVCodecParameters FFAVInputContext::getAudioCodecParameters() {
+    FFAVCodecParameters& FFAVInputContext::getAudioCodecParameters() {
         return this->audioCodecParameters;
     }
 
-    FFAVStream FFAVInputContext::getVideoStream() {
+    FFAVStream& FFAVInputContext::getVideoStream() {
         return this->videoStream;
     }
 
-    FFAVStream FFAVInputContext::getAudioStream() {
+    FFAVStream& FFAVInputContext::getAudioStream() {
         return this->audioStream;
+    }
+
+    int FFAVInputContext::getVideoStreamIndex() {
+        return this->videoStreamIndex;
+    }
+
+    int FFAVInputContext::getAudioStreamIndex() {
+        return this->audioStreamIndex;
     }
 
     FFAVInputContextIterator FFAVInputContext::begin() {
@@ -122,17 +133,15 @@ namespace ff {
     }
 
     void FFAVInputContext::findMetaData() {
-        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
-        for (unsigned int i = 0; i < formatContext->nb_streams; i++) {
-            AVStream* stream = formatContext->streams[i];
-            if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-                this->videoStream.getImpl()->setRaw(stream);
-                this->videoCodecParameters.getImpl()->setRaw(stream->codecpar);
-            } else if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-                this->audioStream.getImpl()->setRaw(stream);
-                this->audioCodecParameters.getImpl()->setRaw(stream->codecpar);
-            }
-        }
+        this->videoStreamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+        this->audioStreamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+
+        // Stream°ú CodecParameters ¼³Á¤
+        this->videoStream.getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[this->videoStreamIndex]);
+        this->audioStream.getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[this->audioStreamIndex]);
+
+        this->videoCodecParameters.getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[this->videoStreamIndex]->codecpar);
+        this->audioCodecParameters.getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[this->audioStreamIndex]->codecpar);
     }
 
 
@@ -150,7 +159,7 @@ namespace ff {
         }
     }
 
-    const FFAVPacket& FFAVInputContextIterator::operator*() const {
+    FFAVPacket& FFAVInputContextIterator::operator*() {
         return this->currentPacket;
 
     }

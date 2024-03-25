@@ -16,7 +16,7 @@ namespace ff {
     public:
         FFAVInputContextIterator(FFAVInputContext* context = nullptr);
 
-        const FFAVPacket& operator*() const;
+        FFAVPacket& operator*();
         FFAVPacket* operator->();
         FFAVInputContextIterator& operator++();
         friend bool operator==(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b);
@@ -26,6 +26,7 @@ namespace ff {
         FFAVInputContext* context;
         FFAVPacket currentPacket;
     };
+
 
     class FFAVInputContext {
     public:
@@ -43,10 +44,12 @@ namespace ff {
         bool isOpened() const;
 
         FFAVFormatContextImplPtr getImpl();
-        FFAVCodecParameters getVideoCodecParameters();
-        FFAVCodecParameters getAudioCodecParameters();
-        FFAVStream getVideoStream();
-        FFAVStream getAudioStream();
+        FFAVCodecParameters& getVideoCodecParameters();
+        FFAVCodecParameters& getAudioCodecParameters();
+        FFAVStream& getVideoStream();
+        FFAVStream& getAudioStream();
+        int getVideoStreamIndex();
+        int getAudioStreamIndex();
 
     public: // for (auto& packet : inputContext) iterator
         FFAVInputContextIterator begin();
@@ -67,5 +70,10 @@ namespace ff {
         // Stream
         FFAVStream videoStream;
         FFAVStream audioStream;
+
+        // Stream Index
+        int videoStreamIndex;
+        int audioStreamIndex;
     };
+
 };

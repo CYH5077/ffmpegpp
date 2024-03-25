@@ -16,10 +16,19 @@ namespace ff {
     public:
         static FFAVCodecContextPtr create();
 
-    public:
+    public: // get set
+        // Cuda
+        void setEnableCuda(bool flag);
+        bool isEnableCuda();
+        int  getCudaHWFormat();
+        bool findCUDAHWFormat();
+
         FFAVCodecContextImplPtr getImpl();
 
     private:
+        bool isEnableCudaFlag;
+        int cudaHWFormat;
+
         FFAVCodecContextImplPtr codecContextImpl;
     };
 

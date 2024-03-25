@@ -1,5 +1,8 @@
-set(SOURCES main.cpp
-            type_test.cpp)
+set(SOURCES
+        main.cpp
+        config.cpp
+        decoder.cpp
+        type_test.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 #enable_testing() # build/test 폴더 생성됨

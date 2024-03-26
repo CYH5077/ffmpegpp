@@ -2,6 +2,7 @@ set(SOURCES
         main.cpp
         config.cpp
         decoder.cpp
+        transMux.cpp
         type_test.cpp)
 
 set(FFMPEGPP_TEST ffmpegpp_test)

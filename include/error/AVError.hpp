@@ -24,6 +24,7 @@ namespace ff {
         std::string   getMessage();
         int           getAVCode();
         std::string   getAVFunction();
+        std::string   getAVErrorMessage();
 
     private:
         std::string getAVErrorMessages(int errorAVCode);

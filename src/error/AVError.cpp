@@ -63,6 +63,10 @@ namespace ff {
         return this->errorAVFunction;
     }
 
+    std::string AVError::getAVErrorMessage() {
+        return this->errorAVMessage;
+    }
+
     std::string AVError::getAVErrorMessages(int errorAVCode) {
         char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
         av_strerror(errorAVCode, avErrorMessage, sizeof(avErrorMessage));

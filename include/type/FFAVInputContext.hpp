@@ -1,6 +1,7 @@
 #pragma once
 
 #include "type/FFAVPacket.hpp"
+
 #include "type/FFAVCodecParameters.hpp"
 #include "type/FFAVStream.hpp"
 
@@ -8,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace ff {
     class FFAVInputContext;
@@ -43,11 +45,15 @@ namespace ff {
     public: // get set
         bool isOpened() const;
 
+        int getStreamsCount();
+
         FFAVFormatContextImplPtr getImpl();
-        FFAVCodecParameters& getVideoCodecParameters();
-        FFAVCodecParameters& getAudioCodecParameters();
-        FFAVStream& getVideoStream();
-        FFAVStream& getAudioStream();
+        FFAVCodecParametersPtr getVideoCodecParameters();
+        FFAVCodecParametersPtr getAudioCodecParameters();
+        FFAVCodecParametersPtr getCodecParameters(int index);
+        FFAVStreamPtr getVideoStream();
+        FFAVStreamPtr getAudioStream();
+        FFAVStreamPtr getStream(int index);
         int getVideoStreamIndex();
         int getAudioStreamIndex();
 
@@ -64,12 +70,10 @@ namespace ff {
         FFAVFormatContextImplPtr formatContextImpl;
 
         // CodecParameters
-        FFAVCodecParameters videoCodecParameters;
-        FFAVCodecParameters audioCodecParameters;
+        std::vector<FFAVCodecParametersPtr> codecParameters;
 
-        // Stream
-        FFAVStream videoStream;
-        FFAVStream audioStream;
+        // Streams
+        std::vector<FFAVStreamPtr> streams;
 
         // Stream Index
         int videoStreamIndex;

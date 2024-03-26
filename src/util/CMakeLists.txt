@@ -1,6 +1,5 @@
 set(SOURCES
-        createDecodeContext.cpp
-        FFAVDecoder.cpp)
+        transMux.cpp)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

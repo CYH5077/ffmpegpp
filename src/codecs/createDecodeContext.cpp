@@ -1,4 +1,4 @@
-#include "codecs/create_decode_context.hpp"
+#include "codecs/createDecodeContext.hpp"
 
 #include "type/impl/FFAVCodecContextImpl.hpp"
 #include "type/impl/FFAVFormatContextImpl.hpp"
@@ -6,7 +6,7 @@
 #include "type/impl/FFAVCodecParametersImpl.hpp"
 
 namespace ff {
-    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters& ffavCodecParameters, AVError* error, bool cudaEnable);
+    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParametersPtr ffavCodecParameters, AVError* error, bool cudaEnable);
 
     namespace video::decode {
         FFAVCodecContextPtr createCodecContext(FFAVInputContext& inputContext, AVError* error) {
@@ -24,14 +24,14 @@ namespace ff {
         }
     };
 
-    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParameters& ffavCodecParameters, AVError* error, bool cudaEnable) {
+    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParametersPtr ffavCodecParameters, AVError* error, bool cudaEnable) {
         if (error == nullptr) {
             return nullptr;
         }
 
         FFAVCodecContextPtr ffavCodecContext = FFAVCodecContext::create();
 
-        AVCodecParameters* codecParameters = ffavCodecParameters.getImpl()->getRaw();
+        AVCodecParameters* codecParameters = ffavCodecParameters->getImpl()->getRaw();
         if (codecParameters == nullptr) {
             return nullptr;
         }

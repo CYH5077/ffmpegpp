@@ -3,6 +3,10 @@
 
 
 namespace ff {
+    FFAVCodecParametersPtr FFAVCodecParameters::create() {
+        return std::make_shared<FFAVCodecParameters>();
+    }
+
     FFAVCodecParameters::FFAVCodecParameters() {
         this->codecParametersImpl = FFAVCodecParametersImpl::create();
     }

@@ -3,6 +3,10 @@
 
 
 namespace ff {
+    FFAVStreamPtr FFAVStream::create() {
+        return std::make_shared<FFAVStream>();
+    }
+
     FFAVStream::FFAVStream() {
         this->streamImpl = FFAVStreamImpl::create();
     }

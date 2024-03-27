@@ -14,7 +14,7 @@ extern "C" {
 }
 
 namespace ff {
-    AVError copyStream(FFAVInputContext& inputContext, FFAVOutputContext* outputContext , std::vector<int>* streamMapper);
+    AVError copyStream(FFAVInputContext& inputContext, FFAVOutputContext* outputContext, std::vector<int>* streamMapper);
     AVError copyPackets(FFAVInputContext& inputContext, FFAVOutputContext* outputContext, std::vector<int>& streamMapper);
 
     AVError transMux(FFAVInputContext& inputContext, std::string& outputFilename) {
@@ -62,11 +62,10 @@ namespace ff {
         int streamIndex = 0;
         streamMapper->resize(inputContext.getStreamsCount(), 0);
         for (unsigned int i = 0; i < inputContext.getStreamsCount(); i++) {
-            AVCodecParameters *codecParameters = inputContext.getCodecParameters(i)->getImpl()->getRaw();
-
-            if (codecParameters->codec_type != AVMEDIA_TYPE_VIDEO &&
-                codecParameters->codec_type != AVMEDIA_TYPE_AUDIO &&
-                codecParameters->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+            AVCodecParameters* inputCodecParameters = inputContext.getCodecParameters(i)->getImpl()->getRaw();
+            if (inputCodecParameters->codec_type != AVMEDIA_TYPE_VIDEO &&
+                inputCodecParameters->codec_type != AVMEDIA_TYPE_AUDIO &&
+                inputCodecParameters->codec_type != AVMEDIA_TYPE_SUBTITLE) {
                 (*streamMapper)[i] = -1;
                 continue;
             }
@@ -86,7 +85,7 @@ namespace ff {
         FFAVPacket ffavPacket;
        // for (auto& iter : inputContext) {
        int i = 0;
-       while (inputContext.readFrame(&ffavPacket).getType() == AV_ERROR_TYPE::SUCCESS) {
+       while (inputContext.readFrame(&ffavPacket).getType() != AV_ERROR_TYPE::AV_EOF) {
            i++;
            //AVPacket* packet = iter.getImpl()->getRaw().get();
             AVPacket* packet = ffavPacket.getImpl()->getRaw().get();

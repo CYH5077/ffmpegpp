@@ -4,6 +4,7 @@
 #include "type/impl/FFAVPacketImpl.hpp"
 #include "type/impl/FFAVCodecParametersImpl.hpp"
 #include "type/impl/FFAVStreamImpl.hpp"
+#include "type/impl/FFAVChannelLayoutImpl.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -89,6 +90,9 @@ namespace ff {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_read_frame failed", ret, "av_read_frame");
         }
 
+        int codecType = formatContext->streams[packet->stream_index]->codecpar->codec_type;
+        ffpacket->setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecType));
+
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
@@ -125,9 +129,7 @@ namespace ff {
     }
 
     FFAVCodecParametersPtr FFAVInputContext::getCodecParameters(int index) {
-        FFAVCodecParametersPtr codecParameters = FFAVCodecParameters::create();
-        codecParameters->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[index]->codecpar);
-        return codecParameters;
+        return this->codecParameters[index];
     }
 
     FFAVStreamPtr FFAVInputContext::getVideoStream() {
@@ -147,9 +149,15 @@ namespace ff {
     }
 
     FFAVStreamPtr FFAVInputContext::getStream(int index) {
-        FFAVStreamPtr ffavStream = FFAVStream::create();
-        ffavStream->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[index]);
-        return ffavStream;
+        return this->streams[index];
+    }
+
+    FFAVChannelLayoutPtr FFAVInputContext::getAudioChannelLayout() {
+        int streamIndex = this->getAudioStreamIndex();
+
+        FFAVChannelLayoutPtr ffavChannelLayoutPtr = FFAVChannelLayout::create();
+        ffavChannelLayoutPtr->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[streamIndex]->codecpar->ch_layout);
+        return ffavChannelLayoutPtr;
     }
 
     int FFAVInputContext::getVideoStreamIndex() {

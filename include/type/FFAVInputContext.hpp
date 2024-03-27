@@ -1,9 +1,9 @@
 #pragma once
 
 #include "type/FFAVPacket.hpp"
-
 #include "type/FFAVCodecParameters.hpp"
 #include "type/FFAVStream.hpp"
+#include "type/FFAVChannelLayout.hpp"
 
 #include "error/AVError.hpp"
 
@@ -38,7 +38,7 @@ namespace ff {
     public:
         AVError open(const std::string& url);
         AVError open(const std::string&& url);
-        void close();
+        void    close();
 
         AVError readFrame(FFAVPacket* packet);
 
@@ -48,12 +48,17 @@ namespace ff {
         int getStreamsCount();
 
         FFAVFormatContextImplPtr getImpl();
+
         FFAVCodecParametersPtr getVideoCodecParameters();
         FFAVCodecParametersPtr getAudioCodecParameters();
         FFAVCodecParametersPtr getCodecParameters(int index);
+
         FFAVStreamPtr getVideoStream();
         FFAVStreamPtr getAudioStream();
         FFAVStreamPtr getStream(int index);
+
+        FFAVChannelLayoutPtr getAudioChannelLayout();
+
         int getVideoStreamIndex();
         int getAudioStreamIndex();
 

@@ -10,3 +10,4 @@
 #include "type/FFAVRational.hpp"
 #include "type/FFAVStream.hpp"
 #include "type/FFAVCodecParameters.hpp"
+#include "type/FFAVChannelLayout.hpp"

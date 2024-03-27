@@ -1,5 +1,9 @@
 set(SOURCES
         createDecodeContext.cpp
+        createEncodeContext.cpp
+        FFAVAudioEncodeParameters.cpp
+        FFAVVideoEncodeParameters.cpp
+        FFAVEncoder.cpp
         FFAVDecoder.cpp)
 
 set(UPDATED_SOURCES "")

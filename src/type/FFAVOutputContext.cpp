@@ -1,9 +1,10 @@
-#include "type/FFAVOutputContext.hpp"
+#include"type/FFAVOutputContext.hpp"
 
 #include "type/impl/FFAVFormatContextImpl.hpp"
 #include "type/impl/FFAVStreamImpl.hpp"
 #include "type/impl/FFAVCodecParametersImpl.hpp"
 #include "type/impl/FFAVPacketImpl.hpp"
+#include "type/impl/FFAVCodecContextImpl.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -58,6 +59,34 @@ namespace ff {
         return ffavStream;
     }
 
+    AVError FFAVOutputContext::createStream(DATA_TYPE type, ff::FFAVCodecContextPtr codecContext) {
+        if (codecContext == nullptr) {
+            return AVError(AV_ERROR_TYPE::SUCCESS);
+        }
+
+        AVStream* stream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
+        if (!stream) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_new_stream failed", AVERROR(ENOMEM), "avformat_new_stream");
+        }
+
+        AVCodecContext* codecContextRaw = codecContext->getImpl()->getRaw();
+        int ret = avcodec_parameters_from_context(stream->codecpar, codecContextRaw);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_parameters_from_context failed", ret, "avcodec_parameters_from_context");
+        }
+
+        FFAVStreamPtr ffavStream = FFAVStream::create();
+        ffavStream->getImpl()->setRaw(stream);
+
+        if (type == DATA_TYPE::VIDEO) {
+            this->videoStream = ffavStream;
+        } else if (type == DATA_TYPE::AUDIO) {
+            this->audioStream = ffavStream;
+        }
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
+
     AVError FFAVOutputContext::writeHeader() {
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
         int ret = avformat_write_header(formatContext, nullptr);
@@ -86,9 +115,11 @@ namespace ff {
     void FFAVOutputContext::close() {
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
 
-        if (formatContext && this->isOpenFlag) {\
-            avformat_close_input(&formatContext);
-        } else if (formatContext && !this->isOpenFlag) {
+        if (formatContext != nullptr) {
+            av_write_trailer(formatContext);
+            if (!(formatContext->flags & AVFMT_NOFILE)) {
+                avio_closep(&formatContext->pb);
+            }
             avformat_free_context(formatContext);
         }
 
@@ -98,6 +129,14 @@ namespace ff {
 
     FFAVFormatContextImplPtr FFAVOutputContext::getImpl() {
         return this->formatContextImpl;
+    }
+
+    FFAVStreamPtr FFAVOutputContext::getVideoStream() {
+        return this->videoStream;
+    }
+
+    FFAVStreamPtr FFAVOutputContext::getAudioStream() {
+        return this->audioStream;
     }
 
     FFAVStreamPtr FFAVOutputContext::getStream(int index) {

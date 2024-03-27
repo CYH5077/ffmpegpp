@@ -22,7 +22,7 @@ namespace ff {
 
     }
 
-    AVError FFAVDecoder::decode(ff::FFAVInputContext inputContext, FFAVDecoderCallback callback) {
+    AVError FFAVDecoder::decode(FFAVInputContext& inputContext, FFAVDecoderCallback callback) {
         AVError error;
         for (auto& iter : inputContext) {
             AVPacket* packet = iter.getImpl()->getRaw().get();
@@ -80,11 +80,11 @@ namespace ff {
                     return error;
                 }
 
-                if (callback(*ffavPacket, cudaFrame) == false) {
+                if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
                     break;
                 }
             } else {
-                if (callback(*ffavPacket, frame) == false) {
+                if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), frame) == false) {
                     break;
                 }
             }

@@ -2,16 +2,13 @@
 #include "type/impl/FFAVChannelLayoutImpl.hpp"
 
 namespace ff {
+    FFAVChannelLayoutPtr FFAVChannelLayout::create() {
+        return std::make_shared<FFAVChannelLayout>();
+    }
+
+
     FFAVChannelLayout::FFAVChannelLayout() {
-        this->channelLayoutImpl = nullptr;
-    }
-
-    FFAVChannelLayout::FFAVChannelLayout(FFAVChannelLayout& channelLayout) {
-        this->channelLayoutImpl = FFAVChannelLayoutImpl::create(channelLayout.channelLayoutImpl);
-    }
-
-    FFAVChannelLayout::FFAVChannelLayout(ff::FFAVChannelLayoutImplPtr channelLayoutImpl) {
-        this->channelLayoutImpl = FFAVChannelLayoutImpl::create(channelLayoutImpl);
+        this->channelLayoutImpl = FFAVChannelLayoutImpl::create();
     }
 
     FFAVChannelLayout::~FFAVChannelLayout() {

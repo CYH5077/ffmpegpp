@@ -6,7 +6,6 @@
 #include <string>
 
 namespace ff {
-    AVError transMux(FFAVInputContext& inputContext, std::string&  outputFilename);
-    AVError transMux(FFAVInputContext& inputContext, std::string&& outputFilename);
-    AVError transMux(std::string& inputFilename , std::string& outputFilename);
+    AVError transMux(FFAVInputContext& inputContext, const std::string&  outputFilename);
+    AVError transMux(const std::string& inputFilename , const std::string& outputFilename);
 };

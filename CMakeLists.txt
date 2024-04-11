@@ -4,13 +4,15 @@ project(ffmpegpp)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# superess
+option(FFMPEGPP_SUPPRESS "Suppress Usage" OFF)
+
 if (WIN32 AND MSVC)
-    set (CMAKE_CXX_FLAGS_RELEASE "/MD /O2 /Ob2 /DNDEBUG")
-    set (CMAKE_CXX_FLAGS_DEBUG "/MD /Zi /Ob0 /Od /RTC1")
+
 elseif (LINUX)
-    set (CMAKE_CXX_FLAGS -Wall)
-	set (CMAKE_CXX_FLAGS_RELEASE "-O3")
-	set (CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS -Wall)
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g")
 endif ()
 
 set(FFMPEGPP_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build/ffmpegpp)
@@ -23,11 +25,15 @@ add_library(${PROJECT_NAME})
 find_package(FFMPEG REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${FFMPEGPP_INCLUDE_DIR}
 										            ${FFMPEG_INCLUDE_DIRS})
-target_link_directories(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARY_DIRS}) 
+target_link_directories(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARIES})
 
+if(FFMPEGPP_SUPPRESS)
+    find_package(OpenCV CONFIG REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC opencv_ml opencv_dnn opencv_dpm opencv_hdf opencv_dnn_superres)
+endif()
 
-add_subdirectory (src)
+add_subdirectory (src) 
 add_subdirectory (test)
 
 install(TARGETS ${PROJECT_NAME}

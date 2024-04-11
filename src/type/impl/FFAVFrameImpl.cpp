@@ -34,7 +34,8 @@ namespace ff {
     }
 
     FFAVFrameImpl::FFAVFrameImpl(FFAVFrameImplPtr frameImpl) {
-        this->copyFrom(frameImpl);
+        //this->copyFrom(frameImpl);
+        this->frame = frameImpl->getRaw();
     }
 
     FFAVFrameImpl::~FFAVFrameImpl() {

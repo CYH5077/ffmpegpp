@@ -17,7 +17,7 @@ namespace ff {
     AVError copyStream(FFAVInputContext& inputContext, FFAVOutputContext* outputContext, std::vector<int>* streamMapper);
     AVError copyPackets(FFAVInputContext& inputContext, FFAVOutputContext* outputContext, std::vector<int>& streamMapper);
 
-    AVError transMux(FFAVInputContext& inputContext, std::string& outputFilename) {
+    AVError transMux(FFAVInputContext& inputContext, const std::string& outputFilename) {
         std::vector<int> streamMapper;
         FFAVOutputContext outputContext;
 
@@ -44,11 +44,11 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
-    AVError transMux(FFAVInputContext& inputContext, std::string&& outputFilename) {
+    AVError transMux(FFAVInputContext& inputContext, const std::string&& outputFilename) {
         return transMux(inputContext, outputFilename);
     }
 
-    AVError transMux(std::string& inputFilename , std::string& outputFilename) {
+    AVError transMux(const std::string& inputFilename , const std::string& outputFilename) {
         FFAVInputContext inputContext;
         AVError error = inputContext.open(inputFilename);
         if (error.getType() != AV_ERROR_TYPE::SUCCESS) {

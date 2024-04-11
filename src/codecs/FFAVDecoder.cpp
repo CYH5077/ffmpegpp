@@ -34,7 +34,8 @@ namespace ff {
             }
             av_packet_unref(packet);
 
-            if (error.getType() == AV_ERROR_TYPE::AV_EOF) {
+            if (error.getType() == AV_ERROR_TYPE::AV_EOF ||
+                error.getType() == AV_ERROR_TYPE::USER_STOP) {
                 break;
             } else if (error.getType() == AV_ERROR_TYPE::AV_EAGAIN) {
                 continue;
@@ -56,7 +57,7 @@ namespace ff {
         AVCodecContext* codecContext = ffavCodecContext->getImpl()->getRaw();
         AVPacket* packet = ffavPacket != nullptr ? ffavPacket->getImpl()->getRaw().get() : nullptr;
 
-        // packetÀ» µðÄÚµùÇÏ°í callbackÀ» È£Ãâ
+        // packetï¿½ï¿½ ï¿½ï¿½ï¿½Úµï¿½ï¿½Ï°ï¿½ callbackï¿½ï¿½ È£ï¿½ï¿½
         FFAVFrame frame;
         FFAVFrame cudaFrame;
         int ret = avcodec_send_packet(codecContext, packet);
@@ -81,11 +82,11 @@ namespace ff {
                 }
 
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
-                    break;
+                    return AVError(AV_ERROR_TYPE::USER_STOP);
                 }
             } else {
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), frame) == false) {
-                    break;
+                    return AVError(AV_ERROR_TYPE::USER_STOP);
                 }
             }
         }

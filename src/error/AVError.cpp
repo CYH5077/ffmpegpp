@@ -13,21 +13,12 @@ namespace ff {
         this->setError(errorType, "", 0, "");
     }
 
-    AVError::AVError(AV_ERROR_TYPE errorType, std::string& errorMessage) {
+    AVError::AVError(AV_ERROR_TYPE errorType, const std::string& errorMessage) {
         std::string errorAVFunction = "";
         this->setError(errorType, errorMessage, 0, errorAVFunction);
     }
 
-    AVError::AVError(AV_ERROR_TYPE errorType, std::string&& errorMessage) {
-        std::string errorAVFunction = "";
-        this->setError(errorType, errorMessage, 0, errorAVFunction);
-    }
-
-    AVError::AVError(AV_ERROR_TYPE errorType, std::string& errorMessage, int errorAVCode, std::string& errorAVFunction) {
-        this->setError(errorType, errorMessage, errorAVCode, errorAVFunction);
-    }
-
-    AVError::AVError(AV_ERROR_TYPE errorType, std::string&& errorMessage, int errorAVCode, std::string&& errorAVFunction) {
+    AVError::AVError(AV_ERROR_TYPE errorType, const std::string& errorMessage, int errorAVCode, const std::string& errorAVFunction) {
         this->setError(errorType, errorMessage, errorAVCode, errorAVFunction);
     }
 
@@ -35,16 +26,12 @@ namespace ff {
 
     }
 
-    void AVError::setError(AV_ERROR_TYPE errorType, std::string& errorMessage, int errorAVCode, std::string& errorAVFunction) {
+    void AVError::setError(AV_ERROR_TYPE errorType, const std::string& errorMessage, int errorAVCode, const std::string& errorAVFunction) {
         this->errorType    = errorType;
         this->errorMessage = errorMessage;
         this->errorAVCode  = errorAVCode;
         this->errorAVFunction = errorAVFunction;
         this->errorAVMessage  = this->getAVErrorMessages(errorAVCode);
-    }
-
-    void AVError::setError(AV_ERROR_TYPE errorType, std::string&& errorMessage, int errorAVCode, std::string&& errorAVFunction) {
-        this->setError(errorType, errorMessage, errorAVCode, errorAVFunction);
     }
 
     AV_ERROR_TYPE AVError::getType() {

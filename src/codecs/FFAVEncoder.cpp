@@ -66,8 +66,12 @@ namespace ff {
         ret = avcodec_send_frame(codecContextRaw, frameRaw);
         while (ret >= 0) {
             ret = avcodec_receive_packet(codecContextRaw, packetRaw);
-            if (ret == AVERROR_EOF ||
-                ret == AVERROR(EAGAIN)) {
+
+            if (ret == AVERROR_EOF) {
+                break;
+            }
+
+            if (ret == AVERROR(EAGAIN)) {
                 break;
             }
 

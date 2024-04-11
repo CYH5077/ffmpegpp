@@ -5,6 +5,7 @@ namespace ff {
         SUCCESS,
         FAILED,
         INVALID_ARGUMENT,
+        USER_STOP,
 
         AV_EAGAIN,
         AV_EOF,

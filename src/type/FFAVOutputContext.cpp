@@ -22,7 +22,7 @@ namespace ff {
         this->close();
     }
 
-    AVError FFAVOutputContext::open(std::string& filename) {
+    AVError FFAVOutputContext::open(const std::string& filename) {
         AVFormatContext* formatContext = nullptr;
         int ret = avformat_alloc_output_context2(&formatContext, nullptr, nullptr, filename.c_str());
         if (ret < 0) {
@@ -106,10 +106,6 @@ namespace ff {
         }
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
-    }
-
-    AVError FFAVOutputContext::open(std::string &&filename) {
-        return this->open(filename);
     }
 
     void FFAVOutputContext::close() {

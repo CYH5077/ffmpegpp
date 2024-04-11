@@ -9,7 +9,7 @@ TEST(TYPE_TEST, INPUT_CONTEXT_OPEN_1) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     inputContext.close();
 }
@@ -22,7 +22,7 @@ TEST(TYPE_TEST, INPUT_CONTEXT_DESTROY_TEST_2) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 }
 
 TEST(TYPE_TEST, INPUT_CONTEXT_FAILED) {
@@ -30,7 +30,7 @@ TEST(TYPE_TEST, INPUT_CONTEXT_FAILED) {
 
     // Failed
     ff::AVError error = inputContext.open("./tasdfadfadfasdf123.mp4");
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::AV_ERROR);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::AV_ERROR);
 }
 
 
@@ -42,18 +42,18 @@ TEST(TYPE_TEST, INPUT_CONTEXT_READ_FRAME_1) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVPacket packet;
     error = inputContext.readFrame(&packet);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 }
 
 TEST(TYPE_TEST, INPUT_CONTEXT_READ_FRAME_2) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError errro = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(errro.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(errro.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     int readCount = 0;
     for (auto& iter : inputContext) {
@@ -67,14 +67,14 @@ TEST(TYPE_TEST, INPUT_CONTEXT_READ_FRAME_3) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     // read를 EOF 까지 호출
     int readCount = 0;
     ff::FFAVPacket packet;
     while (inputContext.readFrame(&packet).getType() != ff::AV_ERROR_TYPE::AV_EOF) {
         readCount++;
-        EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+        ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
     }
     std::cout << "read count: " << readCount << std::endl;
 }

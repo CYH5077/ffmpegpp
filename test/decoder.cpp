@@ -7,12 +7,12 @@ TEST(DECODE_TEST, DECODE_CPU) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCodecContext(inputContext, &error);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
     ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(inputContext, &error);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     int decodeCount = 0;
     ff::FFAVDecoder decoder(videoContext, audioContext);
@@ -20,7 +20,7 @@ TEST(DECODE_TEST, DECODE_CPU) {
         decodeCount++;
         return true;
     });
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     std::cout << "decodeCount: " << decodeCount << std::endl;
 }
@@ -29,12 +29,12 @@ TEST(DECODE_TEST, DECODE_GPU) {
     ff::FFAVInputContext inputContext;
 
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCUDACodecContext(inputContext, &error);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
     ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(inputContext, &error);
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     int decodeCount = 0;
     ff::FFAVDecoder decoder(videoContext, audioContext);
@@ -42,7 +42,7 @@ TEST(DECODE_TEST, DECODE_GPU) {
         decodeCount++;
         return true;
     });
-    EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     std::cout << "decodeCount: " << decodeCount << std::endl;
 }

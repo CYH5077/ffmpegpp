@@ -13,8 +13,7 @@ namespace ff {
         virtual ~FFAVOutputContext();
 
     public:
-        AVError open(std::string& filename);
-        AVError open(std::string&& filename);
+        AVError open(const std::string& filename);
         void close();
 
         FFAVStreamPtr addStream(FFAVCodecParametersPtr codecParameters);

@@ -9,16 +9,12 @@ namespace ff {
     public:
         explicit AVError();
         explicit AVError(AV_ERROR_TYPE errorType);
-        explicit AVError(AV_ERROR_TYPE errorType, std::string& errorMessage);
-        explicit AVError(AV_ERROR_TYPE errorType, std::string&& errorMessage);
-        explicit AVError(AV_ERROR_TYPE errorType, std::string& errorMessage,  int errorAVCode, std::string& errorAVFunction);
-        explicit AVError(AV_ERROR_TYPE errorType, std::string&& errorMessage, int errorAVCode, std::string&& errorAVFunction);
-
+        explicit AVError(AV_ERROR_TYPE errorType, const std::string& errorMessage);
+        explicit AVError(AV_ERROR_TYPE errorType, const std::string& errorMessage,  int errorAVCode, const std::string& errorAVFunction);
         virtual ~AVError();
 
     public:
-        void setError(AV_ERROR_TYPE errorType, std::string& errorMessage,  int errorAVCode, std::string& errorAVFunction);
-        void setError(AV_ERROR_TYPE errorType, std::string&& errorMessage, int errorAVCode, std::string&& errorAVFunction);
+        void setError(AV_ERROR_TYPE errorType, const std::string& errorMessage,  int errorAVCode, const std::string& errorAVFunction);\
 
         AV_ERROR_TYPE getType();
         std::string   getMessage();

@@ -18,7 +18,7 @@ namespace ff {
 
         virtual ~FFAVFrameImpl();
 
-    public: // »ý¼º
+    public: // ï¿½ï¿½ï¿½ï¿½
         static FFAVFrameImplPtr create();
         static FFAVFrameImplPtr create(FFAVFrameImplPtr frameImpl);
 
@@ -27,7 +27,7 @@ namespace ff {
         AVFramePtr getRaw();
         void       setRaw(AVFramePtr frame);
 
-        // AVFrame º¹»ç
+        // AVFrame ï¿½ï¿½ï¿½ï¿½
         FFAVFrameImplPtr copy();
         void             copyFrom(FFAVFrameImplPtr frame);
         void             copyFrom(AVFramePtr frame);

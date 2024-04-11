@@ -67,9 +67,8 @@ namespace ff {
         encodeCodecContext->max_b_frames = encodeParameter->getMaxBFrames();
         encodeCodecContext->pix_fmt      = (AVPixelFormat)(encodeParameter->getPixelFormat());
         encodeCodecContext->thread_count = encodeParameter->getEncodeThreadCount();
-        if (codec->id == AV_CODEC_ID_H264) {
-            av_opt_set(encodeCodecContext->priv_data, "preset", "slow", 0);
-        }
+    
+
         codecContext->getImpl()->setRaw(encodeCodecContext);
 
 

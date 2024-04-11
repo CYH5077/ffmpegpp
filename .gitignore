@@ -17,6 +17,14 @@ transcoding.mp4
 transcoding_1.mp4
 transcoding_2.mp4
 transmuxing.mkv
+transcode_copy.mp4
+transcode_copy_cuda.mp4
+trans_mux_test_1.mkv
+trans_mux_test_2.mkv
+trans_mux_test_3.mkv
+edsr_x2_cuda.ts
+edsr_x3_cuda.ts 
+edsr_x4_cuda.ts
 out
 cmake-build-debug-visual-studio
 

@@ -13,7 +13,7 @@ linux, windows support
 <pre> $ vcpkg install ffmpeg[fdk-aac,fontconfig,freetype,fribidi,gpl,mp3lame,nvcodec,vorbis,vpx,webp,x264,x265] gtest opencv4[core,contrib,cuda,dnn-cuda] </pre>
 
 <h1> Build </h1>
-<pre>$ cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake .</pre>
+<pre>$ cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DFFMPEGPP_TEST=ON .</pre>
 <pre>$ make -j10</pre>
 <pre>$ make install</pre>
 

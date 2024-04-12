@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # superess
 option(FFMPEGPP_SUPPRESS "Suppress Usage" OFF)
+option(FFMPEGPP_TEST "Library Test" OFF)
 
 if (WIN32 AND MSVC)
 
@@ -34,7 +35,10 @@ if(FFMPEGPP_SUPPRESS)
 endif()
 
 add_subdirectory (src) 
-add_subdirectory (test)
+
+if(FFMPEGPP_TEST)
+    add_subdirectory (test)
+endif()
 
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${FFMPEGPP_INSTALL_DIR}/lib)

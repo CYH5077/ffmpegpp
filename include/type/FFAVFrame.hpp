@@ -1,6 +1,6 @@
 #pragma once
 
-#include "type/ffav.hpp"
+#include "type/impl/ffavimpl.hpp"
 
 #include <memory>
 
@@ -19,7 +19,7 @@ namespace ff {
     public:
         void copyTs(FFAVFrame& frame);
         void ref(FFAVFrame& frame);
-
+    
     private:
         FFAVFrameImplPtr frameImpl;
     };

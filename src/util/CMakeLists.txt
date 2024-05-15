@@ -1,5 +1,6 @@
 set(SOURCES
-        transMux.cpp)
+        transMux.cpp
+)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

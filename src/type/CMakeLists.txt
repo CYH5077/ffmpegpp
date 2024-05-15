@@ -1,6 +1,8 @@
 set(SOURCES
-        FFAVRational.cpp
+        FFAVPictureFormat.cpp 
 
+        FFAVRational.cpp
+        
         FFAVPacket.cpp
         impl/FFAVPacketImpl.cpp
 
@@ -20,6 +22,9 @@ set(SOURCES
         FFAVChannelLayout.cpp
         impl/FFAVChannelLayoutImpl.cpp
 
+        FFAVSwsContext.cpp
+        impl/FFAVSwsContextImpl.cpp
+
         FFAVCodecContext.cpp
         impl/FFAVCodecContextImpl.cpp)
 
@@ -27,5 +32,5 @@ set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)
         list(APPEND UPDATED_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE}")
 endforeach()
-
+ 
 target_sources(${PROJECT_NAME} PRIVATE ${UPDATED_SOURCES})

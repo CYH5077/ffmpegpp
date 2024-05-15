@@ -1,6 +1,10 @@
 #include "type/FFAVFrame.hpp"
 #include "type/impl/FFAVFrameImpl.hpp"
 
+extern "C" {
+#include "libswscale/swscale.h"
+}
+
 namespace ff {
     FFAVFrame::FFAVFrame() {
         this->frameImpl = FFAVFrameImpl::create();

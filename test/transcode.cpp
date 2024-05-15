@@ -101,8 +101,16 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
     ff::FFAVDecoder decoder(videoDecodeContext, audioDecodeContext);
     ff::FFAVEncoder encoder(videoEncodeContext, audioEncodeContext);
 
+    // SwsContext - CUDA Format To YUV420P
+    ff::FFAVSwsContext swsContext(videoEncodeContext->getWidth(), videoEncodeContext->getHeight(), ff::PICTURE_FORMAT::YUV420P);
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
     error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+        // CUDA Format to YUV420P
+        if (type == ff::DATA_TYPE::VIDEO) {
+            swsContext.convert(frame);
+        }
+        
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
         error = encoder.encode(type, frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {

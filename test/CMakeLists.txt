@@ -4,6 +4,7 @@ set(SOURCES
         decoder.cpp
         transmux.cpp
         transcode.cpp
+        resize.cpp
         type_test.cpp
 )
 

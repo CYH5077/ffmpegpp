@@ -10,6 +10,7 @@ namespace ff {
     class FFAVStreamImpl;
     class FFAVChannelLayoutImpl;
     class FFAVCodecParametersImpl;
+    class FFAVSwsContextImpl;
 
 	typedef std::shared_ptr<FFAVPacketImpl>		   FFAVPacketImplPtr;
 	typedef std::shared_ptr<FFAVFormatContextImpl> FFAVFormatContextImplPtr;
@@ -18,4 +19,5 @@ namespace ff {
     typedef std::shared_ptr<FFAVStreamImpl>        FFAVStreamImplPtr;
     typedef std::shared_ptr<FFAVChannelLayoutImpl> FFAVChannelLayoutImplPtr;
     typedef std::shared_ptr<FFAVCodecParametersImpl> FFAVCodecParametersImplPtr;
+    typedef std::shared_ptr<FFAVSwsContextImpl>    FFAVSwsContextImplPtr;
 };

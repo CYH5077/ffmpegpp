@@ -19,6 +19,11 @@ namespace ff {
 
     }
 
+
+    FFAVCodecContextImplPtr FFAVCodecContext::getImpl() {
+        return this->codecContextImpl;
+    }
+
     void FFAVCodecContext::setEnableCuda(bool flag) {
         this->isEnableCudaFlag = flag;
     }
@@ -48,7 +53,11 @@ namespace ff {
         return false;
     }
 
-    FFAVCodecContextImplPtr FFAVCodecContext::getImpl() {
-        return this->codecContextImpl;
+    int FFAVCodecContext::getWidth() {
+        return this->codecContextImpl->getRaw()->width;
     }
+
+    int FFAVCodecContext::getHeight() {
+		return this->codecContextImpl->getRaw()->height;
+	}
 };

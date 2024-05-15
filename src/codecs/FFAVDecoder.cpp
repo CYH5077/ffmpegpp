@@ -60,12 +60,12 @@ namespace ff {
 
         // packet�� ���ڵ��ϰ� callback�� ȣ��
         FFAVFrame frame;
-        FFAVFrame cudaFrame;
         int ret = avcodec_send_packet(codecContext, packet.get());
         if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_send_packet failed", ret, "avcodec_send_packet");
         }
 
+        FFAVFrame cudaFrame;
         while (ret >= 0) {
             ret = avcodec_receive_frame(codecContext, frame.getImpl()->getRaw().get());
             if (ret == AVERROR(EAGAIN)) {
@@ -81,11 +81,6 @@ namespace ff {
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
                 }
-
-                AVFramePtr origFrameRaw = frame.getImpl()->getRaw();
-                AVFramePtr cudaFrameRaw = cudaFrame.getImpl()->getRaw();
-                cudaFrameRaw->pts = origFrameRaw->pts;
-                cudaFrameRaw->pkt_dts = origFrameRaw->pkt_dts;
 
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
                     return AVError(AV_ERROR_TYPE::USER_STOP);
@@ -118,10 +113,20 @@ namespace ff {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "srcFrame format is not cuda hw format", -1, "FFAVDecoder::cudaFormatConvert");
         }
 
+        dst->width  = src->width;
+        dst->height = src->height;
+        av_frame_get_buffer(dst, 0);
+
         int ret = av_hwframe_transfer_data(dst, src, 0);
         if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_hwframe_transfer_data failed", ret, "av_hwframe_transfer_data");
         }
+
+        dst->pts          = src->pts;
+        dst->pkt_dts      = src->pkt_dts;
+        dst->best_effort_timestamp = src->best_effort_timestamp;
+        dst->pkt_pos      = src->pkt_pos;
+        dst->pkt_duration = src->pkt_duration;
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

@@ -19,8 +19,8 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
     videoEncodeParameters->setEncodeThreadCount(16);
     
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Resize the video
-    videoEncodeParameters->setWidth(640);
-    videoEncodeParameters->setHeight(480);
+    videoEncodeParameters->setWidth(1280);
+    videoEncodeParameters->setHeight(640);
 
     ff::FFAVCodecContextPtr videoEncodeContext = ff::video::encode::createCUDACodecContext(ff::HW_VIDEO_CODEC::H264, videoEncodeParameters, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -43,7 +43,7 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
     ff::FFAVEncoder encoder(videoEncodeContext, audioEncodeContext);
 
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Resize SwsContext
-    ff::FFAVSwsContext swsContext(640, 480, ff::PICTURE_FORMAT::YUV420P);
+    ff::FFAVSwsContext swsContext(1280, 640, ff::PICTURE_FORMAT::YUV420P);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
     error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {

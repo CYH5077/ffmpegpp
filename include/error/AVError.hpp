@@ -29,7 +29,7 @@ namespace ff {
         AV_ERROR_TYPE errorType;
         std::string errorMessage;
 
-        int         errorAVCode{};
+        int         errorAVCode;
         std::string errorAVFunction;
         std::string errorAVMessage;
     };

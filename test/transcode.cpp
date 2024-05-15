@@ -72,7 +72,7 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    ff::FFAVCodecContextPtr videoDecodeContext = ff::video::decode::createCodecContext(inputContext, &error);
+    ff::FFAVCodecContextPtr videoDecodeContext = ff::video::decode::createCUDACodecContext(inputContext, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
     ff::FFAVCodecContextPtr audioDecodeContext = ff::audio::decode::createCodecContext(inputContext, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);

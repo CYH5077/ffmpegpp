@@ -43,8 +43,8 @@ namespace ff {
 	}
 
     void FFAVPacket::rescaleTS(ff::FFAVStreamPtr srcStream, ff::FFAVStreamPtr dstStream) {
-        AVRational srcTimebase = srcStream.get()->getImpl()->getRaw()->time_base;
-        AVRational dstTimebase = dstStream.get()->getImpl()->getRaw()->time_base;
+        AVRational srcTimebase = srcStream->getImpl()->getRaw()->time_base;
+        AVRational dstTimebase = dstStream->getImpl()->getRaw()->time_base;
 
         AVPacket* packetRaw = this->packetImpl->getRaw().get();
         if (packetRaw->pts != AV_NOPTS_VALUE) {

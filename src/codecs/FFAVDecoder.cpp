@@ -10,6 +10,7 @@
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
 }
 
 namespace ff {
@@ -55,12 +56,12 @@ namespace ff {
         }
 
         AVCodecContext* codecContext = ffavCodecContext->getImpl()->getRaw();
-        AVPacket* packet = ffavPacket != nullptr ? ffavPacket->getImpl()->getRaw().get() : nullptr;
+        AVPacketPtr packet = ffavPacket != nullptr ? ffavPacket->getImpl()->getRaw() : nullptr;
 
         // packet�� ���ڵ��ϰ� callback�� ȣ��
         FFAVFrame frame;
         FFAVFrame cudaFrame;
-        int ret = avcodec_send_packet(codecContext, packet);
+        int ret = avcodec_send_packet(codecContext, packet.get());
         if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_send_packet failed", ret, "avcodec_send_packet");
         }
@@ -80,6 +81,11 @@ namespace ff {
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
                 }
+
+                AVFramePtr origFrameRaw = frame.getImpl()->getRaw();
+                AVFramePtr cudaFrameRaw = cudaFrame.getImpl()->getRaw();
+                cudaFrameRaw->pts = origFrameRaw->pts;
+                cudaFrameRaw->pkt_dts = origFrameRaw->pkt_dts;
 
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
                     return AVError(AV_ERROR_TYPE::USER_STOP);
@@ -104,6 +110,34 @@ namespace ff {
         }
     }
 
+    static AVFrame* convertToYUV420P(AVFrame* inputFrame) {
+        int width = inputFrame->width;
+        int height = inputFrame->height;
+
+        // YUV420P 포맷의 AVFrame 생성
+        AVFrame* outputFrame = av_frame_alloc();
+        outputFrame->format  = AV_PIX_FMT_YUV420P;
+        outputFrame->width   = inputFrame->width;
+        outputFrame->height  = inputFrame->height;
+
+        av_frame_get_buffer(outputFrame, 0);
+
+        // 스케일링 컨텍스트 생성
+        struct SwsContext* swsContext = sws_getContext(
+            width, height, (AVPixelFormat)inputFrame->format,
+            width, height, AV_PIX_FMT_YUV420P,
+            SWS_BILINEAR, NULL, NULL, NULL);
+
+        // 입력 프레임을 YUV420P로 변환
+        sws_scale(swsContext, inputFrame->data, inputFrame->linesize, 0, height,
+            outputFrame->data, outputFrame->linesize);
+
+        // 스케일링 컨텍스트 해제
+        sws_freeContext(swsContext);
+
+        return outputFrame;
+    }
+
     AVError FFAVDecoder::cudaFormatConvert(FFAVFrame& srcFrame, FFAVFrame* dstFrame) {
         AVFrame* src = srcFrame.getImpl()->getRaw().get();
         AVFrame* dst = dstFrame->getImpl()->getRaw().get();
@@ -116,6 +150,8 @@ namespace ff {
         if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_hwframe_transfer_data failed", ret, "av_hwframe_transfer_data");
         }
+
+		dstFrame->getImpl()->setRaw(convertToYUV420P(dst));
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

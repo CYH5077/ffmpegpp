@@ -50,6 +50,10 @@ namespace ff {
         this->frame = frame;
     }
 
+    void FFAVFrameImpl::setRaw(AVFrame* frame) {
+		this->frame = std::shared_ptr<AVFrame>(frame, freeAVFrame);
+	}
+
     FFAVFrameImplPtr FFAVFrameImpl::copy() {
         return FFAVFrameImpl::create(this->shared_from_this());
     }

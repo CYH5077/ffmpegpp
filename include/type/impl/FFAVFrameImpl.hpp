@@ -26,6 +26,7 @@ namespace ff {
         // Raw AVFrame
         AVFramePtr getRaw();
         void       setRaw(AVFramePtr frame);
+        void 	   setRaw(AVFrame* frame);
 
         // AVFrame ����
         FFAVFrameImplPtr copy();

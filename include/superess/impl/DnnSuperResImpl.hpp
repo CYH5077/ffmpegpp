@@ -25,7 +25,7 @@ namespace ff::dnn {
         void enableCuda(bool isEnable);
 
         // Model 설정 (EDSR, ESPCN, Fsrcnn, LapSRN, VESPCN)
-        void setModel(const std::string& modelName, int scale);
+        void setModel(const std::string& model, int scale);
 
         void upsample(CVMatImplPtr srcImage, CVMatImplPtr dstImage);
 

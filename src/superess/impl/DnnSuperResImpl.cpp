@@ -34,21 +34,27 @@ namespace ff::dnn {
         }
     }
 
-    void DnnSuperResImpl::setModel(const std::string &modelName, int scale) {
-        this->dnnSuperResImpl.setModel(modelName, scale);
+    void DnnSuperResImpl::setModel(const std::string& model, int scale) {
+        this->dnnSuperResImpl.setModel(model, scale);
         this->scale = scale;
     }
 
     void DnnSuperResImpl::upsample(CVMatImplPtr srcImage, CVMatImplPtr dstImage) {
         cv::Mat img = srcImage->getRaw();
 
+        int chunkSize    = 64;
+        int paddedWidth  = ((img.cols + chunkSize - 1) / chunkSize) * chunkSize;
+        int paddedHeight = ((img.rows + chunkSize - 1) / chunkSize) * chunkSize;
+
+        cv::Mat paddedImg;
+        cv::copyMakeBorder(img, paddedImg, 0, paddedHeight - img.rows, 0, paddedWidth - img.cols, cv::BORDER_REFLECT);
+
         // 64 x 64 이미지로 나누기
         std::vector<cv::Mat> chunks;
-        int chunk_size = 64;
-        for (int y = 0; y < img.rows; y += chunk_size) {
-            for (int x = 0; x < img.cols; x += chunk_size) {
-                cv::Rect roi(x, y, std::min(chunk_size, img.cols - x), std::min(chunk_size, img.rows - y));
-                chunks.push_back(img(roi));
+        for (int y = 0; y < paddedImg.rows; y += chunkSize) {
+            for (int x = 0; x < paddedImg.cols; x += chunkSize) {
+                cv::Rect roi(x, y, chunkSize, chunkSize);
+                chunks.push_back(paddedImg(roi));
             }
         }
 
@@ -62,9 +68,9 @@ namespace ff::dnn {
 
         // 업스케일된 청크들을 하나의 이미지로 합치기
         cv::Mat result;
-        int upscaled_chunk_size = chunk_size * this->scale; // EDSR x2 모델은 크기를 2배로 만듦
-        int result_cols = img.cols * this->scale;
-        int result_rows = img.rows * this->scale;
+        int upscaled_chunk_size = chunkSize * this->scale; // EDSR x2 모델은 크기를 2배로 만듦
+        int result_cols = paddedWidth * this->scale;
+        int result_rows = paddedHeight * this->scale;
         result.create(result_rows, result_cols, img.type());
 
         for (int i = 0; i < upscaledChunks.size(); ++i) {
@@ -73,7 +79,11 @@ namespace ff::dnn {
             upscaledChunks[i].copyTo(result(cv::Rect(col, row, upscaledChunks[i].cols, upscaledChunks[i].rows)));
         }
 
-        dstImage->setMat(result);
+        // 패딩 제거하여 원래 크기로 자르기
+        cv::Rect crop_roi(0, 0, img.cols * this->scale, img.rows * this->scale);
+        cv::Mat cropped_result = result(crop_roi);
+
+        dstImage->setMat(cropped_result);
     }
 
 };

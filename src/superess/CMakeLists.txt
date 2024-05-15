@@ -3,7 +3,11 @@ set(SOURCES
         impl/CVMatImpl.cpp
 
         CVMat.cpp
-        EDSRSuperess.cpp)
+        DnnSuperRes
+        EDSRSuperess.cpp
+        ESPCNSuperess.cpp
+        FSRCNNSuperess.cpp
+)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

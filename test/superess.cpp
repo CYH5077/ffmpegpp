@@ -5,20 +5,38 @@
 #include "ffmpegpp.hpp"
 #include "ffmpegpp_dnn.hpp"
 
-void transcodeSuperess(const std::string& outputFile, const std::string& modelFile, ff::dnn::EDSR_SCALE scale, bool isCuda);
-TEST(SUPERESS, X2) {
-    transcodeSuperess("edsr_x2_cuda.ts", Config::EDSR_X2_MODEL_FILE, ff::dnn::EDSR_SCALE::X2, true);
+void transcodeSuperess(
+                const std::string& outputFile,
+                const std::string& modelFile,
+                std::shared_ptr<ff::dnn::DnnSuperRes> superess,
+                ff::dnn::SUPERESS_SCALE scale,
+                bool isCuda,
+                int maxEncodeFrame);
+
+
+TEST(SUPERESS_EDSR, X2) {
+    //transcodeSuperess("edsr_x2_cuda.ts", Config::EDSR_X2_MODEL_FILE, std::make_shared<ff::dnn::EDSRSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, 3);
+    transcodeSuperess("edsr_x2_cuda.ts", Config::EDSR_X2_MODEL_FILE, std::make_shared<ff::dnn::EDSRSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, -1);
 }
 
-TEST(SUPERESS, X3) {
-    transcodeSuperess("edsr_x3_cuda.ts", Config::EDSR_X3_MODEL_FILE, ff::dnn::EDSR_SCALE::X3, true);
+TEST(SUPERESS_ESPCN, X2) {
+    //transcodeSuperess("espcn_x2_cuda.ts", Config::ESPCN_X2_MODEL_FILE, std::make_shared<ff::dnn::ESPCNSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, 3);
+    transcodeSuperess("espcn_x2_cuda.ts", Config::ESPCN_X2_MODEL_FILE, std::make_shared<ff::dnn::ESPCNSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, -1);
 }
 
-TEST(SUPERESS, X4) {
-    transcodeSuperess("edsr_x4_cuda.ts", Config::EDSR_X4_MODEL_FILE, ff::dnn::EDSR_SCALE::X4, true);
+TEST(SUPERESS_FSRCNN, X2) {
+    //transcodeSuperess("fsrcnn_x2_cuda.ts", Config::FSRCNN_X2_MODEL_FILE, std::make_shared<ff::dnn::FSRCNNSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, 3);
+    transcodeSuperess("fsrcnn_x2_cuda.ts", Config::FSRCNN_X2_MODEL_FILE, std::make_shared<ff::dnn::FSRCNNSuperess>(), ff::dnn::SUPERESS_SCALE::X2, true, -1);
 }
 
-void transcodeSuperess(const std::string& outputFile, const std::string& modelFile, ff::dnn::EDSR_SCALE scale, bool isCuda) {
+void transcodeSuperess(
+                const std::string& outputFile, 
+                const std::string& modelFile,
+                std::shared_ptr<ff::dnn::DnnSuperRes> superess,
+                ff::dnn::SUPERESS_SCALE scale, 
+                bool isCuda, 
+                int maxEncodeFrame) {
+
     ff::FFAVInputContext inputContext;
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -60,19 +78,20 @@ void transcodeSuperess(const std::string& outputFile, const std::string& modelFi
     ff::FFAVDecoder decoder(videoDecodeContext, audioDecodeContext);
     ff::FFAVEncoder encoder(videoEncodeContext, audioEncodeContext);
 
-    // EDSR Model
-    ff::dnn::EDSRSuperess superess;
-    superess.openModel(modelFile, scale);
-    superess.enableCuda(isCuda);
+    superess->openModel(modelFile, scale);
+    superess->enableCuda(isCuda);
 
-    int count = 0;
+    int videoFrameCounter = 0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
     error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+
         if (type == ff::DATA_TYPE::VIDEO) {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////// EDSR
             ff::FFAVFrame superessFrame;
-            superess.upsample(frame, &superessFrame);
+            superess->upsample(frame, &superessFrame);
             frame.ref(superessFrame);
+
+            videoFrameCounter++;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
@@ -100,10 +119,20 @@ void transcodeSuperess(const std::string& outputFile, const std::string& modelFi
             std::cout << error.getMessage() << " " << error.getAVErrorMessage() << std::endl;
             return false;
         }
+
+        if (videoFrameCounter == maxEncodeFrame) {
+			return false;
+		}
+
         return true;
     });
     //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
-    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    
+    if (error.getType() == ff::AV_ERROR_TYPE::USER_STOP) {
+        std::cout << "Encode Frame Count: " << videoFrameCounter << std::endl;
+    } else {
+        ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    }
 
     encoder.flush();
 }

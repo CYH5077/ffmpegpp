@@ -5,6 +5,8 @@
 #include "ffmpegpp.hpp"
 
 TEST(TRANS_CODE, COPY_PARAMETERS) {
+    ff::ffmpegLogOff();
+
     ff::FFAVInputContext inputContext;
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);

@@ -28,7 +28,7 @@ namespace ff {
     AVError FFAVInputContext::open(const std::string &url) {
         this->close();
 
-        // AVFormatContext ¸Ş¸ğ¸® ÇÒ´ç.
+        // AVFormatContext ë©”ëª¨ë¦¬ í• ë‹¹.
         AVFormatContext* formatContext  = avformat_alloc_context();
         if (!formatContext) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_alloc_context failed", -1, "avformat_alloc_context");
@@ -62,7 +62,7 @@ namespace ff {
     void FFAVInputContext::close() {
         AVFormatContext* formatContext  = this->formatContextImpl->getRaw();
 
-        // formatContext°¡ nullptrÀÌ ¾Æ´Ò°æ¿ì
+        // formatContextê°€ nullptrì´ ì•„ë‹ê²½ìš°
         if (formatContext && isOpenedFlag) {
             avformat_close_input(&formatContext);
         } else if (formatContext && !isOpenedFlag) {
@@ -81,9 +81,9 @@ namespace ff {
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
         AVPacket* packet                = ffpacket->getImpl()->getRaw().get();
 
-        // AVFormatContext ¿¡¼­ AVPacketÀ» ÀĞ¾î¿È.
+        // AVFormatContext ì—ì„œ AVPacketì„ ì½ì–´ì˜´.
         int ret = av_read_frame(formatContext, packet);
-        // retÀÌ eof ÀÏ°æ¿ì
+        // retì´ eof ì¼ê²½ìš°
         if (ret == AVERROR_EOF || avio_feof(formatContext->pb)) {
             return AVError(AV_ERROR_TYPE::AV_EOF);
         } else if (ret < 0) {
@@ -177,7 +177,7 @@ namespace ff {
     }
 
     void FFAVInputContext::findMetaData() {
-        // nb streams ¸¸Å­ ¼øÈ¸ÇÏ¸é¼­ vector¿¡ µ¥ÀÌÅÍ¸¦ ³Ö´Â´Ù
+        // nb streams ë§Œí¼ ìˆœíšŒí•˜ë©´ì„œ vectorì— ë°ì´í„°ë¥¼ ë„£ëŠ”ë‹¤
         for (int i = 0; i < this->getStreamsCount(); i++) {
             AVStream* stream = this->formatContextImpl->getRaw()->streams[i];
 
@@ -196,9 +196,9 @@ namespace ff {
     FFAVInputContextIterator::FFAVInputContextIterator(FFAVInputContext* context)
     : context(context) {
         if (context && context->isOpened()) {
-            // ÃÊ±â ÆĞÅ¶ ÀĞ±â ½Ãµµ
+            // ì´ˆê¸° íŒ¨í‚· ì½ê¸° ì‹œë„
             if (context->readFrame(&this->currentPacket).getType() != AV_ERROR_TYPE::SUCCESS) {
-                // ½ÇÆĞÇÑ °æ¿ì, context¸¦ nullptr·Î ¼³Á¤ÇÏ¿© ¹İº¹ÀÚÀÇ ³¡À» ³ªÅ¸³¿
+                // ì‹¤íŒ¨í•œ ê²½ìš°, contextë¥¼ nullptrë¡œ ì„¤ì •í•˜ì—¬ ë°˜ë³µìì˜ ëì„ ë‚˜íƒ€ëƒ„
                 this->context = nullptr;
             }
         } else {
@@ -216,7 +216,7 @@ namespace ff {
 
     FFAVInputContextIterator& FFAVInputContextIterator::operator++() {
         if (context && context->readFrame(&currentPacket).getType() != AV_ERROR_TYPE::SUCCESS) {
-            // ´ÙÀ½ ÆĞÅ¶À» ÀĞ´Â µ¥ ½ÇÆĞÇÏ¸é ¹İº¹ÀÚ¸¦ ³¡À¸·Î ¼³Á¤
+            // ë‹¤ìŒ íŒ¨í‚·ì„ ì½ëŠ” ë° ì‹¤íŒ¨í•˜ë©´ ë°˜ë³µìë¥¼ ëìœ¼ë¡œ ì„¤ì •
             context = nullptr;
         }
         return *this;

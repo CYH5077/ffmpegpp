@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "ffmpegpp2",
+  "version": "2.0.0",
+  "dependencies": [
+    {
+      "name": "ffmpeg",
+      "features": [
+        "fdk-aac",
+        "fontconfig",
+        "freetype",
+        "fribidi",
+        "gpl",
+        "mp3lame",
+        "nvcodec",
+        "vorbis",
+        "vpx",
+        "webp",
+        "x264",
+        "x265"
+      ]
+     },
+    "gtest"
+  ]
+}

@@ -7,6 +7,10 @@ namespace ff {
 
     FFAVCodecContextImpl::~FFAVCodecContextImpl() {
         if (this->codecContext != nullptr) {
+			if (this->codecContext->hw_device_ctx != nullptr) {
+				av_buffer_unref(&this->codecContext->hw_device_ctx);
+			} 
+
             avcodec_free_context(&this->codecContext);
         }
     }

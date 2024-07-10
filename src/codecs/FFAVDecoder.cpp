@@ -83,12 +83,18 @@ namespace ff {
                 }
 
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
+					av_packet_unref(packet.get());
                     return AVError(AV_ERROR_TYPE::USER_STOP);
                 }
             } else {
                 if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), frame) == false) {
+                    av_packet_unref(packet.get());
                     return AVError(AV_ERROR_TYPE::USER_STOP);
                 }
+            }
+
+            if (packet.get() != nullptr) {
+                av_packet_unref(packet.get());
             }
         }
 

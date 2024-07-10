@@ -17,7 +17,7 @@ linux, windows support
 Install CUDA 11.8 <br>
 Install cudnn 8.6.0
 <h2> DNN (Usage Super Resolution (EDSR, ESPCN, FSRCNN) </h2>
-<pre> $ opencv4[core,contrib,cuda,dnn-cuda] </pre>
+R<pre> $ vcpkg install opencv4[core,contrib,cuda,dnn-cuda] </pre>
 
 <h1> DNN Module </h1>
 <pre>$ cmake -DCMAKE_TOOLCHAIN_FILE=<font color=red>{YOUR VCPKG PATH}</font>/scripts/buildsystems/vcpkg.cmake -DFFMPEGPP_SUPPRESS=ON -DFFMPEGPP_TEST=ON .</pre>

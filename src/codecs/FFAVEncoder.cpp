@@ -18,13 +18,13 @@ namespace ff {
     FFAVEncoder::~FFAVEncoder() {
     }
 
-    AVError FFAVEncoder::encode(DATA_TYPE type, FFAVFrame& frame, EncodeCallback callback) {
+    AVError FFAVEncoder::encode(FFAVFrame& frame, EncodeCallback callback) {
         this->callback = callback;
 
         AVError error;
-        if (type == DATA_TYPE::VIDEO) {
+        if (frame.getType() == DATA_TYPE::VIDEO) {
             error = encodeFrame(this->videoContext, &frame);
-        } else if (type == DATA_TYPE::AUDIO) {
+        } else if (frame.getType() == DATA_TYPE::AUDIO) {
             error = encodeFrame(this->audioContext, &frame);
         }
         return error;
@@ -64,6 +64,10 @@ namespace ff {
         FFAVPacket packet;
         AVPacket* packetRaw = packet.getImpl()->getRaw().get();
         ret = avcodec_send_frame(codecContextRaw, frameRaw);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_send_frame failed", ret, "avcodec_send_frame");
+        }
+
         while (ret >= 0) {
             ret = avcodec_receive_packet(codecContextRaw, packetRaw);
 
@@ -77,9 +81,10 @@ namespace ff {
 
             packet.setFrameNumber(codecContextRaw->frame_num);
             packet.setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContextRaw->codec_type));
-            if (this->callback(packet) == false) {
+            AVError error = this->callback(packet);
+            if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                 av_packet_unref(packetRaw);
-                return AVError(AV_ERROR_TYPE::FAILED, "callback failed", -1, "callback");
+                return error;
             }
 
             av_packet_unref(packetRaw);

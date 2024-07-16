@@ -7,7 +7,7 @@
 #include <functional>
 
 namespace ff {
-    typedef std::function<bool(DATA_TYPE, FFAVFrame&)> FFAVDecoderCallback;
+    typedef std::function<AVError(FFAVFrame&)> FFAVDecoderCallback;
 
     class FFAVDecoder {
     public:

@@ -97,7 +97,7 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
-    AVError FFAVOutputContext::writePacket(ff::FFAVPacket& ffavPacket) {
+    AVError FFAVOutputContext::writePacket(FFAVPacket& ffavPacket) {
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
         AVPacket* packet = ffavPacket.getImpl()->getRaw().get();
         int ret = av_interleaved_write_frame(formatContext, packet);

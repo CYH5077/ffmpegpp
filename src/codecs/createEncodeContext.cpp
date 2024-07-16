@@ -23,6 +23,8 @@ namespace ff {
             case VIDEO_CODEC::H265:
                 return "libx265";
         }
+
+        return "NONE";
     }
 
     std::string HW_VIDEO_CODEC_TO_STRING(HW_VIDEO_CODEC codec) {
@@ -32,6 +34,8 @@ namespace ff {
             case HW_VIDEO_CODEC::H265:
                 return "hevc_nvenc";
         }
+
+        return "NONE";
     }
 
     std::string AUDIO_CODEC_TO_STRING(AUDIO_CODEC codec) {
@@ -41,6 +45,8 @@ namespace ff {
             case AUDIO_CODEC::AAC:
                 return "aac";
         }
+
+        return "NONE";
     }
 
     FFAVCodecContextPtr createAVVideoEncodeContext(const AVCodec* codec, FFAVVideoEncodeParametersPtr& encodeParameter, AVError* result) {

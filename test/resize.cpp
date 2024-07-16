@@ -46,14 +46,15 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
     ff::FFAVSwsContext swsContext(1280, 640, ff::PICTURE_FORMAT::YUV420P);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
         // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Resize Frame
-        if (type == ff::DATA_TYPE::VIDEO) {
-			swsContext.convert(frame);
-		}
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
-        error = encoder.encode(type, frame, [&](ff::FFAVPacket& packet) {
+        if (frame.getType() == ff::DATA_TYPE::VIDEO) {
+            swsContext.convert(frame);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode
+        error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {
                 packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
                 packet.setStreamIndex(inputContext.getVideoStreamIndex());
@@ -65,13 +66,18 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
             error = outputContext.writePacket(packet);
             if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
                 std::cout << error.getMessage() << " " << error.getAVErrorMessage() << std::endl;
-                return false;
+                return error;
             }
 
-            return true;
+            return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
         });
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode End
-        return true;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode End
+        if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
+            return error;
+        }
+        
+        return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
     //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);

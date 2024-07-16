@@ -1,4 +1,6 @@
 set(SOURCES
+        FFAVDefine.cpp
+
         FFAVPictureFormat.cpp 
 
         FFAVRational.cpp

@@ -48,22 +48,22 @@ namespace ff {
     }
 
     AVError copyPackets(FFAVInputContext& inputContext, FFAVOutputContext* outputContext, std::vector<int>& streamMapper) {
-        FFAVPacket ffavPacket;
-       while (inputContext.readFrame(&ffavPacket).getType() != AV_ERROR_TYPE::AV_EOF) {
+        FFAVPacket packet;
+       while (inputContext.readFrame(&packet).getType() != AV_ERROR_TYPE::AV_EOF) {
            //AVPacket* packet = iter.getImpl()->getRaw().get();
-            AVPacket* packet = ffavPacket.getImpl()->getRaw().get();
-            if (packet->stream_index >= streamMapper.size() || streamMapper[packet->stream_index] == -1) {
-                av_packet_unref(packet);
+            AVPacket* packetRaw = packet.getImpl()->getRaw().get();
+            if (packetRaw->stream_index >= streamMapper.size() || streamMapper[packetRaw->stream_index] == -1) {
+                av_packet_unref(packetRaw);
                 continue;
             }
 
-            AVStream* inputStream  = inputContext.getImpl()->getRaw()->streams[packet->stream_index];
-            packet->stream_index = streamMapper[packet->stream_index];
-            AVStream* outputStream = outputContext->getImpl()->getRaw()->streams[packet->stream_index];
-            av_packet_rescale_ts(packet, inputStream->time_base, outputStream->time_base);
-            packet->pos = -1;
+            AVStream* inputStream  = inputContext.getImpl()->getRaw()->streams[packetRaw->stream_index];
+            packetRaw->stream_index = streamMapper[packetRaw->stream_index];
+            AVStream* outputStream = outputContext->getImpl()->getRaw()->streams[packetRaw->stream_index];
+            av_packet_rescale_ts(packetRaw, inputStream->time_base, outputStream->time_base);
+            packetRaw->pos = -1;
 
-            AVError error = outputContext->writePacket(ffavPacket);
+            AVError error = outputContext->writePacket(packet);
             if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                 return error;
             }

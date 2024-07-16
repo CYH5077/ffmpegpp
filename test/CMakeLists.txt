@@ -6,6 +6,7 @@ set(SOURCES
         transcode.cpp
         resize.cpp
         type_test.cpp
+        high_transcode.cpp
 )
 
 if(FFMPEGPP_SUPPRESS)

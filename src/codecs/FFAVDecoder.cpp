@@ -25,15 +25,15 @@ namespace ff {
 
     AVError FFAVDecoder::decode(FFAVInputContext& inputContext, FFAVDecoderCallback callback) {
         AVError error;
-        for (auto& iter : inputContext) {
-            AVPacket* packet = iter.getImpl()->getRaw().get();
-
-            if (packet->stream_index ==  inputContext.getVideoStreamIndex()) {
-                error = this->decode(this->videoContext, &iter, callback);
-            } else if (packet->stream_index == inputContext.getAudioStreamIndex()) {
-                error = this->decode(this->audioContext, &iter, callback);
+        for (auto& packet : inputContext) {
+            AVPacket* packetRaw = packet.getImpl()->getRaw().get();
+            
+            if (packetRaw->stream_index ==  inputContext.getVideoStreamIndex()) {
+                error = this->decode(this->videoContext, &packet, callback);
+            } else if (packetRaw->stream_index == inputContext.getAudioStreamIndex()) {
+                error = this->decode(this->audioContext, &packet, callback);
             }
-            av_packet_unref(packet);
+            av_packet_unref(packetRaw);
 
             if (error.getType() == AV_ERROR_TYPE::AV_EOF ||
                 error.getType() == AV_ERROR_TYPE::USER_STOP) {
@@ -59,14 +59,13 @@ namespace ff {
         AVPacketPtr packet = ffavPacket != nullptr ? ffavPacket->getImpl()->getRaw() : nullptr;
 
         // packet�� ���ڵ��ϰ� callback�� ȣ��
-        FFAVFrame frame;
         int ret = avcodec_send_packet(codecContext, packet.get());
         if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_send_packet failed", ret, "avcodec_send_packet");
         }
 
-        FFAVFrame cudaFrame;
         while (ret >= 0) {
+            FFAVFrame frame;
             ret = avcodec_receive_frame(codecContext, frame.getImpl()->getRaw().get());
             if (ret == AVERROR(EAGAIN)) {
                 return AVError(AV_ERROR_TYPE::AV_EAGAIN);
@@ -77,27 +76,25 @@ namespace ff {
             }
 
             if (ffavCodecContext->isEnableCuda()) {
+                FFAVFrame cudaFrame;
                 AVError error = this->cudaFormatConvert(frame, &cudaFrame);
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
                 }
 
-                if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), cudaFrame) == false) {
-					av_packet_unref(packet.get());
-                    return AVError(AV_ERROR_TYPE::USER_STOP);
+                cudaFrame.setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type));
+                error = callback(cudaFrame);
+                if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+                    return error;
                 }
             } else {
-                if (callback(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type), frame) == false) {
-                    av_packet_unref(packet.get());
-                    return AVError(AV_ERROR_TYPE::USER_STOP);
+                frame.setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContext->codec->type));
+                AVError error = callback(frame);
+                if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+                    return error;
                 }
             }
-
-            if (packet.get() != nullptr) {
-                av_packet_unref(packet.get());
-            }
         }
-
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 

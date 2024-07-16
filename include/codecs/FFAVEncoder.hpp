@@ -5,7 +5,7 @@
 #include <functional>
 
 namespace ff {
-    typedef std::function<bool(FFAVPacket&)> EncodeCallback;
+    typedef std::function<AVError(FFAVPacket&)> EncodeCallback;
 
     class FFAVEncoder {
     public:
@@ -13,7 +13,7 @@ namespace ff {
         virtual ~FFAVEncoder();
 
     public:
-        AVError encode(DATA_TYPE type, FFAVFrame& frame, EncodeCallback callback);
+        AVError encode(FFAVFrame& frame, EncodeCallback callback);
         AVError flush();
 
     private:

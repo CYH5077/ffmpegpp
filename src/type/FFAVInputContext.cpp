@@ -210,8 +210,8 @@ namespace ff {
         return this->currentPacket;
 
     }
-    FFAVPacket* FFAVInputContextIterator::operator->() {
-        return &currentPacket;
+    FFAVPacket& FFAVInputContextIterator::operator->() {
+        return currentPacket;
     }
 
     FFAVInputContextIterator& FFAVInputContextIterator::operator++() {

@@ -55,7 +55,7 @@ namespace ff {
 	}
 
     FFAVFrameImplPtr FFAVFrameImpl::copy() {
-        return FFAVFrameImpl::create(this->shared_from_this());
+        return FFAVFrameImpl::create();
     }
 
     void FFAVFrameImpl::copyFrom(FFAVFrameImplPtr frameImpl) {

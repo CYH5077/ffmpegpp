@@ -16,9 +16,9 @@ TEST(DECODE_TEST, DECODE_CPU) {
 
     int decodeCount = 0;
     ff::FFAVDecoder decoder(videoContext, audioContext);
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
         decodeCount++;
-        return true;
+        return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
@@ -38,9 +38,9 @@ TEST(DECODE_TEST, DECODE_GPU) {
 
     int decodeCount = 0;
     ff::FFAVDecoder decoder(videoContext, audioContext);
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
         decodeCount++;
-        return true;
+        return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 

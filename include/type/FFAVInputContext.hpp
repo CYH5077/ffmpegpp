@@ -19,7 +19,7 @@ namespace ff {
         FFAVInputContextIterator(FFAVInputContext* context = nullptr);
 
         FFAVPacket& operator*();
-        FFAVPacket* operator->();
+        FFAVPacket& operator->();
         FFAVInputContextIterator& operator++();
         friend bool operator==(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b);
         friend bool operator!=(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b);

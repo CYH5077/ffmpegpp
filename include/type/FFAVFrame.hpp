@@ -1,14 +1,14 @@
 #pragma once
 
-#include "type/impl/ffavimpl.hpp"
-
 #include <memory>
+
+#include "type/FFAVDefine.hpp"
+#include "type/impl/ffavimpl.hpp"
 
 namespace ff {
     class FFAVFrame {
     public:
         explicit FFAVFrame();
-        explicit FFAVFrame(const FFAVFrame& frame);
         explicit FFAVFrame(FFAVFrameImplPtr frameImpl);
 
         virtual ~FFAVFrame();
@@ -17,10 +17,15 @@ namespace ff {
         FFAVFrameImplPtr getImpl();
 
     public:
+        void setType(DATA_TYPE type);
+        DATA_TYPE getType();
+
         void copyTs(FFAVFrame& frame);
         void ref(FFAVFrame& frame);
-    
+
     private:
+        DATA_TYPE type;
+
         FFAVFrameImplPtr frameImpl;
     };
 };

@@ -1,7 +1,7 @@
 #include "type/FFAVPacket.hpp"
 
-#include "type/impl/FFAVStreamImpl.hpp"
 #include "type/impl/FFAVPacketImpl.hpp"
+#include "type/impl/FFAVStreamImpl.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -10,37 +10,20 @@ extern "C" {
 #include <memory>
 
 namespace ff {
-    DATA_TYPE DATA_TYPE_FROM_AV_CODEC_TYPE(int codecType) {
-        switch (codecType) {
-        case AVMEDIA_TYPE_VIDEO:
-            return DATA_TYPE::VIDEO;
-        case AVMEDIA_TYPE_AUDIO:
-            return DATA_TYPE::AUDIO;
-        case AVMEDIA_TYPE_SUBTITLE:
-            return DATA_TYPE::SUBTITLE;
-        case AVMEDIA_TYPE_DATA:
-            return DATA_TYPE::DATA;
-        default:
-            return DATA_TYPE::UNKNOWN;
-        }
+    // FFAVPacket
+    FFAVPacket::FFAVPacket() {
+        this->packetImpl = FFAVPacketImpl ::create();
     }
 
-	// FFAVPacket 
-	FFAVPacket::FFAVPacket() {
-		this->packetImpl = FFAVPacketImpl ::create();
-	}
+    FFAVPacket::FFAVPacket(FFAVPacket& packet) {
+        this->packetImpl = FFAVPacketImpl::create(packet.packetImpl);
+    }
 
-	FFAVPacket::FFAVPacket(FFAVPacket& packet) {
-		this->packetImpl = FFAVPacketImpl::create(packet.packetImpl);
-	}
+    FFAVPacket::FFAVPacket(FFAVPacketImplPtr packet) {
+        this->packetImpl = FFAVPacketImpl::create(packet);
+    }
 
-	FFAVPacket::FFAVPacket(FFAVPacketImplPtr packet) {
-		this->packetImpl = FFAVPacketImpl::create(packet);
-	}
-
-	FFAVPacket::~FFAVPacket() {
-
-	}
+    FFAVPacket::~FFAVPacket() {}
 
     void FFAVPacket::rescaleTS(ff::FFAVStreamPtr srcStream, ff::FFAVStreamPtr dstStream) {
         AVRational srcTimebase = srcStream->getImpl()->getRaw()->time_base;
@@ -78,7 +61,7 @@ namespace ff {
         return this->frameNumber;
     }
 
-	FFAVPacketImplPtr FFAVPacket::getImpl() {
-		return this->packetImpl;
-	}
+    FFAVPacketImplPtr FFAVPacket::getImpl() {
+        return this->packetImpl;
+    }
 }

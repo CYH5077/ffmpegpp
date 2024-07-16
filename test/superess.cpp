@@ -83,11 +83,11 @@ void transcodeSuperess(
 
     int videoFrameCounter = 0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame frame) {
 
         if (type == ff::DATA_TYPE::VIDEO) {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////// EDSR
-            ff::FFAVFrame superessFrame;
+            ff::FFAVFrame superessFrame = ff::FFAVFrame::create();
             superess->upsample(frame, &superessFrame);
             frame.ref(superessFrame);
 

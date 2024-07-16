@@ -41,9 +41,9 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
     ff::FFAVEncoder encoder(videoEncodeContext, audioEncodeContext);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
-        error = encoder.encode(type, frame, [&](ff::FFAVPacket& packet) {
+        error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {
                 packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
                 packet.setStreamIndex(inputContext.getVideoStreamIndex());
@@ -55,13 +55,17 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
             error = outputContext.writePacket(packet);
             if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
                 std::cout << error.getMessage() << " " << error.getAVErrorMessage() << std::endl;
-                return false;
+                return error;
             }
 
-            return true;
+            return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
         });
         //////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode End
-        return true;
+        if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
+            return error;
+        }
+
+        return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
     //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
     EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -107,14 +111,14 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
     ff::FFAVSwsContext swsContext(videoEncodeContext->getWidth(), videoEncodeContext->getHeight(), ff::PICTURE_FORMAT::YUV420P);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
-    error = decoder.decode(inputContext, [&](ff::DATA_TYPE type, ff::FFAVFrame& frame) {
+    error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
         // CUDA Format to YUV420P
-        if (type == ff::DATA_TYPE::VIDEO) {
+        if (frame.getType() == ff::DATA_TYPE::VIDEO) {
             swsContext.convert(frame);
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
-        error = encoder.encode(type, frame, [&](ff::FFAVPacket& packet) {
+        error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {
                 packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
                 packet.setStreamIndex(inputContext.getVideoStreamIndex());
@@ -126,13 +130,17 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
             error = outputContext.writePacket(packet);
             if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
                 std::cout << error.getMessage() << " " << error.getAVErrorMessage() << std::endl;
-                return false;
+                return error;
             }
 
-            return true;
+            return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
         });
         //////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode End
-        return true;
+        if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
+            return error;
+        }
+
+        return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
     //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);

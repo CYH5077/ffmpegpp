@@ -5,15 +5,13 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
+#include <memory>
+
 namespace ff {
     FFAVFrame::FFAVFrame() {
         this->frameImpl = FFAVFrameImpl::create();
     }
-
-    FFAVFrame::FFAVFrame(const FFAVFrame& frame) {
-        this->frameImpl = FFAVFrameImpl::create(frame.frameImpl);
-    }
-
+    
     FFAVFrame::FFAVFrame(ff::FFAVFrameImplPtr frameImpl) {
         this->frameImpl = FFAVFrameImpl::create(frameImpl);
     }
@@ -24,6 +22,14 @@ namespace ff {
 
     FFAVFrameImplPtr FFAVFrame::getImpl() {
         return this->frameImpl;
+    }
+
+    void FFAVFrame::setType(DATA_TYPE type) {
+        this->type = type;
+    }
+
+    DATA_TYPE FFAVFrame::getType() {
+        return this->type;
     }
 
     void FFAVFrame::copyTs(ff::FFAVFrame& frame) {

@@ -30,6 +30,14 @@ namespace ff {
         this->successCallback = successCallback;
     }
 
+    void FFAVTranscoder::setDecodeCallback(std::function<void(FFAVFrame&)> decodeCallback) {
+        this->decodeCallback = decodeCallback;
+    }
+
+    void FFAVTranscoder::setEncodeCallback(std::function<void(FFAVPacket&)> encodeCallback) {
+        this->encodeCallback = encodeCallback;
+    }
+
     void FFAVTranscoder::setOutputContextOpt(const std::string& key, const std::string& value) {
         this->outputContextOpt[key] = value;
     }
@@ -111,6 +119,10 @@ namespace ff {
                 return AVError(AV_ERROR_TYPE::USER_STOP);
             }
 
+            if (this->decodeCallback) {
+                this->decodeCallback(frame);
+            }
+
             return AVError(AV_ERROR_TYPE::SUCCESS);
         });
 
@@ -136,6 +148,7 @@ namespace ff {
             return error;
         }
 
+        // Loop
         int encodeCount = 0;
         while (this->isDecoderThreadRunning == true || this->encodeQueue.size() > 0) {
             this->encodeQueue.wait();
@@ -152,6 +165,7 @@ namespace ff {
                 }
             }
 
+            //// Encode
             error = this->encoder->encode(frame, [&](FFAVPacket& packet) {
                 FFAVInputContext& inputContext = this->parameter.getInputContext();
                 if (packet.getType() == DATA_TYPE::VIDEO) {
@@ -165,6 +179,10 @@ namespace ff {
                 error = outputContext.writePacket(packet);
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
+                }
+
+                if (this->encodeCallback) {
+                    this->encodeCallback(packet);
                 }
 
                 return AVError(AV_ERROR_TYPE::SUCCESS);
@@ -186,8 +204,8 @@ namespace ff {
         }
 
         for (auto& opt : this->inputContextOpt) {
-			this->parameter.getInputContext().setOpt(opt.first, opt.second);
-		}
+            this->parameter.getInputContext().setOpt(opt.first, opt.second);
+        }
 
         for (auto& opt : this->videoEncodeContextOpt) {
             this->parameter.getVideoEncodeContext()->setOpt(opt.first, opt.second);

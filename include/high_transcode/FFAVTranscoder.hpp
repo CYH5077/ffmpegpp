@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "codecs/ffav.hpp"
 #include "error/ffav.hpp"
@@ -22,16 +22,19 @@ namespace ff {
         virtual ~FFAVTranscoder();
 
     public:
+        void transcode(const std::string& outputFile, OUTPUT_TYPE type = OUTPUT_TYPE::FILE);
+        void stop();
+
+    public:
         void setErrorCallback(std::function<void(ERROR_TYPE, AVError&)> errorCallback);
         void setSuccessCallback(std::function<void()> successCallback);
+        void setDecodeCallback(std::function<void(FFAVFrame&)> decodeCallback);
+        void setEncodeCallback(std::function<void(FFAVPacket&)> encodeCallback);
 
         void setOutputContextOpt(const std::string& key, const std::string& value);
         void setInputContextOpt(const std::string& key, const std::string& value);
         void setVideoEncodeContextOpt(const std::string& key, const std::string& value);
         void setAudioEncodeContextOpt(const std::string& key, const std::string& value);
-
-        void transcode(const std::string& outputFile, OUTPUT_TYPE type = OUTPUT_TYPE::FILE);
-        void stop();
 
         void callErrorCallback(ERROR_TYPE type, AVError& error);
 
@@ -55,6 +58,8 @@ namespace ff {
 
         std::function<void()> successCallback;
         std::function<void(ERROR_TYPE, AVError&)> errorCallback;
+        std::function<void(FFAVFrame&)> decodeCallback;
+        std::function<void(FFAVPacket&)> encodeCallback;
 
         // Transcode Thread
         bool isDecoderThreadRunning;

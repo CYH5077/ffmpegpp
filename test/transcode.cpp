@@ -1,8 +1,6 @@
-#include "gtest/gtest.h"
-
 #include "config.hpp"
-
 #include "ffmpegpp.hpp"
+#include "gtest/gtest.h"
 
 TEST(TRANS_CODE, COPY_PARAMETERS) {
     ff::ffmpegLogOff();
@@ -10,6 +8,8 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
     ff::FFAVInputContext inputContext;
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+    std::cout << "total frame count: " << inputContext.getFrameCount() << std::endl;
 
     ff::FFAVCodecContextPtr videoDecodeContext = ff::video::decode::createCodecContext(inputContext, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -20,9 +20,11 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
     ff::FFAVAudioEncodeParametersPtr audioEncodeParameters = ff::FFAVAudioEncodeParameters::create(inputContext);
     videoEncodeParameters->setEncodeThreadCount(16);
 
-    ff::FFAVCodecContextPtr videoEncodeContext = ff::video::encode::createCodecContext(ff::VIDEO_CODEC::H264, videoEncodeParameters, &error);
+    ff::FFAVCodecContextPtr videoEncodeContext =
+        ff::video::encode::createCodecContext(ff::VIDEO_CODEC::H264, videoEncodeParameters, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
-    ff::FFAVCodecContextPtr audioEncodeContext = ff::audio::encode::createCodecContext(ff::AUDIO_CODEC::AAC, audioEncodeParameters, &error);
+    ff::FFAVCodecContextPtr audioEncodeContext =
+        ff::audio::encode::createCodecContext(ff::AUDIO_CODEC::AAC, audioEncodeParameters, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVOutputContext outputContext;
@@ -42,7 +44,8 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
     error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode
         error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {
                 packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
@@ -60,14 +63,16 @@ TEST(TRANS_CODE, COPY_PARAMETERS) {
 
             return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
         });
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode End
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode End
         if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
             return error;
         }
 
         return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
+    ///End
     EXPECT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     encoder.flush();
@@ -87,9 +92,11 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
     ff::FFAVAudioEncodeParametersPtr audioEncodeParameters = ff::FFAVAudioEncodeParameters::create(inputContext);
     videoEncodeParameters->setEncodeThreadCount(16);
 
-    ff::FFAVCodecContextPtr videoEncodeContext = ff::video::encode::createCUDACodecContext(ff::HW_VIDEO_CODEC::H264, videoEncodeParameters, &error);
+    ff::FFAVCodecContextPtr videoEncodeContext =
+        ff::video::encode::createCUDACodecContext(ff::HW_VIDEO_CODEC::H264, videoEncodeParameters, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
-    ff::FFAVCodecContextPtr audioEncodeContext = ff::audio::encode::createCodecContext(ff::AUDIO_CODEC::AAC, audioEncodeParameters, &error);
+    ff::FFAVCodecContextPtr audioEncodeContext =
+        ff::audio::encode::createCodecContext(ff::AUDIO_CODEC::AAC, audioEncodeParameters, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVOutputContext outputContext;
@@ -108,7 +115,8 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
     ff::FFAVEncoder encoder(videoEncodeContext, audioEncodeContext);
 
     // SwsContext - CUDA Format To YUV420P
-    ff::FFAVSwsContext swsContext(videoEncodeContext->getWidth(), videoEncodeContext->getHeight(), ff::PICTURE_FORMAT::YUV420P);
+    ff::FFAVSwsContext swsContext(
+        videoEncodeContext->getWidth(), videoEncodeContext->getHeight(), ff::PICTURE_FORMAT::YUV420P);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Decode
     error = decoder.decode(inputContext, [&](ff::FFAVFrame& frame) {
@@ -116,8 +124,9 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
         if (frame.getType() == ff::DATA_TYPE::VIDEO) {
             swsContext.convert(frame);
         }
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////  Encode
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode
         error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
             if (packet.getType() == ff::DATA_TYPE::VIDEO) {
                 packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
@@ -135,14 +144,16 @@ TEST(TRANS_CODE, COPY_PARAMETERS_CUDA) {
 
             return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
         });
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////// Encode End
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Encode End
         if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
             return error;
         }
 
         return ff::AVError(ff::AV_ERROR_TYPE::SUCCESS);
     });
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode End
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////// Decode
+    ///End
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     encoder.flush();

@@ -51,6 +51,8 @@ namespace ff {
         FFAVStreamPtr getStream(int index);
 
     private:
+        std::string filename;
+
         bool isOpenFlag;
 
         FFAVFormatContextImplPtr formatContextImpl;

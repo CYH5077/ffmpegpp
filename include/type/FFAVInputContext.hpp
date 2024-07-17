@@ -42,6 +42,8 @@ namespace ff {
 
         AVError readFrame(FFAVPacket* packet);
 
+        int getFrameCount();
+        
     public: // get set
         bool isOpened() const;
 

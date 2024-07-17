@@ -97,6 +97,15 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
+    int FFAVInputContext::getFrameCount() {
+        int totalCount = 0;
+
+        totalCount += this->getVideoStream()->getImpl()->getRaw()->nb_frames;
+        totalCount += this->getAudioStream()->getImpl()->getRaw()->nb_frames;
+
+        return totalCount;
+    }
+
     bool FFAVInputContext::isOpened() const {
         return this->isOpenedFlag;
     }

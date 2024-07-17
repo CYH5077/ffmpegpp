@@ -45,6 +45,7 @@ namespace ff {
             }
         }
 
+        this->filename = filename;
         this->isOpenFlag = true;
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

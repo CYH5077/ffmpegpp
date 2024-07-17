@@ -17,11 +17,16 @@ namespace ff {
         FFAVFrameImplPtr getImpl();
 
     public:
-        void setType(DATA_TYPE type);
-        DATA_TYPE getType();
-
         void copyTs(FFAVFrame& frame);
         void ref(FFAVFrame& frame);
+
+    public:
+        void setType(DATA_TYPE type);
+        
+        
+        DATA_TYPE getType();
+        int getWidth();
+        int getHeight();
 
     private:
         DATA_TYPE type;

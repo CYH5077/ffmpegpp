@@ -32,6 +32,14 @@ namespace ff {
         return this->type;
     }
 
+    int FFAVFrame::getWidth() {
+		return this->frameImpl->getRaw()->width;
+	}
+
+    int FFAVFrame::getHeight() {
+        return this->frameImpl->getRaw()->height;
+    }
+
     void FFAVFrame::copyTs(ff::FFAVFrame& frame) {
         AVFramePtr dstFrame = this->frameImpl->getRaw();
         AVFramePtr srcFrame = frame.getImpl()->getRaw();

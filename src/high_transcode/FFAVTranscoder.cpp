@@ -1,11 +1,16 @@
 #include "high_transcode/FFAVTranscoder.hpp"
 
 #include <future>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 namespace ff {
-    FFAVTranscoder::FFAVTranscoder(FFAVTranscoderParameter& parameter) : parameter(parameter), encodeQueue(150) {
+    FFAVTranscoder::FFAVTranscoder(FFAVTranscoderParameter& parameter)
+        : parameter(parameter),
+          encodeQueue(200),
+          swsContext(parameter.getVideoEncodeParameters()->getWidth(),
+                     parameter.getVideoEncodeParameters()->getHeight(),
+                     ff::PICTURE_FORMAT::YUV420P) {
         this->decoder =
             std::make_shared<FFAVDecoder>(parameter.getVideoDecodeContext(), parameter.getAudioDecodeContext());
         this->encoder =
@@ -21,7 +26,27 @@ namespace ff {
         this->errorCallback = errorCallback;
     }
 
-    void FFAVTranscoder::transcode(const std::string& outputFile) {
+    void FFAVTranscoder::setSuccessCallback(std::function<void()> successCallback) {
+        this->successCallback = successCallback;
+    }
+
+    void FFAVTranscoder::setOutputContextOpt(const std::string& key, const std::string& value) {
+        this->outputContextOpt[key] = value;
+    }
+
+    void FFAVTranscoder::setInputContextOpt(const std::string& key, const std::string& value) {
+        this->inputContextOpt[key] = value;
+    }
+
+    void FFAVTranscoder::setVideoEncodeContextOpt(const std::string& key, const std::string& value) {
+        this->videoEncodeContextOpt[key] = value;
+    }
+
+    void FFAVTranscoder::setAudioEncodeContextOpt(const std::string& key, const std::string& value) {
+        this->audioEncodeContextOpt[key] = value;
+    }
+
+    void FFAVTranscoder::transcode(const std::string& outputFile, OUTPUT_TYPE type) {
         this->isTranscodeRunning = true;
 
         // Decode Thread
@@ -35,8 +60,8 @@ namespace ff {
         }));
 
         // Encode Thread
-        this->threads.push_back(std::make_shared<std::thread>([this, &outputFile]() {
-            AVError error = this->runEncode(outputFile);
+        this->threads.push_back(std::make_shared<std::thread>([this, &outputFile, type]() {
+            AVError error = this->runEncode(outputFile, type);
             if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                 this->isTranscodeRunning = false;
                 this->callErrorCallback(ERROR_TYPE::ENCODE_THREAD, error);
@@ -94,33 +119,41 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
-    AVError FFAVTranscoder::runEncode(const std::string& outputFile) {
+    AVError FFAVTranscoder::runEncode(const std::string& outputFile, OUTPUT_TYPE type) {
         AVError error;
 
         FFAVOutputContext outputContext;
-        error = outputContext.open(outputFile);
+        error = outputContext.open(outputFile, type);
         if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
             return error;
         }
 
         outputContext.createStream(DATA_TYPE::VIDEO, this->parameter.getVideoEncodeContext());
         outputContext.createStream(DATA_TYPE::AUDIO, this->parameter.getAudioEncodeContext());
+        this->setOptions(outputContext, type);
         error = outputContext.writeHeader();
         if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
             return error;
         }
 
         int encodeCount = 0;
-        FFAVInputContext& inputContext = this->parameter.getInputContext();
-        while (this->isDecoderThreadRunning == true ||
-               this->encodeQueue.size() > 0) {
+        while (this->isDecoderThreadRunning == true || this->encodeQueue.size() > 0) {
             this->encodeQueue.wait();
             if (this->encodeQueue.isClosed()) {
                 return AVError(AV_ERROR_TYPE::SUCCESS);
             }
             auto frame = this->encodeQueue.pop();
 
+            auto videoEncodeParameters = this->parameter.getVideoEncodeParameters();
+            if (frame.getType() == DATA_TYPE::VIDEO) {
+                if (frame.getWidth() != videoEncodeParameters->getWidth() ||
+                    frame.getHeight() != videoEncodeParameters->getHeight()) {
+                    this->swsContext.convert(frame);
+                }
+            }
+
             error = this->encoder->encode(frame, [&](FFAVPacket& packet) {
+                FFAVInputContext& inputContext = this->parameter.getInputContext();
                 if (packet.getType() == DATA_TYPE::VIDEO) {
                     packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
                     packet.setStreamIndex(inputContext.getVideoStreamIndex());
@@ -131,18 +164,38 @@ namespace ff {
 
                 error = outputContext.writePacket(packet);
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
-					return error;
-				}
+                    return error;
+                }
 
                 return AVError(AV_ERROR_TYPE::SUCCESS);
             });
 
             if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
-				return error;
-			}
+                return error;
+            }
         }
 
         this->encoder->flush();
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
+
+    AVError FFAVTranscoder::setOptions(FFAVOutputContext& outputContext, OUTPUT_TYPE type) {
+        for (auto& opt : this->outputContextOpt) {
+            outputContext.setOpt(opt.first, opt.second);
+        }
+
+        for (auto& opt : this->inputContextOpt) {
+			this->parameter.getInputContext().setOpt(opt.first, opt.second);
+		}
+
+        for (auto& opt : this->videoEncodeContextOpt) {
+            this->parameter.getVideoEncodeContext()->setOpt(opt.first, opt.second);
+        }
+
+        for (auto& opt : this->audioEncodeContextOpt) {
+            this->parameter.getAudioEncodeContext()->setOpt(opt.first, opt.second);
+        }
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

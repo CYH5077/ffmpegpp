@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "codecs/ffav.hpp"
 #include "error/ffav.hpp"
@@ -22,8 +23,14 @@ namespace ff {
 
     public:
         void setErrorCallback(std::function<void(ERROR_TYPE, AVError&)> errorCallback);
+        void setSuccessCallback(std::function<void()> successCallback);
 
-        void transcode(const std::string& outputFile);
+        void setOutputContextOpt(const std::string& key, const std::string& value);
+        void setInputContextOpt(const std::string& key, const std::string& value);
+        void setVideoEncodeContextOpt(const std::string& key, const std::string& value);
+        void setAudioEncodeContextOpt(const std::string& key, const std::string& value);
+
+        void transcode(const std::string& outputFile, OUTPUT_TYPE type = OUTPUT_TYPE::FILE);
         void stop();
 
         void callErrorCallback(ERROR_TYPE type, AVError& error);
@@ -34,19 +41,31 @@ namespace ff {
 
     private:  // Thread
         AVError runDecode();
-        AVError runEncode(const std::string& outputFile);
+        AVError runEncode(const std::string& outputFile, OUTPUT_TYPE type);
+
+    private:
+        AVError setOptions(FFAVOutputContext& outputContext, OUTPUT_TYPE type);
 
     private:
         FFAVTranscoderParameter& parameter;
 
         std::shared_ptr<FFAVDecoder> decoder;
         std::shared_ptr<FFAVEncoder> encoder;
+        ff::FFAVSwsContext swsContext;
 
+        std::function<void()> successCallback;
         std::function<void(ERROR_TYPE, AVError&)> errorCallback;
 
+        // Transcode Thread
         bool isDecoderThreadRunning;
         bool isTranscodeRunning;
         std::vector<std::shared_ptr<std::thread>> threads;
         FFAVThreadSafeQueue<FFAVFrame> encodeQueue;
+
+        // Options;
+        std::unordered_map<std::string, std::string> outputContextOpt;
+        std::unordered_map<std::string, std::string> inputContextOpt;
+        std::unordered_map<std::string, std::string> videoEncodeContextOpt;
+        std::unordered_map<std::string, std::string> audioEncodeContextOpt;
     };
 };

@@ -62,6 +62,8 @@ namespace ff {
         int getVideoStreamIndex();
         int getAudioStreamIndex();
 
+        AVError setOpt(const std::string& key, const std::string& value);
+
     public: // for (auto& packet : inputContext) iterator
         FFAVInputContextIterator begin();
         FFAVInputContextIterator end();

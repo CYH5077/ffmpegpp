@@ -1,12 +1,13 @@
 set(SOURCES
         main.cpp
         config.cpp
-        decoder.cpp
-        transmux.cpp
-        transcode.cpp
-        resize.cpp
-        type_test.cpp
-        high_transcode.cpp
+#        decoder.cpp
+#        transmux.cpp
+#        transcode.cpp
+#        resize.cpp
+#        type_test.cpp
+#        high_transcode.cpp
+        streaming.cpp
 )
 
 if(FFMPEGPP_SUPPRESS)

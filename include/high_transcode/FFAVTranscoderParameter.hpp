@@ -28,6 +28,10 @@ namespace ff {
         FFAVCodecContextPtr getVideoEncodeContext();
         FFAVCodecContextPtr getAudioEncodeContext();
 
+        // HLS
+        void setHLSSegmentDuration(int duration);
+        int getHLSSegmentDuration();
+
     private:
         FFAVInputContext& inputContext;
 
@@ -39,5 +43,8 @@ namespace ff {
 
         FFAVVideoEncodeParametersPtr videoEncodeParameters;
         FFAVAudioEncodeParametersPtr audioEncodeParameters;
+
+        // HLS
+        int hlsSegmentDuration;
     };
 };  // namespace ff

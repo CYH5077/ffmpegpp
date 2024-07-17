@@ -5,7 +5,7 @@
 #include "utils/ffav.hpp"
 
 namespace ff {
-    FFAVTranscoderParameter::FFAVTranscoderParameter(FFAVInputContext& inputContext) : inputContext(inputContext) {
+    FFAVTranscoderParameter::FFAVTranscoderParameter(FFAVInputContext& inputContext) : inputContext(inputContext), hlsSegmentDuration(4) {
         // create parameters
         this->videoEncodeParameters = FFAVVideoEncodeParameters::create(inputContext);
         this->audioEncodeParameters = FFAVAudioEncodeParameters::create(inputContext);
@@ -91,5 +91,13 @@ namespace ff {
 
     FFAVCodecContextPtr FFAVTranscoderParameter::getAudioEncodeContext() {
         return this->audioEncodeContext;
+    }
+
+    void FFAVTranscoderParameter::setHLSSegmentDuration(int duration) {
+        this->hlsSegmentDuration = duration;
+    }
+
+    int FFAVTranscoderParameter::getHLSSegmentDuration() {
+        return this->hlsSegmentDuration;
     }
 }

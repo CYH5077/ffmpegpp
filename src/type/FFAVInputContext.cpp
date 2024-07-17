@@ -1,13 +1,14 @@
 #include "type/FFAVInputContext.hpp"
-#include "type/impl/FFAVFormatContextImpl.hpp"
 
-#include "type/impl/FFAVPacketImpl.hpp"
-#include "type/impl/FFAVCodecParametersImpl.hpp"
-#include "type/impl/FFAVStreamImpl.hpp"
 #include "type/impl/FFAVChannelLayoutImpl.hpp"
+#include "type/impl/FFAVCodecParametersImpl.hpp"
+#include "type/impl/FFAVFormatContextImpl.hpp"
+#include "type/impl/FFAVPacketImpl.hpp"
+#include "type/impl/FFAVStreamImpl.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
+#include "libavutil/opt.h"
 }
 
 #include <memory>
@@ -25,11 +26,11 @@ namespace ff {
         this->close();
     }
 
-    AVError FFAVInputContext::open(const std::string &url) {
+    AVError FFAVInputContext::open(const std::string& url) {
         this->close();
 
         // AVFormatContext 메모리 할당.
-        AVFormatContext* formatContext  = avformat_alloc_context();
+        AVFormatContext* formatContext = avformat_alloc_context();
         if (!formatContext) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_alloc_context failed", -1, "avformat_alloc_context");
         }
@@ -48,19 +49,18 @@ namespace ff {
             return AVError(AV_ERROR_TYPE::AV_ERROR, url + " find stream info failed", ret, "avformat_find_stream_info");
         }
 
-
         this->isOpenedFlag = true;
         this->formatContextImpl->setRaw(formatContext);
         this->findMetaData();
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
-    AVError FFAVInputContext::open(const std::string &&url) {
+    AVError FFAVInputContext::open(const std::string&& url) {
         return this->open(url);
     }
 
     void FFAVInputContext::close() {
-        AVFormatContext* formatContext  = this->formatContextImpl->getRaw();
+        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
 
         // formatContext가 nullptr이 아닐경우
         if (formatContext && isOpenedFlag) {
@@ -75,11 +75,12 @@ namespace ff {
 
     AVError FFAVInputContext::readFrame(ff::FFAVPacket* ffpacket) {
         if (!this->isOpened()) {
-            return AVError(AV_ERROR_TYPE::AV_ERROR, "FFAVInputContext is not opened", -1, "FFAVInputContext::readFrame");
+            return AVError(
+                AV_ERROR_TYPE::AV_ERROR, "FFAVInputContext is not opened", -1, "FFAVInputContext::readFrame");
         }
 
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
-        AVPacket* packet                = ffpacket->getImpl()->getRaw().get();
+        AVPacket* packet = ffpacket->getImpl()->getRaw().get();
 
         // AVFormatContext 에서 AVPacket을 읽어옴.
         int ret = av_read_frame(formatContext, packet);
@@ -113,7 +114,8 @@ namespace ff {
     }
 
     FFAVCodecParametersPtr FFAVInputContext::getVideoCodecParameters() {
-        int streamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+        int streamIndex =
+            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
         if (streamIndex < 0) {
             return nullptr;
         }
@@ -121,7 +123,8 @@ namespace ff {
     }
 
     FFAVCodecParametersPtr FFAVInputContext::getAudioCodecParameters() {
-        int streamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+        int streamIndex =
+            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
         if (streamIndex < 0) {
             return nullptr;
         }
@@ -133,7 +136,8 @@ namespace ff {
     }
 
     FFAVStreamPtr FFAVInputContext::getVideoStream() {
-        int streamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
+        int streamIndex =
+            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
         if (streamIndex < 0) {
             return nullptr;
         }
@@ -141,7 +145,8 @@ namespace ff {
     }
 
     FFAVStreamPtr FFAVInputContext::getAudioStream() {
-        int streamIndex = av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+        int streamIndex =
+            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
         if (streamIndex < 0) {
             return nullptr;
         }
@@ -156,7 +161,8 @@ namespace ff {
         int streamIndex = this->getAudioStreamIndex();
 
         FFAVChannelLayoutPtr ffavChannelLayoutPtr = FFAVChannelLayout::create();
-        ffavChannelLayoutPtr->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[streamIndex]->codecpar->ch_layout);
+        ffavChannelLayoutPtr->getImpl()->setRaw(
+            this->formatContextImpl->getRaw()->streams[streamIndex]->codecpar->ch_layout);
         return ffavChannelLayoutPtr;
     }
 
@@ -166,6 +172,16 @@ namespace ff {
 
     int FFAVInputContext::getAudioStreamIndex() {
         return av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    }
+
+    AVError FFAVInputContext::setOpt(const std::string& key, const std::string& value) {
+        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
+        int ret = av_opt_set(formatContext->priv_data, key.c_str(), value.c_str(), 0);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "av_opt_set failed", ret, "av_opt_set");
+        }
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
     FFAVInputContextIterator FFAVInputContext::begin() {
@@ -191,10 +207,8 @@ namespace ff {
         }
     }
 
-
     //////////////////////// Iterator
-    FFAVInputContextIterator::FFAVInputContextIterator(FFAVInputContext* context)
-    : context(context) {
+    FFAVInputContextIterator::FFAVInputContextIterator(FFAVInputContext* context) : context(context) {
         if (context && context->isOpened()) {
             // 초기 패킷 읽기 시도
             if (context->readFrame(&this->currentPacket).getType() != AV_ERROR_TYPE::SUCCESS) {
@@ -208,7 +222,6 @@ namespace ff {
 
     FFAVPacket& FFAVInputContextIterator::operator*() {
         return this->currentPacket;
-
     }
     FFAVPacket& FFAVInputContextIterator::operator->() {
         return currentPacket;

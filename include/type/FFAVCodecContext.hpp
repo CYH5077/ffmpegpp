@@ -1,8 +1,9 @@
 #pragma once
 
-#include "type/impl/ffavimpl.hpp"
-
 #include <memory>
+
+#include "error/ffav.hpp"
+#include "type/impl/ffavimpl.hpp"
 
 namespace ff {
     class FFAVCodecContext;
@@ -16,17 +17,19 @@ namespace ff {
     public:
         static FFAVCodecContextPtr create();
 
-    public: // get set
+    public:  // get set
         FFAVCodecContextImplPtr getImpl();
 
         // Cuda
         void setEnableCuda(bool flag);
         bool isEnableCuda();
-        int  getCudaHWFormat();
+        int getCudaHWFormat();
         bool findCUDAHWFormat();
 
         int getWidth();
         int getHeight();
+
+        AVError setOpt(const std::string& key, const std::string& value);
 
     private:
         bool isEnableCudaFlag;

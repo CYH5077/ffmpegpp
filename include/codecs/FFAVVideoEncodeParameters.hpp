@@ -1,8 +1,8 @@
 #pragma once
 
-#include "type/ffav.hpp"
-
 #include <memory>
+
+#include "type/ffav.hpp"
 
 namespace ff {
     class FFAVVideoEncodeParameters;
@@ -25,13 +25,13 @@ namespace ff {
         void copyFrom(FFAVInputContext& inputContext);
 
         long long getBitrate() const;
-        int       getWidth() const;
-        int       getHeight() const;
-        int       getGOPSize() const;
-        int       getMaxBFrames() const;
+        int getWidth() const;
+        int getHeight() const;
+        int getGOPSize() const;
+        int getMaxBFrames() const;
         const FFAVRational& getTimeBase() const;
-        int       getPixelFormat() const;
-        int       getEncodeThreadCount() const;
+        int getPixelFormat() const;
+        int getEncodeThreadCount() const;
 
         void setBitrate(long long bitrate);
         void setWidth(int width);

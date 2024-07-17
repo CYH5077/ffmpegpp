@@ -30,6 +30,7 @@ namespace ff {
         void setSuccessCallback(std::function<void()> successCallback);
         void setDecodeCallback(std::function<void(FFAVFrame&)> decodeCallback);
         void setEncodeCallback(std::function<void(FFAVPacket&)> encodeCallback);
+        void setFinishCallback(std::function<void()> finishCallback);
 
         void setOutputContextOpt(const std::string& key, const std::string& value);
         void setInputContextOpt(const std::string& key, const std::string& value);
@@ -60,6 +61,7 @@ namespace ff {
         std::function<void(ERROR_TYPE, AVError&)> errorCallback;
         std::function<void(FFAVFrame&)> decodeCallback;
         std::function<void(FFAVPacket&)> encodeCallback;
+        std::function<void()> finishCallback;
 
         // Transcode Thread
         bool isDecoderThreadRunning;

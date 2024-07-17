@@ -37,6 +37,10 @@ namespace ff {
     void FFAVTranscoder::setEncodeCallback(std::function<void(FFAVPacket&)> encodeCallback) {
         this->encodeCallback = encodeCallback;
     }
+    
+    void FFAVTranscoder::setFinishCallback(std::function<void()> finishCallback) {
+		this->finishCallback = finishCallback;
+	}
 
     void FFAVTranscoder::setOutputContextOpt(const std::string& key, const std::string& value) {
         this->outputContextOpt[key] = value;
@@ -194,6 +198,10 @@ namespace ff {
         }
 
         this->encoder->flush();
+
+        if (this->finishCallback) {
+            finishCallback();
+        }
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

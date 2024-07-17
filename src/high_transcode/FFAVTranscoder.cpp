@@ -112,19 +112,18 @@ namespace ff {
     }
 
     AVError FFAVTranscoder::runDecode() {
-        int decodeCount = 0;
         FFAVInputContext& inputContext = this->parameter.getInputContext();
         AVError error = this->decoder->decode(inputContext, [&](FFAVFrame& frame) {
+            if (this->decodeCallback) {
+                this->decodeCallback(frame);
+            }
+
             if (frame.getType() == DATA_TYPE::VIDEO || frame.getType() == DATA_TYPE::AUDIO) {
                 this->encodeQueue.push(frame);
             }
 
             if (this->isTranscodeRunning == false) {
                 return AVError(AV_ERROR_TYPE::USER_STOP);
-            }
-
-            if (this->decodeCallback) {
-                this->decodeCallback(frame);
             }
 
             return AVError(AV_ERROR_TYPE::SUCCESS);
@@ -180,13 +179,13 @@ namespace ff {
                     packet.setStreamIndex(inputContext.getAudioStreamIndex());
                 }
 
+                if (this->encodeCallback) {
+                    this->encodeCallback(packet);
+                }
+
                 error = outputContext.writePacket(packet);
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
-                }
-
-                if (this->encodeCallback) {
-                    this->encodeCallback(packet);
                 }
 
                 return AVError(AV_ERROR_TYPE::SUCCESS);

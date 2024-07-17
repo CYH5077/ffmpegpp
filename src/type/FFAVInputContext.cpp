@@ -85,7 +85,7 @@ namespace ff {
         // AVFormatContext 에서 AVPacket을 읽어옴.
         int ret = av_read_frame(formatContext, packet);
         // ret이 eof 일경우
-        if (ret == AVERROR_EOF || avio_feof(formatContext->pb)) {
+        if (ret == AVERROR_EOF) {
             return AVError(AV_ERROR_TYPE::AV_EOF);
         } else if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_read_frame failed", ret, "av_read_frame");

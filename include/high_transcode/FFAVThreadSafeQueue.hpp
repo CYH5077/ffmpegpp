@@ -8,7 +8,7 @@ namespace ff {
     public:
         FFAVThreadSafeQueue(size_t maxSize) : maxSize(maxSize), close(false) {}
 
-        void push(T item) {
+        void push(T& item) {
             std::unique_lock<std::mutex> lock(this->pushConditionMutex);
             pushCondition.wait(lock, [this] {
                 if (this->isClosed() == true || queue.size() < maxSize) {
@@ -22,7 +22,7 @@ namespace ff {
             }
 
             {
-                std::lock_guard<std::mutex>(this->queueMutex);
+                std::lock_guard<std::mutex> lockGuard(this->queueMutex);
                 queue.emplace(item);
             }
 
@@ -41,7 +41,7 @@ namespace ff {
 
         T pop() {
        
-            std::lock_guard<std::mutex>(this->queueMutex);
+            std::lock_guard<std::mutex> lockGuard(this->queueMutex);
             T item = queue.front();
             queue.pop();
 

@@ -13,14 +13,17 @@ namespace ff {
     // FFAVPacket
     FFAVPacket::FFAVPacket() {
         this->packetImpl = FFAVPacketImpl ::create();
+        this->init();
     }
 
     FFAVPacket::FFAVPacket(FFAVPacket& packet) {
         this->packetImpl = FFAVPacketImpl::create(packet.packetImpl);
+        this->init();
     }
 
     FFAVPacket::FFAVPacket(FFAVPacketImplPtr packet) {
         this->packetImpl = FFAVPacketImpl::create(packet);
+        this->init();
     }
 
     FFAVPacket::~FFAVPacket() {}
@@ -53,6 +56,14 @@ namespace ff {
         packet->stream_index = streamIndex;
     }
 
+    void FFAVPacket::setDecodeStream(FFAVStreamPtr decodeStream) {
+        this->decodeStream = decodeStream;
+    }
+
+    void FFAVPacket::setEncodeStream(FFAVStreamPtr encodeStream) {
+		this->encodeStream = encodeStream;
+	}
+
     DATA_TYPE FFAVPacket::getType() {
         return this->type;
     }
@@ -63,5 +74,24 @@ namespace ff {
 
     FFAVPacketImplPtr FFAVPacket::getImpl() {
         return this->packetImpl;
+    }
+
+    FFAVStreamPtr FFAVPacket::getDecodeStream() {
+        return this->decodeStream;
+    }
+
+    FFAVStreamPtr FFAVPacket::getEncodeStream() {
+        return this->encodeStream;
+    }
+
+    int FFAVPacket::getStreamIndex() {
+		AVPacket* packet = this->packetImpl->getRaw().get();
+		return packet->stream_index;
+    }
+
+    void FFAVPacket::init() {
+        this->frameNumber = 0;
+        this->type = DATA_TYPE::UNKNOWN;
+        this->decodeStream = nullptr;
     }
 }

@@ -2,12 +2,12 @@ set(SOURCES
         main.cpp
         config.cpp
         decoder.cpp
-        transmux.cpp
+        
         transcode.cpp
         resize.cpp
         type_test.cpp
-        high_transcode.cpp
-        streaming.cpp
+
+        hls_dash.cpp
 )
 
 if(FFMPEGPP_SUPPRESS)
@@ -17,7 +17,7 @@ endif()
 set(FFMPEGPP_TEST ffmpegpp_test)
 #enable_testing() # build/test 폴더 생성됨
 
-add_executable(${FFMPEGPP_TEST} ${SOURCES} )
+add_executable(${FFMPEGPP_TEST} ${SOURCES})
 
 enable_testing()
 add_test(AllTestsInMain main)

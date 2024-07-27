@@ -1,15 +1,14 @@
 #pragma once
 
-#include "type/FFAVPacket.hpp"
-#include "type/FFAVCodecParameters.hpp"
-#include "type/FFAVStream.hpp"
-#include "type/FFAVChannelLayout.hpp"
-
-#include "error/AVError.hpp"
-
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "error/AVError.hpp"
+#include "type/FFAVChannelLayout.hpp"
+#include "type/FFAVCodecParameters.hpp"
+#include "type/FFAVPacket.hpp"
+#include "type/FFAVStream.hpp"
 
 namespace ff {
     class FFAVInputContext;
@@ -29,7 +28,6 @@ namespace ff {
         FFAVPacket currentPacket;
     };
 
-
     class FFAVInputContext {
     public:
         explicit FFAVInputContext();
@@ -38,35 +36,28 @@ namespace ff {
     public:
         AVError open(const std::string& url);
         AVError open(const std::string&& url);
-        void    close();
+        void close();
 
         AVError readFrame(FFAVPacket* packet);
 
         int getFrameCount();
-        
-    public: // get set
+
+    public:  // get set
         bool isOpened() const;
 
         int getStreamsCount();
 
         FFAVFormatContextImplPtr getImpl();
 
-        FFAVCodecParametersPtr getVideoCodecParameters();
-        FFAVCodecParametersPtr getAudioCodecParameters();
         FFAVCodecParametersPtr getCodecParameters(int index);
 
-        FFAVStreamPtr getVideoStream();
-        FFAVStreamPtr getAudioStream();
-        FFAVStreamPtr getStream(int index);
-
-        FFAVChannelLayoutPtr getAudioChannelLayout();
-
-        int getVideoStreamIndex();
-        int getAudioStreamIndex();
+        FFAVStreamListPtr getStreams();
+        FFAVStreamListPtr getVideoStreams();
+        FFAVStreamListPtr getAudioStreams();
 
         AVError setOpt(const std::string& key, const std::string& value);
 
-    public: // for (auto& packet : inputContext) iterator
+    public:  // for (auto& packet : inputContext) iterator
         FFAVInputContextIterator begin();
         FFAVInputContextIterator end();
 
@@ -78,15 +69,10 @@ namespace ff {
 
         FFAVFormatContextImplPtr formatContextImpl;
 
-        // CodecParameters
-        std::vector<FFAVCodecParametersPtr> codecParameters;
-
         // Streams
-        std::vector<FFAVStreamPtr> streams;
-
-        // Stream Index
-        int videoStreamIndex;
-        int audioStreamIndex;
+        FFAVStreamListPtr videoStreams;
+        FFAVStreamListPtr audioStreams;
+        FFAVStreamListPtr streams; // all streams
     };
 
 };

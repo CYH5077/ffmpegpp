@@ -7,15 +7,15 @@
 
 
 namespace ff {
-    FFAVCodecContextPtr createDecodeCodecContext(FFAVCodecParametersPtr ffavCodecParameters, AVError* error, bool cudaEnable) {
-        if (error == nullptr || ffavCodecParameters == nullptr) {
+    FFAVCodecContextPtr createDecodeCodecContext(FFAVStreamPtr stream, AVError* error, bool cudaEnable) {
+        if (error == nullptr || stream == nullptr) {
             *error = AVError(AV_ERROR_TYPE::SUCCESS);
             return nullptr;
         }
 
         FFAVCodecContextPtr ffavCodecContext = FFAVCodecContext::create();
 
-        AVCodecParameters* codecParameters = ffavCodecParameters->getImpl()->getRaw();
+        AVCodecParameters* codecParameters = stream->getImpl()->getRaw()->codecpar;
         if (codecParameters == nullptr) {
             error->setError(AV_ERROR_TYPE::FAILED, "codecParameters is nullptr", -1 , "");
             return nullptr;
@@ -62,24 +62,26 @@ namespace ff {
 
 
         ffavCodecContext->setEnableCuda(cudaEnable);
+        ffavCodecContext->setStreamIndex(stream->getStreamIndex());
+        ffavCodecContext->setDecodeStream(stream);
         *error = AVError(AV_ERROR_TYPE::SUCCESS);
         return ffavCodecContext;
     }
 };
 
 namespace ff::video::decode {
-    FFAVCodecContextPtr createCodecContext(FFAVInputContext& inputContext, AVError* error) {
-        return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, false);
+    FFAVCodecContextPtr createCodecContext(FFAVStreamPtr stream, AVError* error) {
+        return createDecodeCodecContext(stream, error, false);
     }
 
-    FFAVCodecContextPtr createCUDACodecContext(FFAVInputContext& inputContext, AVError* error) {
-        return createDecodeCodecContext(inputContext.getVideoCodecParameters(), error, true);
+    FFAVCodecContextPtr createCUDACodecContext(FFAVStreamPtr stream, AVError* error) {
+        return createDecodeCodecContext(stream, error, true);
     }
 };
 
 namespace ff::audio::decode {
-    FFAVCodecContextPtr createCodecContext(FFAVInputContext& inputContext, AVError* error) {
-        return createDecodeCodecContext(inputContext.getAudioCodecParameters(), error, false);
+    FFAVCodecContextPtr createCodecContext(FFAVStreamPtr stream, AVError* error) {
+        return createDecodeCodecContext(stream, error, false);
     }
 };
 

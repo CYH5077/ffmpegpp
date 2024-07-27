@@ -14,3 +14,6 @@
 #include "type/FFAVCodecParameters.hpp"
 #include "type/FFAVChannelLayout.hpp"
 #include "type/FFAVSwsContext.hpp"
+
+#include <vector>
+#include <memory>

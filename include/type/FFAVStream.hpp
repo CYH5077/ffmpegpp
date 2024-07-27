@@ -1,8 +1,10 @@
 #pragma once
 
-#include "type/impl/ffavimpl.hpp"
-
 #include <memory>
+#include <vector>
+
+#include "type/FFAVChannelLayout.hpp"
+#include "type/impl/ffavimpl.hpp"
 
 namespace ff {
     class FFAVStream;
@@ -11,16 +13,29 @@ namespace ff {
 
     class FFAVStream {
     public:
-        explicit FFAVStream();
+        explicit FFAVStream(DATA_TYPE type);
         virtual ~FFAVStream();
 
     public:
-        static FFAVStreamPtr create();
+        static FFAVStreamPtr create(DATA_TYPE type);
 
     public:
-         FFAVStreamImplPtr getImpl();
+        FFAVStreamImplPtr getImpl();
+        int getStreamIndex();
+        DATA_TYPE getDataType();
+        FFAVChannelLayoutPtr getChannelLayout();
+
+        void setStreamIndex(int streamIndex);
+        void setDataType(DATA_TYPE dataType);
 
     private:
+        DATA_TYPE dataType;
+
+        int streamIndex;
+
         FFAVStreamImplPtr streamImpl;
     };
+
+    using FFAVStreamList = std::vector<FFAVStreamPtr>;
+    using FFAVStreamListPtr = std::shared_ptr<FFAVStreamList>;
 };

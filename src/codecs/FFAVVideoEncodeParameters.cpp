@@ -5,8 +5,8 @@
 #include "type/impl/FFAVStreamImpl.hpp"
 
 extern "C" {
-#include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 }
 
 namespace ff {
@@ -14,14 +14,13 @@ namespace ff {
         return std::make_shared<FFAVVideoEncodeParameters>();
     }
 
-    FFAVVideoEncodeParametersPtr FFAVVideoEncodeParameters::create(FFAVInputContext& inputContext) {
-        return std::make_shared<FFAVVideoEncodeParameters>(inputContext);
+    FFAVVideoEncodeParametersPtr FFAVVideoEncodeParameters::create(FFAVStreamPtr stream) {
+        return std::make_shared<FFAVVideoEncodeParameters>(stream);
     }
 
     FFAVVideoEncodeParametersPtr FFAVVideoEncodeParameters::create(FFAVVideoEncodeParametersPtr encodeParameters) {
         return std::make_shared<FFAVVideoEncodeParameters>(encodeParameters);
     }
-
 
     FFAVVideoEncodeParameters::FFAVVideoEncodeParameters() {
         this->bitrate = 0;
@@ -33,7 +32,7 @@ namespace ff {
         this->encodeThreadCount = 1;
     }
 
-    FFAVVideoEncodeParameters::FFAVVideoEncodeParameters(FFAVInputContext& inputContext) {
+    FFAVVideoEncodeParameters::FFAVVideoEncodeParameters(FFAVStreamPtr inputContext) {
         this->copyFrom(inputContext);
     }
 
@@ -41,23 +40,27 @@ namespace ff {
         *this = *encodeParameters;
     }
 
-    FFAVVideoEncodeParameters::~FFAVVideoEncodeParameters() {
+    FFAVVideoEncodeParameters::~FFAVVideoEncodeParameters() {}
 
-    }
+    void FFAVVideoEncodeParameters::copyFrom(FFAVStreamPtr stream) {
+        if (stream == nullptr) {
+            return;
+        }
 
-    void FFAVVideoEncodeParameters::copyFrom(FFAVInputContext& inputContext) {
-        AVCodecParameters* codecParameters = inputContext.getVideoCodecParameters()->getImpl()->getRaw();
-        AVStream* stream                   = inputContext.getVideoStream()->getImpl()->getRaw();
+        AVCodecParameters* codecParameters = stream->getImpl()->getRaw()->codecpar;
+        AVStream* streamRaw = stream->getImpl()->getRaw();
 
         this->bitrate = codecParameters->bit_rate;
-        this->width   = codecParameters->width;
-        this->height  = codecParameters->height;
-        this->gopSize = stream->avg_frame_rate.num / stream->avg_frame_rate.den;
+        this->width = codecParameters->width;
+        this->height = codecParameters->height;
+        this->gopSize = streamRaw->avg_frame_rate.num / streamRaw->avg_frame_rate.den;
         this->maxBFrames = 0;
-        this->pixelFormat = stream->codecpar->format;
+        this->pixelFormat = streamRaw->codecpar->format;
 
-        FFAVRational rational(stream->time_base.num, stream->time_base.den);
+        FFAVRational rational(streamRaw->time_base.num, streamRaw->time_base.den);
         this->timebase = rational;
+
+        this->decodeStream = stream;
     }
 
     long long FFAVVideoEncodeParameters::getBitrate() const {
@@ -91,6 +94,10 @@ namespace ff {
     int FFAVVideoEncodeParameters::getEncodeThreadCount() const {
         return this->encodeThreadCount;
     }
+
+    FFAVStreamPtr FFAVVideoEncodeParameters::getDecodeStream() const {
+		return this->decodeStream;
+	}
 
     void FFAVVideoEncodeParameters::setBitrate(long long bitrate) {
         this->bitrate = bitrate;

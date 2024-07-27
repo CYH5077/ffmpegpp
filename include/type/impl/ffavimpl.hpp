@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "type/FFAVDefine.hpp"
+
 namespace ff {
 	class FFAVPacketImpl;
 	class FFAVFormatContextImpl;

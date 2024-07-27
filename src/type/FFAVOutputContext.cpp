@@ -17,6 +17,7 @@ namespace ff {
     FFAVOutputContext::FFAVOutputContext() {
         this->isOpenFlag = false;
         this->formatContextImpl = FFAVFormatContextImpl::create();
+        this->streams = std::make_shared<FFAVStreamList>();
     }
 
     FFAVOutputContext::~FFAVOutputContext() {
@@ -56,7 +57,7 @@ namespace ff {
             return nullptr;
         }
 
-        FFAVStreamPtr ffavStream = FFAVStream::create();
+        FFAVStreamPtr ffavStream = FFAVStream::create(DATA_TYPE::UNKNOWN);
         ffavStream->getImpl()->setRaw(stream);
 
         AVCodecParameters* codecParametersRaw = codecParameters->getImpl()->getRaw();
@@ -64,6 +65,7 @@ namespace ff {
         if (ret < 0) {
             return nullptr;
         }
+        this->streams->emplace_back(ffavStream);
 
         return ffavStream;
     }
@@ -88,14 +90,16 @@ namespace ff {
                            "avcodec_parameters_from_context");
         }
 
-        FFAVStreamPtr ffavStream = FFAVStream::create();
+        FFAVStreamPtr ffavStream = FFAVStream::create(type);
         ffavStream->getImpl()->setRaw(stream);
 
-        if (type == DATA_TYPE::VIDEO) {
-            this->videoStream = ffavStream;
-        } else if (type == DATA_TYPE::AUDIO) {
-            this->audioStream = ffavStream;
+        if (this->streams == nullptr) {
+            this->streams = std::make_shared<FFAVStreamList>();
         }
+        this->streams->emplace_back(ffavStream);
+
+        codecContext->setStreamIndex(this->streams->size() - 1);
+        codecContext->setEncodeStream(ffavStream);
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
@@ -111,6 +115,11 @@ namespace ff {
     }
 
     AVError FFAVOutputContext::writePacket(FFAVPacket& ffavPacket) {
+        FFAVStreamPtr srcStream = ffavPacket.getDecodeStream();
+        if (srcStream != nullptr) {
+            ffavPacket.rescaleTS(srcStream, this->streams->at(ffavPacket.getStreamIndex()));
+        }
+
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
         AVPacket* packet = ffavPacket.getImpl()->getRaw().get();
         int ret = av_interleaved_write_frame(formatContext, packet);
@@ -151,17 +160,7 @@ namespace ff {
         return this->formatContextImpl;
     }
 
-    FFAVStreamPtr FFAVOutputContext::getVideoStream() {
-        return this->videoStream;
-    }
-
-    FFAVStreamPtr FFAVOutputContext::getAudioStream() {
-        return this->audioStream;
-    }
-
-    FFAVStreamPtr FFAVOutputContext::getStream(int index) {
-        FFAVStreamPtr stream = FFAVStream::create();
-        stream->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[index]);
-        return stream;
+    FFAVStreamListPtr FFAVOutputContext::getStreams() {
+        return this->streams;
     }
 };

@@ -76,8 +76,7 @@ namespace ff {
     
 
         codecContext->getImpl()->setRaw(encodeCodecContext);
-
-
+        codecContext->setDecodeStream(encodeParameter->getDecodeStream());
         int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
         if (ret < 0) {
             result->setError(AV_ERROR_TYPE::AV_ERROR, "avcodec_open2 failed", ret, "avcodec_open2");
@@ -154,6 +153,7 @@ namespace ff {
             return nullptr;
         }*/
 
+        codecContext->setDecodeStream(encodeParameters->getDecodeStream());
         int ret = avcodec_open2(encodeCodecContext, codec, nullptr);
         if (ret < 0) {
             result->setError(AV_ERROR_TYPE::AV_ERROR, "avcodec_open2 failed", ret, "avcodec_open2");

@@ -9,9 +9,14 @@ TEST(DECODE_TEST, DECODE_CPU) {
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCodecContext(inputContext, &error);
+    auto videoStreams = inputContext.getVideoStreams();
+    auto audioStreams = inputContext.getAudioStreams();
+    auto videoStream = videoStreams->size() > 0 ? (*videoStreams)[0] : nullptr;
+    auto audioStream = audioStreams->size() > 0 ? (*audioStreams)[0] : nullptr;
+    
+    ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCodecContext(videoStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
-    ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(inputContext, &error);
+    ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(audioStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     int decodeCount = 0;
@@ -31,9 +36,14 @@ TEST(DECODE_TEST, DECODE_GPU) {
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCUDACodecContext(inputContext, &error);
+    auto videoStreams = inputContext.getVideoStreams();
+    auto audioStreams = inputContext.getAudioStreams();
+    auto videoStream = videoStreams->size() > 0 ? (*videoStreams)[0] : nullptr;
+    auto audioStream = audioStreams->size() > 0 ? (*audioStreams)[0] : nullptr;
+    
+    ff::FFAVCodecContextPtr videoContext = ff::video::decode::createCUDACodecContext(videoStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
-    ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(inputContext, &error);
+    ff::FFAVCodecContextPtr audioContext = ff::audio::decode::createCodecContext(audioStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     int decodeCount = 0;

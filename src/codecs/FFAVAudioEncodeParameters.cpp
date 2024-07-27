@@ -9,8 +9,8 @@ namespace ff {
         return std::make_shared<FFAVAudioEncodeParameters>();
     }
 
-    FFAVAudioEncodeParametersPtr FFAVAudioEncodeParameters::create(FFAVInputContext &inputContext) {
-        return std::make_shared<FFAVAudioEncodeParameters>(inputContext);
+    FFAVAudioEncodeParametersPtr FFAVAudioEncodeParameters::create(FFAVStreamPtr stream) {
+        return std::make_shared<FFAVAudioEncodeParameters>(stream);
     }
 
     FFAVAudioEncodeParametersPtr FFAVAudioEncodeParameters::create(FFAVAudioEncodeParametersPtr &encodeParameters) {
@@ -23,10 +23,11 @@ namespace ff {
         this->sampleRate = 0;
         this->timebase = FFAVRational();
         this->channelLayout = FFAVChannelLayout::create();
+        this->sampleFormat = 0;
     }
 
-    FFAVAudioEncodeParameters::FFAVAudioEncodeParameters(FFAVInputContext &inputContext) {
-        this->copyFrom(inputContext);
+    FFAVAudioEncodeParameters::FFAVAudioEncodeParameters(FFAVStreamPtr stream) {
+        this->copyFrom(stream);
     }
 
     FFAVAudioEncodeParameters::FFAVAudioEncodeParameters(FFAVAudioEncodeParametersPtr &encodeParameters) {
@@ -37,17 +38,19 @@ namespace ff {
 
     }
 
-    void FFAVAudioEncodeParameters::copyFrom(FFAVInputContext &inputContext) {
-        AVStream* stream = inputContext.getAudioStream()->getImpl()->getRaw();
+    void FFAVAudioEncodeParameters::copyFrom(FFAVStreamPtr stream) {
+        AVStream* streamRaw = stream->getImpl()->getRaw();
 
-        this->bitrate = stream->codecpar->bit_rate;
-        this->sampleFormat = stream->codecpar->format;
-        this->sampleRate   = stream->codecpar->sample_rate;
+        this->bitrate = streamRaw->codecpar->bit_rate;
+        this->sampleFormat = streamRaw->codecpar->format;
+        this->sampleRate = streamRaw->codecpar->sample_rate;
 
-        FFAVRational rational(stream->time_base.num, stream->time_base.den);
+        FFAVRational rational(streamRaw->time_base.num, streamRaw->time_base.den);
         this->timebase = rational;
 
-        this->channelLayout = inputContext.getAudioChannelLayout();
+        this->channelLayout = stream->getChannelLayout();
+
+        this->decodeStream = stream;
     }
 
     long long FFAVAudioEncodeParameters::getBitrate() const {
@@ -70,6 +73,10 @@ namespace ff {
         return this->channelLayout;
     }
 
+    FFAVStreamPtr FFAVAudioEncodeParameters::getDecodeStream() const {
+		return this->decodeStream;
+	}
+
     void FFAVAudioEncodeParameters::setBitrate(long long bitrate) {
         this->bitrate = bitrate;
     }
@@ -89,4 +96,8 @@ namespace ff {
     void FFAVAudioEncodeParameters::setChannelLayout(const FFAVChannelLayoutPtr &channelLayout) {
         this->channelLayout = channelLayout;
     }
+
+    void FFAVAudioEncodeParameters::setDecodeStream(FFAVStreamPtr stream) {
+		this->decodeStream = stream;
+	}
 };

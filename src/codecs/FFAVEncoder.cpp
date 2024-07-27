@@ -3,10 +3,11 @@
 #include "type/impl/FFAVCodecContextImpl.hpp"
 #include "type/impl/FFAVFrameImpl.hpp"
 #include "type/impl/FFAVPacketImpl.hpp"
+#include "type/impl/FFAVStreamImpl.hpp"
 
 extern "C" {
-#include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 }
 
 namespace ff {
@@ -15,8 +16,7 @@ namespace ff {
         this->audioContext = audioContext;
     }
 
-    FFAVEncoder::~FFAVEncoder() {
-    }
+    FFAVEncoder::~FFAVEncoder() {}
 
     AVError FFAVEncoder::encode(FFAVFrame& frame, EncodeCallback callback) {
         this->callback = callback;
@@ -51,7 +51,6 @@ namespace ff {
         AVCodecContext* codecContextRaw = codecContext->getImpl()->getRaw();
         AVFrame* frameRaw = frame == nullptr ? nullptr : frame->getImpl()->getRaw().get();
 
-
         int ret = 0;
         if (codecContextRaw->codec_type == AVMEDIA_TYPE_AUDIO && frame != nullptr) {
             int ret = av_channel_layout_copy(&frameRaw->ch_layout, &codecContextRaw->ch_layout);
@@ -59,7 +58,6 @@ namespace ff {
                 return AVError(AV_ERROR_TYPE::AV_ERROR, "av_channel_layout_copy failed", ret, "av_channel_layout_copy");
             }
         }
-
 
         FFAVPacket packet;
         AVPacket* packetRaw = packet.getImpl()->getRaw().get();
@@ -81,6 +79,10 @@ namespace ff {
 
             packet.setFrameNumber(codecContextRaw->frame_num);
             packet.setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecContextRaw->codec_type));
+            packet.setStreamIndex(codecContext->getStreamIndex());
+            packet.setDecodeStream(codecContext->getDecodeStream());
+            packet.setEncodeStream(codecContext->getEncodeStream());
+
             AVError error = this->callback(packet);
             if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                 av_packet_unref(packetRaw);

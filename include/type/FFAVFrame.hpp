@@ -4,6 +4,7 @@
 
 #include "type/FFAVDefine.hpp"
 #include "type/impl/ffavimpl.hpp"
+#include "type/FFAVStream.hpp"
 
 namespace ff {
     class FFAVFrame {
@@ -21,12 +22,11 @@ namespace ff {
         void ref(FFAVFrame& frame);
 
     public:
-        void setType(DATA_TYPE type);
-        
-        
         DATA_TYPE getType();
         int getWidth();
         int getHeight();
+
+        void setType(DATA_TYPE type);
 
     private:
         DATA_TYPE type;

@@ -19,19 +19,29 @@ namespace ff {
         void rescaleTS(FFAVStreamPtr srcStream, FFAVStreamPtr dstStream);
 
     public:
+        FFAVPacketImplPtr getImpl();
+        DATA_TYPE getType();
+        int getFrameNumber();
+        FFAVStreamPtr getDecodeStream();
+        FFAVStreamPtr getEncodeStream();
+        int getStreamIndex();
+
         void setType(DATA_TYPE type);
         void setFrameNumber(int frameNumber);
         void setStreamIndex(int streamIndex);
+        void setDecodeStream(FFAVStreamPtr decodeStream);
+        void setEncodeStream(FFAVStreamPtr encodeStream);
 
-        DATA_TYPE getType();
-        int getFrameNumber();
-
-        FFAVPacketImplPtr getImpl();
+    private:
+        void init();
 
     private:
         int frameNumber;
 
         DATA_TYPE type;
+
+        FFAVStreamPtr decodeStream;
+        FFAVStreamPtr encodeStream;
 
         FFAVPacketImplPtr packetImpl;
     };

@@ -28,9 +28,9 @@ namespace ff {
         for (auto& packet : inputContext) {
             AVPacket* packetRaw = packet.getImpl()->getRaw().get();
             
-            if (packetRaw->stream_index ==  inputContext.getVideoStreamIndex()) {
+            if (packetRaw->stream_index ==  this->videoContext->getStreamIndex()) {
                 error = this->decode(this->videoContext, &packet, callback);
-            } else if (packetRaw->stream_index == inputContext.getAudioStreamIndex()) {
+            } else if (packetRaw->stream_index == this->audioContext->getStreamIndex()) {
                 error = this->decode(this->audioContext, &packet, callback);
             }
             av_packet_unref(packetRaw);

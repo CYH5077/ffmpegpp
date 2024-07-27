@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "error/AVError.hpp"
 #include "type/ffav.hpp"
@@ -46,9 +47,7 @@ namespace ff {
     public:
         FFAVFormatContextImplPtr getImpl();
 
-        FFAVStreamPtr getVideoStream();
-        FFAVStreamPtr getAudioStream();
-        FFAVStreamPtr getStream(int index);
+        FFAVStreamListPtr getStreams();
 
     private:
         std::string filename;
@@ -57,7 +56,6 @@ namespace ff {
 
         FFAVFormatContextImplPtr formatContextImpl;
 
-        FFAVStreamPtr videoStream;
-        FFAVStreamPtr audioStream;
+        FFAVStreamListPtr streams;
     };
 };

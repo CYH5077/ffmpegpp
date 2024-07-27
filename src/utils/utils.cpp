@@ -57,10 +57,7 @@ namespace ff {
                 continue;
             }
 
-            AVStream* inputStream  = inputContext.getImpl()->getRaw()->streams[packetRaw->stream_index];
             packetRaw->stream_index = streamMapper[packetRaw->stream_index];
-            AVStream* outputStream = outputContext->getImpl()->getRaw()->streams[packetRaw->stream_index];
-            av_packet_rescale_ts(packetRaw, inputStream->time_base, outputStream->time_base);
             packetRaw->pos = -1;
 
             AVError error = outputContext->writePacket(packet);

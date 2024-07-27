@@ -9,36 +9,40 @@ namespace ff {
     class FFAVAudioEncodeParameters {
     public:
         explicit FFAVAudioEncodeParameters();
-        explicit FFAVAudioEncodeParameters(FFAVInputContext &inputContext);
-        explicit FFAVAudioEncodeParameters(FFAVAudioEncodeParametersPtr &encodeParameters);
+        explicit FFAVAudioEncodeParameters(FFAVStreamPtr stream);
+        explicit FFAVAudioEncodeParameters(FFAVAudioEncodeParametersPtr& encodeParameters);
 
         virtual ~FFAVAudioEncodeParameters();
 
     public:
         static FFAVAudioEncodeParametersPtr create();
-        static FFAVAudioEncodeParametersPtr create(FFAVInputContext &inputContext);
-        static FFAVAudioEncodeParametersPtr create(FFAVAudioEncodeParametersPtr &encodeParameters);
+        static FFAVAudioEncodeParametersPtr create(FFAVStreamPtr stream);
+        static FFAVAudioEncodeParametersPtr create(FFAVAudioEncodeParametersPtr& encodeParameters);
 
     public:
-        void copyFrom(FFAVInputContext& inputContext);
+        void copyFrom(FFAVStreamPtr stream);
 
         long long getBitrate() const;
-        int       getSampleFormat() const;
-        int       getSamplerate() const;
-        const FFAVRational&        getTimebase() const;
+        int getSampleFormat() const;
+        int getSamplerate() const;
+        const FFAVRational& getTimebase() const;
         const FFAVChannelLayoutPtr getChannelLayout() const;
+        FFAVStreamPtr getDecodeStream() const;
 
         void setBitrate(long long bitrate);
         void setSampleFormat(int sampleFormat);
         void setSampleRate(int sampleRate);
         void setTimebase(const FFAVRational& timebase);
-        void setChannelLayout(const FFAVChannelLayoutPtr &channelLayout);
+        void setChannelLayout(const FFAVChannelLayoutPtr& channelLayout);
+        void setDecodeStream(FFAVStreamPtr stream);
 
     private:
         long long bitrate;
 
         int sampleFormat;
         int sampleRate;
+
+        FFAVStreamPtr decodeStream;
 
         FFAVRational timebase;
 

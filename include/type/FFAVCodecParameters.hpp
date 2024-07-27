@@ -1,8 +1,9 @@
 #pragma once
 
-#include "type/impl/ffavimpl.hpp"
-
 #include <memory>
+#include <vector>
+
+#include "type/impl/ffavimpl.hpp"
 
 namespace ff {
     class FFAVCodecParameters;
@@ -23,4 +24,6 @@ namespace ff {
     private:
         FFAVCodecParametersImplPtr codecParametersImpl;
     };
+
+    using FFAVCodecParametersList = std::vector<FFAVCodecParametersPtr>;
 };

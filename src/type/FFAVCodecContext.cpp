@@ -17,6 +17,7 @@ namespace ff {
 
         this->isEnableCudaFlag = false;
         this->cudaHWFormat = -1;
+        this->streamIndex = 0;
     }
 
     FFAVCodecContext::~FFAVCodecContext() {}
@@ -24,6 +25,30 @@ namespace ff {
     FFAVCodecContextImplPtr FFAVCodecContext::getImpl() {
         return this->codecContextImpl;
     }
+
+    int FFAVCodecContext::getStreamIndex() {
+        return this->streamIndex;
+    }
+
+    FFAVStreamPtr FFAVCodecContext::getDecodeStream() {
+        return this->decodeStream;
+    }
+
+    FFAVStreamPtr FFAVCodecContext::getEncodeStream() {
+        return this->encodeStream;
+    }
+
+    void FFAVCodecContext::setStreamIndex(int streamIndex) {
+        this->streamIndex = streamIndex;
+    }
+
+    void FFAVCodecContext::setDecodeStream(FFAVStreamPtr stream) {
+        this->decodeStream = stream;
+    }
+
+    void FFAVCodecContext::setEncodeStream(FFAVStreamPtr stream) {
+		this->encodeStream = stream;
+	}
 
     void FFAVCodecContext::setEnableCuda(bool flag) {
         this->isEnableCudaFlag = flag;

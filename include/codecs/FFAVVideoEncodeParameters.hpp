@@ -11,18 +11,18 @@ namespace ff {
     class FFAVVideoEncodeParameters {
     public:
         explicit FFAVVideoEncodeParameters();
-        explicit FFAVVideoEncodeParameters(FFAVInputContext& inputContext);
+        explicit FFAVVideoEncodeParameters(FFAVStreamPtr stream);
         explicit FFAVVideoEncodeParameters(FFAVVideoEncodeParametersPtr encodeParameters);
 
         virtual ~FFAVVideoEncodeParameters();
 
     public:
         static FFAVVideoEncodeParametersPtr create();
-        static FFAVVideoEncodeParametersPtr create(FFAVInputContext& inputContext);
+        static FFAVVideoEncodeParametersPtr create(FFAVStreamPtr stream);
         static FFAVVideoEncodeParametersPtr create(FFAVVideoEncodeParametersPtr encodeParameters);
 
     public:
-        void copyFrom(FFAVInputContext& inputContext);
+        void copyFrom(FFAVStreamPtr inputContext);
 
         long long getBitrate() const;
         int getWidth() const;
@@ -32,6 +32,7 @@ namespace ff {
         const FFAVRational& getTimeBase() const;
         int getPixelFormat() const;
         int getEncodeThreadCount() const;
+        FFAVStreamPtr getDecodeStream() const;
 
         void setBitrate(long long bitrate);
         void setWidth(int width);
@@ -56,5 +57,7 @@ namespace ff {
         int pixelFormat;
 
         int encodeThreadCount;
+
+        FFAVStreamPtr decodeStream;
     };
 };

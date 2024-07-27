@@ -18,8 +18,9 @@ namespace ff {
         this->formatContextImpl = FFAVFormatContextImpl::create();
         this->isOpenedFlag = false;
 
-        this->videoStreamIndex = -1;
-        this->audioStreamIndex = -1;
+        this->videoStreams = std::make_shared<FFAVStreamList>();
+        this->audioStreams = std::make_shared<FFAVStreamList>();
+        this->streams = std::make_shared<FFAVStreamList>();
     }
 
     FFAVInputContext::~FFAVInputContext() {
@@ -93,15 +94,19 @@ namespace ff {
 
         int codecType = formatContext->streams[packet->stream_index]->codecpar->codec_type;
         ffpacket->setType(DATA_TYPE_FROM_AV_CODEC_TYPE(codecType));
-
+        ffpacket->setDecodeStream(this->streams->at(packet->stream_index));
+        
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
     int FFAVInputContext::getFrameCount() {
         int totalCount = 0;
 
-        totalCount += this->getVideoStream()->getImpl()->getRaw()->nb_frames;
-        totalCount += this->getAudioStream()->getImpl()->getRaw()->nb_frames;
+        FFAVStreamPtr videoStream = this->videoStreams->size() > 0 ? this->videoStreams->at(0) : nullptr;
+        FFAVStreamPtr audioStream = this->audioStreams->size() > 0 ? this->audioStreams->at(0) : nullptr;
+
+        totalCount += videoStream ? videoStream->getImpl()->getRaw()->nb_frames : 0;
+        totalCount += audioStream ? audioStream->getImpl()->getRaw()->nb_frames : 0;
 
         return totalCount;
     }
@@ -115,6 +120,7 @@ namespace ff {
         if (formatContext == nullptr) {
             return -1;
         }
+
         return formatContext->nb_streams;
     }
 
@@ -122,65 +128,22 @@ namespace ff {
         return this->formatContextImpl;
     }
 
-    FFAVCodecParametersPtr FFAVInputContext::getVideoCodecParameters() {
-        int streamIndex =
-            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
-        if (streamIndex < 0) {
-            return nullptr;
-        }
-        return this->codecParameters[streamIndex];
-    }
-
-    FFAVCodecParametersPtr FFAVInputContext::getAudioCodecParameters() {
-        int streamIndex =
-            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
-        if (streamIndex < 0) {
-            return nullptr;
-        }
-        return this->codecParameters[streamIndex];
-    }
-
     FFAVCodecParametersPtr FFAVInputContext::getCodecParameters(int index) {
-        return this->codecParameters[index];
+        FFAVCodecParametersPtr codecParameters = FFAVCodecParameters::create();
+        codecParameters->getImpl()->setRaw(this->formatContextImpl->getRaw()->streams[index]->codecpar);
+        return codecParameters;
     }
 
-    FFAVStreamPtr FFAVInputContext::getVideoStream() {
-        int streamIndex =
-            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
-        if (streamIndex < 0) {
-            return nullptr;
-        }
-        return this->streams[streamIndex];
+    FFAVStreamListPtr FFAVInputContext::getStreams() {
+		return this->streams;
+	}
+
+    FFAVStreamListPtr FFAVInputContext::getVideoStreams() {
+        return this->videoStreams;
     }
 
-    FFAVStreamPtr FFAVInputContext::getAudioStream() {
-        int streamIndex =
-            av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
-        if (streamIndex < 0) {
-            return nullptr;
-        }
-        return this->streams[streamIndex];
-    }
-
-    FFAVStreamPtr FFAVInputContext::getStream(int index) {
-        return this->streams[index];
-    }
-
-    FFAVChannelLayoutPtr FFAVInputContext::getAudioChannelLayout() {
-        int streamIndex = this->getAudioStreamIndex();
-
-        FFAVChannelLayoutPtr ffavChannelLayoutPtr = FFAVChannelLayout::create();
-        ffavChannelLayoutPtr->getImpl()->setRaw(
-            this->formatContextImpl->getRaw()->streams[streamIndex]->codecpar->ch_layout);
-        return ffavChannelLayoutPtr;
-    }
-
-    int FFAVInputContext::getVideoStreamIndex() {
-        return av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0);
-    }
-
-    int FFAVInputContext::getAudioStreamIndex() {
-        return av_find_best_stream(this->formatContextImpl->getRaw(), AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
+    FFAVStreamListPtr FFAVInputContext::getAudioStreams() {
+        return this->audioStreams;
     }
 
     AVError FFAVInputContext::setOpt(const std::string& key, const std::string& value) {
@@ -203,16 +166,24 @@ namespace ff {
 
     void FFAVInputContext::findMetaData() {
         // nb streams 만큼 순회하면서 vector에 데이터를 넣는다
+        int streamIndex = 0;
         for (int i = 0; i < this->getStreamsCount(); i++) {
             AVStream* stream = this->formatContextImpl->getRaw()->streams[i];
 
-            FFAVStreamPtr ffavStream = FFAVStream::create();
+            FFAVStreamPtr ffavStream = FFAVStream::create(DATA_TYPE::UNKNOWN);
             ffavStream->getImpl()->setRaw(stream);
-            this->streams.push_back(ffavStream);
+            ffavStream->setStreamIndex(streamIndex);
 
-            FFAVCodecParametersPtr codecParameters = FFAVCodecParameters::create();
-            codecParameters->getImpl()->setRaw(stream->codecpar);
-            this->codecParameters.push_back(codecParameters);
+            if (stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+                ffavStream->setDataType(DATA_TYPE::VIDEO);
+                this->videoStreams->emplace_back(ffavStream);
+            } else if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+                ffavStream->setDataType(DATA_TYPE::AUDIO);
+                this->audioStreams->emplace_back(ffavStream);
+            }
+            this->streams->emplace_back(ffavStream);
+
+            streamIndex++;
         }
     }
 

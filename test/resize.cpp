@@ -9,13 +9,18 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
     ff::AVError error = inputContext.open(Config::SAMPLE_MP4);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    ff::FFAVCodecContextPtr videoDecodeContext = ff::video::decode::createCUDACodecContext(inputContext, &error);
+    auto videoStreams = inputContext.getVideoStreams();
+    auto audioStreams = inputContext.getAudioStreams();
+    auto videoStream = videoStreams->size() > 0 ? (*videoStreams)[0] : nullptr;
+    auto audioStream = audioStreams->size() > 0 ? (*audioStreams)[0] : nullptr;
+
+    ff::FFAVCodecContextPtr videoDecodeContext = ff::video::decode::createCUDACodecContext(videoStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
-    ff::FFAVCodecContextPtr audioDecodeContext = ff::audio::decode::createCodecContext(inputContext, &error);
+    ff::FFAVCodecContextPtr audioDecodeContext = ff::audio::decode::createCodecContext(audioStream, &error);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    ff::FFAVVideoEncodeParametersPtr videoEncodeParameters = ff::FFAVVideoEncodeParameters::create(inputContext);
-    ff::FFAVAudioEncodeParametersPtr audioEncodeParameters = ff::FFAVAudioEncodeParameters::create(inputContext);
+    ff::FFAVVideoEncodeParametersPtr videoEncodeParameters = ff::FFAVVideoEncodeParameters::create(videoStream);
+    ff::FFAVAudioEncodeParametersPtr audioEncodeParameters = ff::FFAVAudioEncodeParameters::create(audioStream);
     videoEncodeParameters->setEncodeThreadCount(16);
     
     // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Resize the video
@@ -55,14 +60,6 @@ TEST(RESIZE_TRANS_CODE, VIDEO_DOWN_SIZE) {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///Encode
         error = encoder.encode(frame, [&](ff::FFAVPacket& packet) {
-            if (packet.getType() == ff::DATA_TYPE::VIDEO) {
-                packet.rescaleTS(inputContext.getVideoStream(), outputContext.getVideoStream());
-                packet.setStreamIndex(inputContext.getVideoStreamIndex());
-            } else if (packet.getType() == ff::DATA_TYPE::AUDIO) {
-                packet.rescaleTS(inputContext.getAudioStream(), outputContext.getAudioStream());
-                packet.setStreamIndex(inputContext.getAudioStreamIndex());
-            }
-
             error = outputContext.writePacket(packet);
             if (error.getType() != ff::AV_ERROR_TYPE::SUCCESS) {
                 std::cout << error.getMessage() << " " << error.getAVErrorMessage() << std::endl;

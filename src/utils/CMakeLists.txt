@@ -1,6 +1,6 @@
 set(SOURCES
-        transMux.cpp
         utils.cpp
+        transMux.cpp
 )
 
 set(UPDATED_SOURCES "")

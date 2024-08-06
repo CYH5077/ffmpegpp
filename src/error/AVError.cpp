@@ -18,20 +18,24 @@ namespace ff {
         this->setError(errorType, errorMessage, 0, errorAVFunction);
     }
 
-    AVError::AVError(AV_ERROR_TYPE errorType, const std::string& errorMessage, int errorAVCode, const std::string& errorAVFunction) {
+    AVError::AVError(AV_ERROR_TYPE errorType,
+                     const std::string& errorMessage,
+                     int errorAVCode,
+                     const std::string& errorAVFunction) {
         this->setError(errorType, errorMessage, errorAVCode, errorAVFunction);
     }
 
-    AVError::~AVError() {
+    AVError::~AVError() {}
 
-    }
-
-    void AVError::setError(AV_ERROR_TYPE errorType, const std::string& errorMessage, int errorAVCode, const std::string& errorAVFunction) {
-        this->errorType    = errorType;
+    void AVError::setError(AV_ERROR_TYPE errorType,
+                           const std::string& errorMessage,
+                           int errorAVCode,
+                           const std::string& errorAVFunction) {
+        this->errorType = errorType;
         this->errorMessage = errorMessage;
-        this->errorAVCode  = errorAVCode;
+        this->errorAVCode = errorAVCode;
         this->errorAVFunction = errorAVFunction;
-        this->errorAVMessage  = this->getAVErrorMessages(errorAVCode);
+        this->errorAVMessage = this->getAVErrorMessages(errorAVCode);
     }
 
     AV_ERROR_TYPE AVError::getType() {
@@ -55,7 +59,9 @@ namespace ff {
     }
 
     std::string AVError::getAVErrorMessages(int errorAVCode) {
-        char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {0, };
+        char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {
+            0,
+        };
         av_strerror(errorAVCode, avErrorMessage, sizeof(avErrorMessage));
         return avErrorMessage;
     }

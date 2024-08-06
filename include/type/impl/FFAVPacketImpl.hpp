@@ -9,30 +9,20 @@ extern "C" {
 #include <memory>
 
 namespace ff {
-	typedef std::shared_ptr<AVPacket> AVPacketPtr;
+    using AVPacketPtr = std::shared_ptr<AVPacket>;
 
-	class FFAVPacketImpl : public std::enable_shared_from_this<FFAVPacketImpl> {
-	public:
-		explicit FFAVPacketImpl();
-		explicit FFAVPacketImpl(FFAVPacketImplPtr packetImpl);
+    class FFAVPacketImpl : public std::enable_shared_from_this<FFAVPacketImpl> {
+    public:
+        explicit FFAVPacketImpl();
+        virtual ~FFAVPacketImpl();
 
-		virtual ~FFAVPacketImpl();
+    public:  // create
+        static FFAVPacketImplPtr create();
 
-	public: // 생성
-		static FFAVPacketImplPtr create();
-		static FFAVPacketImplPtr create(FFAVPacketImplPtr packetImpl);
+    public:  // get set
+        AVPacketPtr getRaw();
 
-	public: 
-		// Raw AVPacket
-		AVPacketPtr getRaw();
-		void        setRaw(AVPacketPtr packet);
-
-		// AVPacket 복사
-		FFAVPacketImplPtr copy();
-		void			  copyFrom(FFAVPacketImplPtr packetImpl);
-		void			  copyFrom(AVPacketPtr packet);
-
-	private:
-		AVPacketPtr packet;
-	};
+    private:
+        AVPacketPtr packet;
+    };
 }

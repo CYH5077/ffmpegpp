@@ -17,7 +17,6 @@ namespace ff {
 
     public:
         AVStream* getRaw();
-        void      setRaw(AVStream* stream);
 
     private:
         AVStream* stream;

@@ -1,13 +1,6 @@
 set(SOURCES
         main.cpp
         config.cpp
-        decoder.cpp
-        
-        transcode.cpp
-        resize.cpp
-        type_test.cpp
-
-        hls_dash.cpp
 )
 
 if(FFMPEGPP_SUPPRESS)

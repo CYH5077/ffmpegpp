@@ -16,11 +16,6 @@ namespace ff {
 		static FFAVSwsContextImplPtr create();
 
 	public:
-		// Raw AVSwsContext
-		SwsContext* getRaw();
-		void        setRaw(SwsContext* swsContext);
-
-	public:
 		SwsContext* swsContext;
 	};
 }

@@ -15,121 +15,10 @@ extern "C" {
 
 namespace ff {
     FFAVOutputContext::FFAVOutputContext() {
-        this->isOpenFlag = false;
         this->formatContextImpl = FFAVFormatContextImpl::create();
-        this->streams = std::make_shared<FFAVStreamList>();
     }
 
-    FFAVOutputContext::~FFAVOutputContext() {
-        this->close();
-    }
-
-    AVError FFAVOutputContext::open(const std::string& filename, OUTPUT_TYPE type) {
-        AVFormatContext* formatContext = nullptr;
-
-        std::string formatName = OUTPUT_TYPE_TO_STRING(type);
-        const char* formatNameChar = formatName == "file" ? nullptr : formatName.c_str();
-
-        int ret = avformat_alloc_output_context2(&formatContext, nullptr, formatNameChar, filename.c_str());
-        if (ret < 0) {
-            return AVError(AV_ERROR_TYPE::AV_ERROR,
-                           "avformat_alloc_output_context2 failed",
-                           ret,
-                           "avformat_alloc_output_context2");
-        }
-        this->formatContextImpl->setRaw(formatContext);
-
-        if (!(formatContext->flags & AVFMT_NOFILE)) {
-            int ret = avio_open(&formatContext->pb, filename.c_str(), AVIO_FLAG_WRITE);
-            if (ret < 0) {
-                return AVError(AV_ERROR_TYPE::AV_ERROR, "avio_open failed", ret, "avio_open");
-            }
-        }
-
-        this->filename = filename;
-        this->isOpenFlag = true;
-        return AVError(AV_ERROR_TYPE::SUCCESS);
-    }
-
-    FFAVStreamPtr FFAVOutputContext::addStream(ff::FFAVCodecParametersPtr codecParameters) {
-        AVStream* stream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
-        if (!stream) {
-            return nullptr;
-        }
-
-        FFAVStreamPtr ffavStream = FFAVStream::create(DATA_TYPE::UNKNOWN);
-        ffavStream->getImpl()->setRaw(stream);
-
-        AVCodecParameters* codecParametersRaw = codecParameters->getImpl()->getRaw();
-        int ret = avcodec_parameters_copy(stream->codecpar, codecParametersRaw);
-        if (ret < 0) {
-            return nullptr;
-        }
-        this->streams->emplace_back(ffavStream);
-
-        return ffavStream;
-    }
-
-    AVError FFAVOutputContext::createStream(DATA_TYPE type, ff::FFAVCodecContextPtr codecContext) {
-        if (codecContext == nullptr) {
-            return AVError(AV_ERROR_TYPE::SUCCESS);
-        }
-
-        AVStream* stream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
-        if (!stream) {
-            return AVError(
-                AV_ERROR_TYPE::AV_ERROR, "avformat_new_stream failed", AVERROR(ENOMEM), "avformat_new_stream");
-        }
-
-        AVCodecContext* codecContextRaw = codecContext->getImpl()->getRaw();
-        int ret = avcodec_parameters_from_context(stream->codecpar, codecContextRaw);
-        if (ret < 0) {
-            return AVError(AV_ERROR_TYPE::AV_ERROR,
-                           "avcodec_parameters_from_context failed",
-                           ret,
-                           "avcodec_parameters_from_context");
-        }
-
-        FFAVStreamPtr ffavStream = FFAVStream::create(type);
-        ffavStream->getImpl()->setRaw(stream);
-
-        if (this->streams == nullptr) {
-            this->streams = std::make_shared<FFAVStreamList>();
-        }
-        this->streams->emplace_back(ffavStream);
-
-        codecContext->setStreamIndex(this->streams->size() - 1);
-        codecContext->setEncodeStream(ffavStream);
-
-        return AVError(AV_ERROR_TYPE::SUCCESS);
-    }
-
-    AVError FFAVOutputContext::writeHeader() {
-        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
-        int ret = avformat_write_header(formatContext, nullptr);
-        if (ret < 0) {
-            return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_write_header failed", ret, "avformat_write_header");
-        }
-
-        return AVError(AV_ERROR_TYPE::SUCCESS);
-    }
-
-    AVError FFAVOutputContext::writePacket(FFAVPacket& ffavPacket) {
-        FFAVStreamPtr srcStream = ffavPacket.getDecodeStream();
-        if (srcStream != nullptr) {
-            ffavPacket.rescaleTS(srcStream, this->streams->at(ffavPacket.getStreamIndex()));
-        }
-
-        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
-        AVPacket* packet = ffavPacket.getImpl()->getRaw().get();
-        int ret = av_interleaved_write_frame(formatContext, packet);
-        if (ret < 0) {
-            return AVError(
-                AV_ERROR_TYPE::AV_ERROR, "av_interleaved_write_frame failed", ret, "av_interleaved_write_frame");
-        }
-
-        return AVError(AV_ERROR_TYPE::SUCCESS);
-    }
+    FFAVOutputContext::~FFAVOutputContext() {}
 
     AVError FFAVOutputContext::setOpt(const std::string& key, const std::string& value) {
         AVFormatContext* formatContext = this->formatContextImpl->getRaw();
@@ -141,26 +30,7 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
-    void FFAVOutputContext::close() {
-        AVFormatContext* formatContext = this->formatContextImpl->getRaw();
-
-        if (formatContext != nullptr) {
-            av_write_trailer(formatContext);
-            if (!(formatContext->flags & AVFMT_NOFILE)) {
-                avio_closep(&formatContext->pb);
-            }
-            avformat_free_context(formatContext);
-        }
-
-        this->isOpenFlag = false;
-        this->formatContextImpl->setRaw(nullptr);
-    }
-
     FFAVFormatContextImplPtr FFAVOutputContext::getImpl() {
         return this->formatContextImpl;
-    }
-
-    FFAVStreamListPtr FFAVOutputContext::getStreams() {
-        return this->streams;
     }
 };

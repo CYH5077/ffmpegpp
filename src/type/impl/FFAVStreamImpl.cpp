@@ -1,24 +1,17 @@
 #include "type/impl/FFAVStreamImpl.hpp"
 
 namespace ff {
-    FFAVStreamImplPtr  FFAVStreamImpl::create() {
+    FFAVStreamImplPtr FFAVStreamImpl::create() {
         return std::make_shared<FFAVStreamImpl>();
     }
-
 
     FFAVStreamImpl::FFAVStreamImpl() {
         this->stream = nullptr;
     }
 
-    FFAVStreamImpl::~FFAVStreamImpl() {
-
-    }
+    FFAVStreamImpl::~FFAVStreamImpl() {}
 
     AVStream* FFAVStreamImpl::getRaw() {
         return this->stream;
-    }
-
-    void FFAVStreamImpl::setRaw(AVStream *stream) {
-        this->stream = stream;
     }
 };

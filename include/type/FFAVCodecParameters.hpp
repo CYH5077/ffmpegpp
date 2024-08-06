@@ -7,8 +7,7 @@
 
 namespace ff {
     class FFAVCodecParameters;
-
-    typedef std::shared_ptr<FFAVCodecParameters> FFAVCodecParametersPtr;
+    using FFAVCodecParametersPtr = std::shared_ptr<FFAVCodecParameters>;
 
     class FFAVCodecParameters {
     public:

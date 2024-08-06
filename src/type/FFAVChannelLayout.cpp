@@ -1,4 +1,5 @@
 #include "type/FFAVChannelLayout.hpp"
+
 #include "type/impl/FFAVChannelLayoutImpl.hpp"
 
 namespace ff {
@@ -6,17 +7,13 @@ namespace ff {
         return std::make_shared<FFAVChannelLayout>();
     }
 
-
     FFAVChannelLayout::FFAVChannelLayout() {
         this->channelLayoutImpl = FFAVChannelLayoutImpl::create();
     }
 
-    FFAVChannelLayout::~FFAVChannelLayout() {
-
-    }
+    FFAVChannelLayout::~FFAVChannelLayout() {}
 
     FFAVChannelLayoutImplPtr FFAVChannelLayout::getImpl() {
         return this->channelLayoutImpl;
     }
-
 };

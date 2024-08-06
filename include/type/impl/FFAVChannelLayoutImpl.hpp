@@ -17,7 +17,8 @@ namespace ff {
 
     public:
         AVChannelLayout getRaw();
-        void            setRaw(AVChannelLayout channelLayout);
+
+        void setRaw(AVChannelLayout channelLayout);
 
     private:
         AVChannelLayout channelLayout;

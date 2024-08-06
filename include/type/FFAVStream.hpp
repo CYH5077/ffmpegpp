@@ -8,8 +8,7 @@
 
 namespace ff {
     class FFAVStream;
-
-    typedef std::shared_ptr<FFAVStream> FFAVStreamPtr;
+    using FFAVStreamPtr = std::shared_ptr<FFAVStream>;
 
     class FFAVStream {
     public:
@@ -21,18 +20,8 @@ namespace ff {
 
     public:
         FFAVStreamImplPtr getImpl();
-        int getStreamIndex();
-        DATA_TYPE getDataType();
-        FFAVChannelLayoutPtr getChannelLayout();
-
-        void setStreamIndex(int streamIndex);
-        void setDataType(DATA_TYPE dataType);
 
     private:
-        DATA_TYPE dataType;
-
-        int streamIndex;
-
         FFAVStreamImplPtr streamImpl;
     };
 

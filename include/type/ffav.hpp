@@ -1,19 +1,17 @@
 #pragma once
 
-#include "type/impl/ffavimpl.hpp"
+#include <memory>
+#include <vector>
 
-#include "type/FFAVPictureFormat.hpp"
-
+#include "common/FFAVPictureFormat.hpp"
+#include "type/FFAVChannelLayout.hpp"
 #include "type/FFAVCodecContext.hpp"
+#include "type/FFAVCodecParameters.hpp"
+#include "type/FFAVFrame.hpp"
 #include "type/FFAVInputContext.hpp"
 #include "type/FFAVOutputContext.hpp"
-#include "type/FFAVFrame.hpp"
 #include "type/FFAVPacket.hpp"
 #include "type/FFAVRational.hpp"
 #include "type/FFAVStream.hpp"
-#include "type/FFAVCodecParameters.hpp"
-#include "type/FFAVChannelLayout.hpp"
 #include "type/FFAVSwsContext.hpp"
-
-#include <vector>
-#include <memory>
+#include "type/impl/ffavimpl.hpp"

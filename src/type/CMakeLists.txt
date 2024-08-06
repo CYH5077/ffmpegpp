@@ -1,8 +1,4 @@
 set(SOURCES
-        FFAVDefine.cpp
-
-        FFAVPictureFormat.cpp 
-
         FFAVRational.cpp
         
         FFAVPacket.cpp
@@ -24,11 +20,11 @@ set(SOURCES
         FFAVChannelLayout.cpp
         impl/FFAVChannelLayoutImpl.cpp
 
-        FFAVSwsContext.cpp
-        impl/FFAVSwsContextImpl.cpp
-
         FFAVCodecContext.cpp
-        impl/FFAVCodecContextImpl.cpp)
+        impl/FFAVCodecContextImpl.cpp
+
+        impl/FFAVFilterContextImpl.cpp
+)
 
 set(UPDATED_SOURCES "")
 foreach(SOURCE IN LISTS SOURCES)

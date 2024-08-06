@@ -9,7 +9,7 @@ extern "C" {
 #include <memory>
 
 namespace ff {
-    typedef std::shared_ptr<AVFrame> AVFramePtr;
+    using AVFramePtr = std::shared_ptr<AVFrame>;
 
     class FFAVFrameImpl : public std::enable_shared_from_this<FFAVFrameImpl> {
     public:
@@ -18,20 +18,12 @@ namespace ff {
 
         virtual ~FFAVFrameImpl();
 
-    public: // ����
+    public: // create
         static FFAVFrameImplPtr create();
         static FFAVFrameImplPtr create(FFAVFrameImplPtr frameImpl);
 
-    public:
-        // Raw AVFrame
+    public: // get set
         AVFramePtr getRaw();
-        void       setRaw(AVFramePtr frame);
-        void 	   setRaw(AVFrame* frame);
-
-        // AVFrame ����
-        FFAVFrameImplPtr copy();
-        void             copyFrom(FFAVFrameImplPtr frame);
-        void             copyFrom(AVFramePtr frame);
 
     private:
         AVFramePtr frame;

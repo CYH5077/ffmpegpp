@@ -35,3 +35,6 @@ BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 AllowShortLambdasOnASingleLine: All
+
+Language: Cpp
+SeparateDefinitionBlocks: Always

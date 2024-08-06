@@ -6,7 +6,7 @@
 
 namespace ff {
     class FFAVChannelLayout;
-    typedef std::shared_ptr<FFAVChannelLayout> FFAVChannelLayoutPtr;
+    using FFAVChannelLayoutPtr = std::shared_ptr<FFAVChannelLayout>;
 
     class FFAVChannelLayout {
     public:

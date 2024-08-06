@@ -1,4 +1,4 @@
-#include "type/FFAVDefine.hpp"
+#include "common/FFAVDataType.hpp"
 
 extern "C" {
     #include "libavformat/avformat.h"

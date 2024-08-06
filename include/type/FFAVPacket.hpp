@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "common/FFAVDataType.hpp"
+#include "common/FFAVType.hpp"
 #include "type/FFAVStream.hpp"
 #include "type/impl/ffavimpl.hpp"
 

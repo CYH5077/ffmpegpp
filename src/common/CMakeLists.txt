@@ -1,6 +1,6 @@
 set(SOURCES 
         FFAVPictureFormat.cpp
-        FFAVDataType.cpp
+        FFAVType.cpp
 )
 
 set(UPDATED_SOURCES "")

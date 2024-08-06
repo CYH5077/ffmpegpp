@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "common/FFAVDataType.hpp"
+#include "common/FFAVType.hpp"
 
 namespace ff {
     class FFAVPacketImpl;

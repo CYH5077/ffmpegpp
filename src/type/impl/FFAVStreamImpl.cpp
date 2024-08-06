@@ -14,4 +14,8 @@ namespace ff {
     AVStream* FFAVStreamImpl::getRaw() {
         return this->stream;
     }
+
+    void FFAVStreamImpl::setRaw(AVStream* stream) {
+        this->stream = stream;
+    }
 };

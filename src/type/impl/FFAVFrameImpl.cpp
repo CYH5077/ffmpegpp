@@ -23,10 +23,6 @@ namespace ff {
         return std::make_shared<FFAVFrameImpl>();
     }
 
-    FFAVFrameImplPtr FFAVFrameImpl::create(FFAVFrameImplPtr frameImpl) {
-        return std::make_shared<FFAVFrameImpl>(frameImpl);
-    }
-
     FFAVFrameImpl::FFAVFrameImpl() {
         this->frame = std::shared_ptr<AVFrame>(newAVFrame(), freeAVFrame);
     }

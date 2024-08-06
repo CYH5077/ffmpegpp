@@ -1,11 +1,7 @@
 set(SOURCES
         main.cpp
-        config.cpp
+        test.cpp
 )
-
-if(FFMPEGPP_SUPPRESS)
-    list(APPEND SOURCES superess.cpp)
-endif()
 
 set(FFMPEGPP_TEST ffmpegpp_test)
 #enable_testing() # build/test 폴더 생성됨

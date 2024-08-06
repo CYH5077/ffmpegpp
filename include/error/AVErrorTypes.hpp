@@ -7,6 +7,7 @@ namespace ff {
         INVALID_ARGUMENT,
         USER_STOP,
 
+        AV_DECODE_FINISH,
         AV_EAGAIN,
         AV_EOF,
         AV_ERROR,

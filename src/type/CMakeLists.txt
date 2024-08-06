@@ -14,16 +14,15 @@ set(SOURCES
         FFAVFrame.cpp
         impl/FFAVFrameImpl.cpp
 
-        FFAVStream.cpp
         impl/FFAVStreamImpl.cpp
+        FFAVDecodeStream.cpp
+        FFAVEncodeStream.cpp
 
         FFAVChannelLayout.cpp
         impl/FFAVChannelLayoutImpl.cpp
 
         FFAVCodecContext.cpp
         impl/FFAVCodecContextImpl.cpp
-
-        impl/FFAVFilterContextImpl.cpp
 )
 
 set(UPDATED_SOURCES "")

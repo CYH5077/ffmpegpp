@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "common/FFAVDataType.hpp"
 #include "type/FFAVStream.hpp"
@@ -15,7 +16,13 @@ namespace ff {
     public:
         FFAVPacketImplPtr getImpl();
 
+        int getStreamIndex();
+        void setStreamIndex(int streamIndex);
+
     private:
         FFAVPacketImplPtr packetImpl;
     };
+
+    using FFAVPacketList = std::vector<FFAVPacket>;
+    using FFAVPacketListPtr = std::shared_ptr<FFAVPacketList>;
 };

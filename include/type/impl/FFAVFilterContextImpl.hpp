@@ -23,3 +23,4 @@ namespace ff {
     public:
         AVFilterContextPtr filterContext;
     };
+};

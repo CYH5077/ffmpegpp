@@ -21,4 +21,13 @@ namespace ff {
     FFAVPacketImplPtr FFAVPacket::getImpl() {
         return this->packetImpl;
     }
+
+    int FFAVPacket::getStreamIndex() {
+		return this->packetImpl->getRaw()->stream_index;
+	}
+
+    void FFAVPacket::setStreamIndex(int streamIndex) {
+		this->packetImpl->getRaw()->stream_index = streamIndex;
+	}
+
 }

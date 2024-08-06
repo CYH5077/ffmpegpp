@@ -28,16 +28,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${FFMPEGPP_INCLUDE_DIR}
 target_link_directories(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${FFMPEG_LIBRARIES})
 
-if(FFMPEGPP_SUPPRESS)
-    find_package(OpenCV CONFIG REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PUBLIC opencv_ml opencv_dnn opencv_dpm opencv_hdf opencv_dnn_superres)
-endif()
-
 add_subdirectory (src) 
-
-if(FFMPEGPP_TEST)
-    add_subdirectory (test)
-endif()
+add_subdirectory (test)
 
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${FFMPEGPP_INSTALL_DIR}/lib)

@@ -1,5 +1,6 @@
 set(SOURCES
         utils.cpp
+        createDecodeContext.cpp
 )
 
 set(UPDATED_SOURCES "")

@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "error/ffav.hpp"
-#include "type/FFAVStream.hpp"
 #include "type/impl/ffavimpl.hpp"
 
 namespace ff {

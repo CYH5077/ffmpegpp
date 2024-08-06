@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "common/FFAVDataType.hpp"
 #include "type/impl/ffavimpl.hpp"
@@ -18,4 +19,7 @@ namespace ff {
     private:
         FFAVFrameImplPtr frameImpl;
     };
+
+    using FFAVFrameList = std::vector<FFAVFrame>;
+    using FFAVFrameListPtr = std::shared_ptr<FFAVFrameList>;
 };

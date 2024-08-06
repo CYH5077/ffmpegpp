@@ -14,7 +14,7 @@ namespace ff {
             return nullptr;
         }
 
-        FFAVCodecContextPtr ffavCodecContext = FFAVCodecContext::create();
+        FFAVCodecContextPtr codecContext = FFAVCodecContext::create();
 
         AVCodecParameters* codecParameters = stream->getImpl()->getRaw()->codecpar;
         if (codecParameters == nullptr) {
@@ -37,9 +37,25 @@ namespace ff {
                 AV_ERROR_TYPE::AV_ERROR, "avcodec_alloc_context3 failed", AVERROR(ENOMEM), "avcodec_alloc_context3");
             return nullptr;
         }
-        ffavCodecContext->getImpl()->setRaw(decodeCodecContext);
+        codecContext->getImpl()->setRaw(decodeCodecContext);
 
         int ret = 0;
+        if (cudaEnable == true) {
+            ret =
+                av_hwdevice_ctx_create(&decodeCodecContext->hw_device_ctx, AV_HWDEVICE_TYPE_CUDA, nullptr, nullptr, 0);
+            if (ret < 0) {
+                error->setError(
+                    AV_ERROR_TYPE::AV_ERROR, "av_hwdevice_ctx_create failed", ret, "av_hwdevice_ctx_create");
+                return nullptr;
+            }
+
+            if (codecContext->findCudaFormat() == false) {
+                error->setError(
+                    AV_ERROR_TYPE::AV_ERROR, "findCUDAHWFormat failed", AVERROR_DECODER_NOT_FOUND, "findCUDAHWFormat");
+                return nullptr;
+            }
+        }
+
         ret = avcodec_parameters_to_context(decodeCodecContext, codecParameters);
         if (ret < 0) {
             error->setError(
@@ -54,7 +70,7 @@ namespace ff {
         }
 
         *error = AVError(AV_ERROR_TYPE::SUCCESS);
-        return ffavCodecContext;
+        return codecContext;
     }
 };
 

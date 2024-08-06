@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "type/FFAVStream.hpp"
-#include "type/FFAVPacket.hpp"
 #include "type/FFAVFrame.hpp"
+#include "type/FFAVPacket.hpp"
+#include "type/FFAVStream.hpp"
 
 namespace ff {
     class FFAVDecodeStream;
@@ -20,6 +20,9 @@ namespace ff {
     public:
         FFAVFrameListPtr decode(FFAVPacket& packet, AVError* error = nullptr);
         FFAVFrameListPtr decodeFlush();
+
+    private:
+        AVError cudaFormatConvert(FFAVFrame& srcFrame, FFAVFrame* dstFrame);
     };
 
     using FFAVDecodeStreamList = std::vector<FFAVDecodeStreamPtr>;

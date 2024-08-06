@@ -1,6 +1,7 @@
 set(SOURCES
         main.cpp
-        test.cpp
+
+        decode.cpp
 )
 
 set(FFMPEGPP_TEST ffmpegpp_test)

@@ -100,6 +100,30 @@ namespace ff {
         return this->decodeStreamList;
     }
 
+    FFAVDecodeStreamListPtr FFAVInputContext::getVideoDecodeStreamList() {
+        FFAVDecodeStreamListPtr videoDecodeStreamList = std::make_shared<FFAVDecodeStreamList>();
+
+        for (auto iter : *this->decodeStreamList) {
+			if (iter->getType() == DATA_TYPE::VIDEO) {
+                videoDecodeStreamList->emplace_back(iter);
+			}
+		}
+
+        return videoDecodeStreamList;
+    }
+
+    FFAVDecodeStreamListPtr FFAVInputContext::getAudioDecodeStreamList() {
+        FFAVDecodeStreamListPtr audioDecodeStreamList = std::make_shared<FFAVDecodeStreamList>();
+
+        for (auto iter : *this->decodeStreamList) {
+            if (iter->getType() == DATA_TYPE::AUDIO) {
+                audioDecodeStreamList->emplace_back(iter);
+            }
+        }
+
+        return audioDecodeStreamList;
+    }
+
     AVError FFAVInputContext::parseStreamInfo(bool cudaDecode) {
         this->decodeStreamList = std::make_shared<FFAVDecodeStreamList>();
 
@@ -124,13 +148,25 @@ namespace ff {
             }
 
             // Decode context create
-            if (codecType == AVMEDIA_TYPE_VIDEO || codecType == AVMEDIA_TYPE_AUDIO) {
-                FFAVCodecContextPtr decodeContext = video::decode::createCodecContext(decodeStream, &error);
+            if (codecType == AVMEDIA_TYPE_VIDEO) { // Video
+                FFAVCodecContextPtr decodeContext;
+                if (cudaDecode) {
+					decodeContext = video::decode::createCUDACodecContext(decodeStream, &error);
+				} else {
+                    decodeContext = video::decode::createCodecContext(decodeStream, &error);
+				}
+                
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
                 }
                 decodeStream->setCodecContext(decodeContext);
-            }
+            } else if (codecType == AVMEDIA_TYPE_AUDIO) { // Audio
+				FFAVCodecContextPtr decodeContext = audio::decode::createCodecContext(decodeStream, &error);
+				if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+					return error;
+				}
+				decodeStream->setCodecContext(decodeContext);
+			}
 
             this->decodeStreamList->emplace_back(decodeStream);
         }

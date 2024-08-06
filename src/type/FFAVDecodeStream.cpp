@@ -48,6 +48,16 @@ namespace ff {
                 break;
             }
 
+            if (FFAVStream::codecContext->isCudaFormat()) {
+                FFAVFrame convertFrame;
+                AVError cudaConvertError = this->cudaFormatConvert(frame, &convertFrame);
+                if (cudaConvertError.getType() != AV_ERROR_TYPE::SUCCESS) {
+                    *error = cudaConvertError;
+                    return nullptr;
+                }
+
+                frame = convertFrame;
+            }
             frameList->push_back(frame);
         }
 
@@ -61,5 +71,32 @@ namespace ff {
 
         AVError error;
         return this->decode(packet, &error);
+    }
+
+    AVError FFAVDecodeStream::cudaFormatConvert(FFAVFrame& srcFrame, FFAVFrame* dstFrame) {
+        AVFrame* src = srcFrame.getImpl()->getRaw().get();
+        AVFrame* dst = dstFrame->getImpl()->getRaw().get();
+
+        if (src->format != FFAVStream::codecContext->getCudaFormat()) {
+            return AVError(
+                AV_ERROR_TYPE::AV_ERROR, "srcFrame format is not cuda hw format", -1, "FFAVDecoder::cudaFormatConvert");
+        }
+
+        dst->width = src->width;
+        dst->height = src->height;
+        av_frame_get_buffer(dst, 0);
+
+        int ret = av_hwframe_transfer_data(dst, src, 0);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "av_hwframe_transfer_data failed", ret, "av_hwframe_transfer_data");
+        }
+
+        dst->pts = src->pts;
+        dst->pkt_dts = src->pkt_dts;
+        dst->best_effort_timestamp = src->best_effort_timestamp;
+        dst->pkt_pos = src->pkt_pos;
+        dst->pkt_duration = src->pkt_duration;
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 }

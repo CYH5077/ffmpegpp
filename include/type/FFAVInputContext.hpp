@@ -7,9 +7,9 @@
 #include "error/AVError.hpp"
 #include "type/FFAVChannelLayout.hpp"
 #include "type/FFAVCodecParameters.hpp"
+#include "type/FFAVDecodeStream.hpp"
 #include "type/FFAVPacket.hpp"
 #include "type/FFAVStream.hpp"
-#include "type/FFAVDecodeStream.hpp"
 
 namespace ff {
     class FFAVInputContext {
@@ -28,6 +28,8 @@ namespace ff {
         AVError demux(FFAVPacket* packet);
 
         FFAVDecodeStreamListPtr getDecodeStreamList();
+        FFAVDecodeStreamListPtr getVideoDecodeStreamList();
+        FFAVDecodeStreamListPtr getAudioDecodeStreamList();
 
     private:
         AVError parseStreamInfo(bool cudaDecode);

@@ -16,7 +16,21 @@ namespace ff {
         virtual ~FFAVEncodeStream();
 
     public:
+        void setCodec(VIDEO_CODEC codec);
+        void setCodec(AUDIO_CODEC codec);
+
+        bool isVideoStream();
+        bool isAudioStream();
+
+        VIDEO_CODEC getVideoCodec();
+        AUDIO_CODEC getAudioCodec();
+
+    public:
         AVError encode();
+
+    private:
+        VIDEO_CODEC videoCodec;
+        AUDIO_CODEC audioCodec;
     };
 
     using FFAVEncodeStreamList = std::vector<FFAVEncodeStreamPtr>;

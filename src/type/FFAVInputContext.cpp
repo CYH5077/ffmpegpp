@@ -7,6 +7,7 @@
 #include "type/impl/FFAVPacketImpl.hpp"
 #include "type/impl/FFAVStreamImpl.hpp"
 #include "utils/createDecodeContext.hpp"
+#include "error/AVDemuxException.hpp"
 
 extern "C" {
 #include "libavformat/avformat.h"
@@ -86,8 +87,9 @@ namespace ff {
 
         // AVFormatContext 에서 AVPacket을 읽어옴.
         int ret = av_read_frame(formatContext, avPacket);
-        // ret이 eof 일경우
+        // ret이 eof 일경우 null packet을 반환
         if (ret == AVERROR_EOF) {
+            packet->getImpl()->getRaw() = nullptr;
             return AVError(AV_ERROR_TYPE::AV_EOF);
         } else if (ret < 0) {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_read_frame failed", ret, "av_read_frame");
@@ -104,10 +106,10 @@ namespace ff {
         FFAVDecodeStreamListPtr videoDecodeStreamList = std::make_shared<FFAVDecodeStreamList>();
 
         for (auto iter : *this->decodeStreamList) {
-			if (iter->getType() == DATA_TYPE::VIDEO) {
+            if (iter->getType() == DATA_TYPE::VIDEO) {
                 videoDecodeStreamList->emplace_back(iter);
-			}
-		}
+            }
+        }
 
         return videoDecodeStreamList;
     }
@@ -122,6 +124,14 @@ namespace ff {
         }
 
         return audioDecodeStreamList;
+    }
+
+    FFAVInputContextIterator FFAVInputContext::begin() {
+        return FFAVInputContextIterator(this);
+    }
+
+    FFAVInputContextIterator FFAVInputContext::end() {
+        return FFAVInputContextIterator();
     }
 
     AVError FFAVInputContext::parseStreamInfo(bool cudaDecode) {
@@ -148,29 +158,77 @@ namespace ff {
             }
 
             // Decode context create
-            if (codecType == AVMEDIA_TYPE_VIDEO) { // Video
+            if (codecType == AVMEDIA_TYPE_VIDEO) {  // Video
                 FFAVCodecContextPtr decodeContext;
                 if (cudaDecode) {
-					decodeContext = video::decode::createCUDACodecContext(decodeStream, &error);
-				} else {
+                    decodeContext = video::decode::createCUDACodecContext(decodeStream, &error);
+                } else {
                     decodeContext = video::decode::createCodecContext(decodeStream, &error);
-				}
-                
+                }
+
                 if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
                     return error;
                 }
                 decodeStream->setCodecContext(decodeContext);
-            } else if (codecType == AVMEDIA_TYPE_AUDIO) { // Audio
-				FFAVCodecContextPtr decodeContext = audio::decode::createCodecContext(decodeStream, &error);
-				if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
-					return error;
-				}
-				decodeStream->setCodecContext(decodeContext);
-			}
+            } else if (codecType == AVMEDIA_TYPE_AUDIO) {  // Audio
+                FFAVCodecContextPtr decodeContext = audio::decode::createCodecContext(decodeStream, &error);
+                if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+                    return error;
+                }
+                decodeStream->setCodecContext(decodeContext);
+            }
 
             this->decodeStreamList->emplace_back(decodeStream);
         }
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
+
+    //////////////////////// Iterator
+    FFAVInputContextIterator::FFAVInputContextIterator(FFAVInputContext* context) : context(context) {
+        this->eofFlag = false;
+        if (this->context && this->context->isOpened()) {
+            // 초기 패킷 읽기 시도
+            if (this->context->demux(&this->currentPacket).getType() != AV_ERROR_TYPE::SUCCESS) {
+                // 실패한 경우, context를 nullptr로 설정하여 반복자의 끝을 나타냄
+                this->context = nullptr;
+            }
+        } else {
+            this->context = nullptr;
+        }
+    }
+
+    FFAVPacket& FFAVInputContextIterator::operator*() {
+        return this->currentPacket;
+    }
+
+    FFAVPacket& FFAVInputContextIterator::operator->() {
+        return this->currentPacket;
+    }
+
+    FFAVInputContextIterator& FFAVInputContextIterator::operator++() {
+        if (this->context != nullptr) {
+            AVError error = this->context->demux(&this->currentPacket);
+            if (error.getType() == AV_ERROR_TYPE::AV_EOF) {
+                if (eofFlag == false) {
+                    eofFlag = true;
+                } else {
+                    // 더 이상 패킷을 읽을 수 없으면 반복자를 끝으로 설정
+                    this->context = nullptr;
+                }
+            } else if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+                // 다음 패킷을 읽는 데 실패하면 반복자를 끝으로 설정
+                throw AVDemuxException(error);
+            }
+        }
+        return *this;
+    }
+
+    bool operator==(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b) {
+        return a.context == b.context;
+    }
+
+    bool operator!=(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b) {
+        return a.context != b.context;
     }
 };

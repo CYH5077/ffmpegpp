@@ -35,30 +35,30 @@ namespace ff {
         this->errorMessage = errorMessage;
         this->errorAVCode = errorAVCode;
         this->errorAVFunction = errorAVFunction;
-        this->errorAVMessage = this->getAVErrorMessages(errorAVCode);
+        this->errorAVMessage = this->getAVErrorMessage(errorAVCode);
     }
 
-    AV_ERROR_TYPE AVError::getType() {
+    AV_ERROR_TYPE AVError::getType() const {
         return this->errorType;
     }
 
-    std::string AVError::getMessage() {
+    std::string AVError::getMessage() const {
         return this->errorMessage;
     }
 
-    int AVError::getAVCode() {
+    int AVError::getAVCode() const {
         return this->errorAVCode;
     }
 
-    std::string AVError::getAVFunction() {
+    std::string AVError::getAVFunction() const {
         return this->errorAVFunction;
     }
 
-    std::string AVError::getAVErrorMessage() {
+    std::string AVError::getAVErrorMessage() const {
         return this->errorAVMessage;
     }
 
-    std::string AVError::getAVErrorMessages(int errorAVCode) {
+    std::string AVError::getAVErrorMessage(int errorAVCode) {
         char avErrorMessage[AV_ERROR_MAX_STRING_SIZE] = {
             0,
         };

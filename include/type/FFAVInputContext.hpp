@@ -12,6 +12,8 @@
 #include "type/FFAVStream.hpp"
 
 namespace ff {
+    class FFAVInputContextIterator;
+
     class FFAVInputContext {
     public:
         explicit FFAVInputContext();
@@ -31,6 +33,10 @@ namespace ff {
         FFAVDecodeStreamListPtr getVideoDecodeStreamList();
         FFAVDecodeStreamListPtr getAudioDecodeStreamList();
 
+    public:  // for (auto& packet : inputContext) iterator
+        FFAVInputContextIterator begin();
+        FFAVInputContextIterator end();
+
     private:
         AVError parseStreamInfo(bool cudaDecode);
 
@@ -39,4 +45,21 @@ namespace ff {
         FFAVDecodeStreamListPtr decodeStreamList;
     };
 
+    // Iterator for FFAVInputContext
+    class FFAVInputContextIterator {
+    public:
+        FFAVInputContextIterator(FFAVInputContext* context = nullptr);
+
+        FFAVPacket& operator*();
+        FFAVPacket& operator->();
+        FFAVInputContextIterator& operator++();
+        friend bool operator==(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b);
+        friend bool operator!=(const FFAVInputContextIterator& a, const FFAVInputContextIterator& b);
+
+    private:
+        bool eofFlag;
+
+        FFAVInputContext* context;
+        FFAVPacket currentPacket;
+    };
 };

@@ -28,8 +28,8 @@ namespace ff {
         FFAVEncodeStreamPtr addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr decodeStream);
 
     private:
-        FFAVEncodeStreamPtr createStream(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream);
-        FFAVCodecContextPtr createCodecContext(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream);
+        FFAVEncodeStreamPtr createStream(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo);
+        FFAVCodecContextPtr createCodecContext(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo);
 
     private:
         bool isWrite;

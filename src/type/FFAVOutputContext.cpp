@@ -83,17 +83,18 @@ namespace ff {
     FFAVEncodeStreamPtr FFAVOutputContext::addStream(VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr stream) {
         FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::VIDEO);
         encodeStream->setCodec(videoCodec);
-        return this->createStream(encodeStream, stream);
+        return this->createStream(encodeStream, stream, true);
     }
 
     FFAVEncodeStreamPtr FFAVOutputContext::addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr stream) {
         FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::AUDIO);
         encodeStream->setCodec(audioCodec);
-        return this->createStream(encodeStream, stream);
+        return this->createStream(encodeStream, stream, false);
     }
 
     FFAVEncodeStreamPtr FFAVOutputContext::createStream(FFAVEncodeStreamPtr encodeStream,
-                                                        FFAVDecodeStreamPtr decodeStream) {
+                                                        FFAVDecodeStreamPtr decodeStream,
+                                                        bool isVideo) {
         /// Create Stream
         AVStream* avEncodeStream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
         if (avEncodeStream == nullptr) {
@@ -107,7 +108,7 @@ namespace ff {
             return nullptr;
         }
 
-        FFAVCodecContextPtr encodeCodecContext = this->createCodecContext(encodeStream, decodeStream);
+        FFAVCodecContextPtr encodeCodecContext = this->createCodecContext(encodeStream, decodeStream, isVideo);
         if (encodeCodecContext == nullptr) {
             return nullptr;
         }
@@ -120,7 +121,8 @@ namespace ff {
     }
 
     FFAVCodecContextPtr FFAVOutputContext::createCodecContext(FFAVEncodeStreamPtr encodeStream,
-                                                              FFAVDecodeStreamPtr decodeStream) {
+                                                              FFAVDecodeStreamPtr decodeStream,
+                                                              bool isVideo) {
         FFAVCodecContextPtr encodeCodecContext = FFAVCodecContext::create();
 
         // Codec name setting
@@ -146,16 +148,33 @@ namespace ff {
         }
         encodeCodecContext->getImpl()->setRaw(avCodecContext);
 
+        AVCodecContext* avDecodeCodecContext = decodeStream->getCodecContext()->getImpl()->getRaw();
         AVCodecParameters* avDecodeCodecParameters = decodeStream->getImpl()->getRaw()->codecpar;
-        int ret = avcodec_parameters_to_context(avCodecContext, avDecodeCodecParameters);
-        if (ret < 0) {
-            return nullptr;
+        AVStream* avDecodeStream = decodeStream->getImpl()->getRaw();
+        if (isVideo == true) {
+            avCodecContext->width = avDecodeCodecParameters->width;
+            avCodecContext->height = avDecodeCodecParameters->height;
+
+            avCodecContext->pix_fmt = (AVPixelFormat)avDecodeStream->codecpar->format;
+            avCodecContext->framerate = avDecodeStream->avg_frame_rate;
+
+            avCodecContext->gop_size = avDecodeCodecContext->gop_size;
+            avCodecContext->max_b_frames = avDecodeCodecContext->max_b_frames;
         }
 
-        avCodecContext->codec_id = avCodec->id;
-        avCodecContext->codec_type = avCodec->type;
-        avCodecContext->time_base = 
-        ret = avcodec_open2(avCodecContext, avCodec, nullptr);
+        if (isVideo == false) {  // Audio
+            avCodecContext->sample_rate = avDecodeCodecParameters->sample_rate;
+            avCodecContext->channels = avDecodeCodecParameters->channels;
+            avCodecContext->channel_layout = av_get_default_channel_layout(avDecodeCodecParameters->channels);
+            avCodecContext->sample_fmt = (AVSampleFormat)avDecodeCodecParameters->format;
+        }
+
+        avCodecContext->bit_rate = avDecodeCodecParameters->bit_rate;
+        avCodecContext->time_base = avDecodeStream->time_base;
+
+        avCodecContext->thread_count = 1;
+
+        int ret = avcodec_open2(avCodecContext, avCodec, nullptr);
         if (ret < 0) {
             return nullptr;
         }

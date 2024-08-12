@@ -23,6 +23,10 @@ namespace ff {
         FFAVPacketImplPtr packetImpl;
     };
 
-    using FFAVPacketList = std::vector<FFAVPacket>;
+    // FFAVPacketList
+    class FFAVPacketList : public std::vector<FFAVPacket> {
+    public:
+        virtual ~FFAVPacketList();
+    };
     using FFAVPacketListPtr = std::shared_ptr<FFAVPacketList>;
 };

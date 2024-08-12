@@ -3,6 +3,9 @@
 #include <memory>
 #include <vector>
 
+#include "error/ffav.hpp"
+#include "type/FFAVFrame.hpp"
+#include "type/FFAVPacket.hpp"
 #include "type/FFAVStream.hpp"
 
 namespace ff {
@@ -26,7 +29,7 @@ namespace ff {
         AUDIO_CODEC getAudioCodec();
 
     public:
-        AVError encode();
+        FFAVPacketListPtr encode(FFAVFrameListPtr frameList, AVError* error);
 
     private:
         VIDEO_CODEC videoCodec;

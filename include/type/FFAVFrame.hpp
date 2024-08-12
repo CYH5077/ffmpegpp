@@ -20,6 +20,11 @@ namespace ff {
         FFAVFrameImplPtr frameImpl;
     };
 
-    using FFAVFrameList = std::vector<FFAVFrame>;
+    // FFAVFrameList
+    class FFAVFrameList : public std::vector<FFAVFrame> {
+    public:
+        virtual ~FFAVFrameList();
+    };
+
     using FFAVFrameListPtr = std::shared_ptr<FFAVFrameList>;
 };

@@ -15,7 +15,7 @@ TEST(TRANSCODE, H265_CPU) {
     error = outputContext.open("output.mp4");
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    auto encodeVideoStream = outputContext.addStream(ff::VIDEO_CODEC::H265, videoStream);
+    auto encodeVideoStream = outputContext.addStream(ff::VIDEO_CODEC::H264, videoStream);
     auto encodeAudioStream = outputContext.addStream(ff::AUDIO_CODEC::AAC, audioStream);
     ASSERT_TRUE(encodeVideoStream != nullptr);
     ASSERT_TRUE(encodeAudioStream != nullptr);
@@ -24,12 +24,12 @@ TEST(TRANSCODE, H265_CPU) {
     try {
         for (auto& packet : inputContext) {
             // Decode
-            if (videoStream->getStreamIndex() == packet.getStreamIndex()) {
+            if (videoStream->getStreamIndex() == packet.getStreamIndex()) { // Video Stream Index
                 auto videoFrameList = videoStream->decode(packet, &error);
-
-            } else if (audioStream->getStreamIndex() == packet.getStreamIndex()) {
+                auto videoPacketList = encodeVideoStream->encode(videoFrameList, &error);
+            } else if (audioStream->getStreamIndex() == packet.getStreamIndex()) { // Audio Stream Index
                 auto audioFrameList = audioStream->decode(packet, &error);
-
+                encodeAudioStream->encode(audioFrameList, &error);
             }
         }
     } catch (ff::AVDemuxException& e) {
@@ -38,4 +38,4 @@ TEST(TRANSCODE, H265_CPU) {
         std::cout << "error message: " << error.getMessage() << std::endl;
     }
 
-}
+    }

@@ -18,4 +18,11 @@ namespace ff {
     FFAVFrameImplPtr FFAVFrame::getImpl() {
         return this->frameImpl;
     }
+
+    // FFAVFrameList
+    FFAVFrameList::~FFAVFrameList() {
+		for (auto& frame : *this) {
+			av_frame_unref(frame.getImpl()->getRaw().get());
+		}
+	}
 };

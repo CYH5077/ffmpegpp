@@ -30,4 +30,10 @@ namespace ff {
 		this->packetImpl->getRaw()->stream_index = streamIndex;
 	}
 
+    // FFAVPacketList
+    FFAVPacketList::~FFAVPacketList() {
+        for (auto& packet : *this) {
+            av_packet_unref(packet.getImpl()->getRaw().get());
+        }
+    }
 }

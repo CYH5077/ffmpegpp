@@ -81,141 +81,145 @@ namespace ff {
             }
         }
 
-            int ret = avformat_write_header(avFormatContext, nullptr);
+        int ret = avformat_write_header(avFormatContext, nullptr);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_write_header failed", ret, "avformat_write_header");
+        }
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
+
+    AVError FFAVOutputContext::writePacket(FFAVPacketListPtr packetList) {
+        for (auto& packet : *packetList) {
+            FFAVDecodeStreamPtr decodeStream = this->streamList[packet.getStreamIndex()].first;
+            FFAVEncodeStreamPtr encodeStream = this->streamList[packet.getStreamIndex()].second;
+            packet.rescaleTS(decodeStream, encodeStream);
+
+            AVPacket* avPacket = packet.getImpl()->getRaw().get();
+            int ret = av_interleaved_write_frame(this->formatContextImpl->getRaw(), avPacket);
             if (ret < 0) {
-                return AVError(AV_ERROR_TYPE::AV_ERROR, "avformat_write_header failed", ret, "avformat_write_header");
+                return AVError(
+                    AV_ERROR_TYPE::AV_ERROR, "av_interleaved_write_frame failed", ret, "av_interleaved_write_frame");
             }
-
-            return AVError(AV_ERROR_TYPE::SUCCESS);
         }
 
-        AVError FFAVOutputContext::writePacket(FFAVPacketListPtr packetList) {
-            for (auto& packet : *packetList) {
-                FFAVDecodeStreamPtr decodeStream = this->streamList[packet.getStreamIndex()].first;
-                FFAVEncodeStreamPtr encodeStream = this->streamList[packet.getStreamIndex()].second;
-                packet.rescaleTS(decodeStream, encodeStream);
+        return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
 
-                AVPacket* avPacket = packet.getImpl()->getRaw().get();
-                int ret = av_interleaved_write_frame(this->formatContextImpl->getRaw(), avPacket);
-                if (ret < 0) {
-                    return AVError(AV_ERROR_TYPE::AV_ERROR,
-                                   "av_interleaved_write_frame failed",
-                                   ret,
-                                   "av_interleaved_write_frame");
-                }
-            }
+    FFAVEncodeStreamPtr FFAVOutputContext::addStream(HW_VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr stream) {
+        FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::VIDEO);
+        encodeStream->setCodec(videoCodec);
+        return this->createStream(encodeStream, stream, true);
+    }
 
-            return AVError(AV_ERROR_TYPE::SUCCESS);
+    FFAVEncodeStreamPtr FFAVOutputContext::addStream(VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr stream) {
+        FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::VIDEO);
+        encodeStream->setCodec(videoCodec);
+        return this->createStream(encodeStream, stream, true);
+    }
+
+    FFAVEncodeStreamPtr FFAVOutputContext::addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr stream) {
+        FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::AUDIO);
+        encodeStream->setCodec(audioCodec);
+        return this->createStream(encodeStream, stream, false);
+    }
+
+    FFAVEncodeStreamPtr FFAVOutputContext::createStream(FFAVEncodeStreamPtr encodeStream,
+                                                        FFAVDecodeStreamPtr decodeStream,
+                                                        bool isVideo) {
+        /// Create Stream
+        AVStream* avEncodeStream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
+        if (avEncodeStream == nullptr) {
+            return nullptr;
+        }
+        encodeStream->getImpl()->setRaw(avEncodeStream);
+
+        FFAVCodecContextPtr encodeCodecContext = this->createCodecContext(encodeStream, decodeStream, isVideo);
+        if (encodeCodecContext == nullptr) {
+            return nullptr;
         }
 
-        FFAVEncodeStreamPtr FFAVOutputContext::addStream(HW_VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr stream) {
-            FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::VIDEO);
-            encodeStream->setCodec(videoCodec);
-            return this->createStream(encodeStream, stream, true);
+        AVStream* avDecodeStream = decodeStream->getImpl()->getRaw();
+        int ret = avcodec_parameters_from_context(avEncodeStream->codecpar, encodeCodecContext->getImpl()->getRaw());
+        if (ret < 0) {
+            return nullptr;
         }
 
-        FFAVEncodeStreamPtr FFAVOutputContext::addStream(VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr stream) {
-            FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::VIDEO);
-            encodeStream->setCodec(videoCodec);
-            return this->createStream(encodeStream, stream, true);
-        }
+        encodeStream->setCodecContext(encodeCodecContext);
+        encodeStream->setStreamIndex(this->streamList.size());
 
-        FFAVEncodeStreamPtr FFAVOutputContext::addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr stream) {
-            FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::AUDIO);
-            encodeStream->setCodec(audioCodec);
-            return this->createStream(encodeStream, stream, false);
-        }
+        this->streamList.emplace_back(std::make_pair(decodeStream, encodeStream));
 
-        FFAVEncodeStreamPtr FFAVOutputContext::createStream(
-            FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo) {
-            /// Create Stream
-            AVStream* avEncodeStream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
-            if (avEncodeStream == nullptr) {
-                return nullptr;
-            }
-            encodeStream->getImpl()->setRaw(avEncodeStream);
+        return encodeStream;
+    }
 
-            AVStream* avDecodeStream = decodeStream->getImpl()->getRaw();
-            int ret = avcodec_parameters_copy(avEncodeStream->codecpar, avDecodeStream->codecpar);
-            if (ret < 0) {
-                return nullptr;
-            }
+    FFAVCodecContextPtr FFAVOutputContext::createCodecContext(FFAVEncodeStreamPtr encodeStream,
+                                                              FFAVDecodeStreamPtr decodeStream,
+                                                              bool isVideo) {
+        FFAVCodecContextPtr encodeCodecContext = FFAVCodecContext::create();
 
-            FFAVCodecContextPtr encodeCodecContext = this->createCodecContext(encodeStream, decodeStream, isVideo);
-            if (encodeCodecContext == nullptr) {
-                return nullptr;
-            }
-
-            encodeStream->setCodecContext(encodeCodecContext);
-            encodeStream->setStreamIndex(this->streamList.size());
-
-            this->streamList.emplace_back(std::make_pair(decodeStream, encodeStream));
-
-            return encodeStream;
-        }
-
-        FFAVCodecContextPtr FFAVOutputContext::createCodecContext(
-            FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo) {
-            FFAVCodecContextPtr encodeCodecContext = FFAVCodecContext::create();
-
-            // Codec name setting
-            std::string codecName;
-            if (encodeStream->isVideoStream()) {
-                if (encodeStream->getHWVideoCodec() != HW_VIDEO_CODEC::NONE) {
-                    codecName = HW_VIDEO_CODEC_TO_STRING(encodeStream->getHWVideoCodec());
-                } else {
-                    codecName = VIDEO_CODEC_TO_STRING(encodeStream->getVideoCodec());
-                }
-            } else if (encodeStream->isAudioStream()) {
-                codecName = AUDIO_CODEC_TO_STRING(encodeStream->getAudioCodec());
+        // Codec name setting
+        std::string codecName;
+        if (encodeStream->isVideoStream()) {
+            if (encodeStream->getHWVideoCodec() != HW_VIDEO_CODEC::NONE) {
+                codecName = HW_VIDEO_CODEC_TO_STRING(encodeStream->getHWVideoCodec());
             } else {
-                return nullptr;
+                codecName = VIDEO_CODEC_TO_STRING(encodeStream->getVideoCodec());
             }
-
-            // Codec find
-            const AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.c_str());
-            if (avCodec == nullptr) {
-                return nullptr;
-            }
-
-            // AVCodecContext alloc
-            AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
-            if (avCodec == nullptr) {
-                return nullptr;
-            }
-            encodeCodecContext->setCodecName(codecName);
-            encodeCodecContext->getImpl()->setRaw(avCodecContext);
-
-            AVCodecContext* avDecodeCodecContext = decodeStream->getCodecContext()->getImpl()->getRaw();
-            AVCodecParameters* avDecodeCodecParameters = decodeStream->getImpl()->getRaw()->codecpar;
-            AVStream* avDecodeStream = decodeStream->getImpl()->getRaw();
-            if (isVideo == true) {
-                avCodecContext->width = avDecodeCodecParameters->width;
-                avCodecContext->height = avDecodeCodecParameters->height;
-
-                if (avCodec->pix_fmts) {
-                    avCodecContext->pix_fmt = avCodec->pix_fmts[0];
-                } else {
-                    avCodecContext->pix_fmt = avDecodeCodecContext->pix_fmt;
-                }
-                avCodecContext->framerate = avDecodeStream->avg_frame_rate;
-
-                avCodecContext->gop_size = avDecodeCodecContext->gop_size;
-                avCodecContext->max_b_frames = avDecodeCodecContext->max_b_frames;
-                avCodecContext->sample_aspect_ratio = avDecodeCodecContext->sample_aspect_ratio;
-            }
-
-            if (isVideo == false) {  // Audio
-                avCodecContext->sample_rate = avDecodeCodecParameters->sample_rate;
-                av_channel_layout_copy(&avCodecContext->ch_layout, &avDecodeCodecParameters->ch_layout);
-                avCodecContext->sample_fmt = (AVSampleFormat)avDecodeCodecParameters->format;
-            }
-
-            avCodecContext->bit_rate = avDecodeCodecParameters->bit_rate;
-            avCodecContext->time_base = avDecodeStream->time_base;
-
-            avCodecContext->thread_count = std::thread::hardware_concurrency();
-
-            return encodeCodecContext;
+        } else if (encodeStream->isAudioStream()) {
+            codecName = AUDIO_CODEC_TO_STRING(encodeStream->getAudioCodec());
+        } else {
+            return nullptr;
         }
-    };
+
+        // Codec find
+        const AVCodec* avCodec = avcodec_find_encoder_by_name(codecName.c_str());
+        if (avCodec == nullptr) {
+            return nullptr;
+        }
+
+        // AVCodecContext alloc
+        AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
+        if (avCodec == nullptr) {
+            return nullptr;
+        }
+        encodeCodecContext->setCodecName(codecName);
+        encodeCodecContext->getImpl()->setRaw(avCodecContext);
+
+        AVCodecContext* avDecodeCodecContext = decodeStream->getCodecContext()->getImpl()->getRaw();
+        AVCodecParameters* avDecodeCodecParameters = decodeStream->getImpl()->getRaw()->codecpar;
+        AVStream* avDecodeStream = decodeStream->getImpl()->getRaw();
+        if (isVideo == true) {  // Video
+            avCodecContext->width = avDecodeCodecParameters->width;
+            avCodecContext->height = avDecodeCodecParameters->height;
+
+            if (avCodec->pix_fmts) {
+                avCodecContext->pix_fmt = avCodec->pix_fmts[0];
+            } else {
+                avCodecContext->pix_fmt = avDecodeCodecContext->pix_fmt;
+            }
+            avCodecContext->framerate = avDecodeStream->avg_frame_rate;
+
+            avCodecContext->gop_size = avDecodeCodecContext->gop_size;
+            avCodecContext->max_b_frames = avDecodeCodecContext->max_b_frames;
+            avCodecContext->sample_aspect_ratio = avDecodeCodecContext->sample_aspect_ratio;
+        }
+
+        if (isVideo == false) {  // Audio
+            avCodecContext->sample_rate = avDecodeCodecParameters->sample_rate;
+            av_channel_layout_copy(&avCodecContext->ch_layout, &avDecodeCodecContext->ch_layout);
+            avCodecContext->sample_fmt = (AVSampleFormat)avDecodeCodecParameters->format;
+        }
+
+        avCodecContext->bit_rate = avDecodeCodecParameters->bit_rate;
+        avCodecContext->time_base = avDecodeStream->time_base;
+
+        avCodecContext->thread_count = std::thread::hardware_concurrency();
+
+        if (formatContextImpl->getRaw()->oformat->flags & AVFMT_GLOBALHEADER) {
+            avCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        }
+
+        return encodeCodecContext;
+    }
+};

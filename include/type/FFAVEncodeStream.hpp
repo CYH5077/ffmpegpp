@@ -18,6 +18,9 @@ namespace ff {
 
         virtual ~FFAVEncodeStream();
 
+    public: // open codec
+        AVError openCodec();
+
     public:  // Encode parameter
         void setBitrate(long long bitrate);
         void setGOPSize(int gopSize);

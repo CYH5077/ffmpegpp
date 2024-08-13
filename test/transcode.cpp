@@ -3,7 +3,7 @@
 
 TEST(TRANSCODE, TRANSCODE_GPU) {
     ff::FFAVInputContext inputContext;
-    ff::AVError error = inputContext.open("sample.mp4", true);
+    ff::AVError error = inputContext.open("sample.mp4", true); // GPU Decode
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     auto videoStreams = inputContext.getVideoDecodeStreamList();
@@ -15,16 +15,19 @@ TEST(TRANSCODE, TRANSCODE_GPU) {
     error = outputContext.open("hw_h264_encode.m3u8");
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    
+    outputContext.setOpt("hls_time", "3");
+    outputContext.setOpt("hls_list_size", "0");
+    outputContext.setOpt("hls_flags", "delete_segments+append_list+temp_file");
+    outputContext.setOpt("hls_wrap", "0");
 
-    auto encodeVideoStream = outputContext.addStream(ff::HW_VIDEO_CODEC::H264, videoStream);
-    auto encodeVideoStream2 = outputContext.addStream(ff::VIDEO_CODEC::H264, videoStream);
+    auto encodeVideoStream = outputContext.addStream(ff::HW_VIDEO_CODEC::H264, videoStream); // GPU Encode
+    auto encodeVideoStream2 = outputContext.addStream(ff::HW_VIDEO_CODEC::H264, videoStream); // GPU Encode
     auto encodeAudioStream = outputContext.addStream(ff::AUDIO_CODEC::AAC, audioStream);
     ASSERT_TRUE(encodeVideoStream != nullptr);
     ASSERT_TRUE(encodeVideoStream2 != nullptr);
     ASSERT_TRUE(encodeAudioStream != nullptr);
 
-    encodeVideoStream2->setBitrate(99999);
+    encodeVideoStream2->setBitrate(9999);
 
     error = outputContext.writeHeader();
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -80,7 +83,9 @@ TEST(TRANSCODE, TRANSCODE_GPU) {
     error = outputContext.writePacket(videoFrameList2);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    outputContext.writePacket(audioFrameList);
+    error = outputContext.writePacket(audioFrameList);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+    outputContext.close();
 }
 

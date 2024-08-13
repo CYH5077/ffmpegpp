@@ -6,6 +6,7 @@
 #include "type/FFAVFrame.hpp"
 #include "type/FFAVPacket.hpp"
 #include "type/FFAVStream.hpp"
+#include "type/FFAVSwsContext.hpp"
 
 namespace ff {
     class FFAVDecodeStream;
@@ -23,6 +24,9 @@ namespace ff {
 
     private:
         AVError cudaFormatConvert(FFAVFrame& srcFrame, FFAVFrame* dstFrame);
+
+    private: // CUDA SwsContext
+        FFAVSwsContextPtr swsContext;
     };
 
     using FFAVDecodeStreamList = std::vector<FFAVDecodeStreamPtr>;

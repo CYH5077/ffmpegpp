@@ -7,15 +7,19 @@ extern "C" {
 }
 
 namespace ff {
-	class FFAVSwsContextImpl : public std::enable_shared_from_this<FFAVSwsContextImpl> {
-	public:
-		explicit FFAVSwsContextImpl();
-		virtual ~FFAVSwsContextImpl();
+    class FFAVSwsContextImpl : public std::enable_shared_from_this<FFAVSwsContextImpl> {
+    public:
+        explicit FFAVSwsContextImpl();
+        virtual ~FFAVSwsContextImpl();
 
-	public:
-		static FFAVSwsContextImplPtr create();
+    public:
+        static FFAVSwsContextImplPtr create();
 
-	public:
-		SwsContext* swsContext;
-	};
+    public:  // get set
+        SwsContext* getRaw();
+        void setRaw(SwsContext* swsContext);
+
+    public:
+        SwsContext* swsContext;
+    };
 }

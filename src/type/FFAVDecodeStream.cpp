@@ -91,11 +91,20 @@ namespace ff {
             return AVError(AV_ERROR_TYPE::AV_ERROR, "av_hwframe_transfer_data failed", ret, "av_hwframe_transfer_data");
         }
 
-        dst->pts = src->pts;
-        dst->pkt_dts = src->pkt_dts;
-        dst->best_effort_timestamp = src->best_effort_timestamp;
-        dst->pkt_pos = src->pkt_pos;
-        dst->pkt_duration = src->pkt_duration;
+        ret = av_frame_copy_props(dst, src);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "av_frame_copy_props failed", ret, "av_frame_copy_props");
+        }
+
+        if (this->swsContext == nullptr) {
+            AVCodecContext* avCodecContext = FFAVStream::codecContext->getImpl()->getRaw();
+            this->swsContext =
+                FFAVSwsContext::create(avCodecContext->width, avCodecContext->height, PICTURE_FORMAT::YUV420P);
+        } 
+
+        if (this->swsContext != nullptr) {
+            this->swsContext->convert(dstFrame);
+        }
 
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }

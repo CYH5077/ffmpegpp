@@ -24,6 +24,10 @@ namespace ff {
         AVError open(const std::string& filename);
         void close();
 
+        AVError writeHeader();
+        AVError writePacket(FFAVPacketListPtr packetList);
+
+        FFAVEncodeStreamPtr addStream(HW_VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr decodeStream);
         FFAVEncodeStreamPtr addStream(VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr decodeStream);
         FFAVEncodeStreamPtr addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr decodeStream);
 
@@ -32,9 +36,8 @@ namespace ff {
         FFAVCodecContextPtr createCodecContext(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo);
 
     private:
-        bool isWrite;
         FFAVFormatContextImplPtr formatContextImpl;
 
-        FFAVEncodeStreamListPtr encodeStreamList;
+        std::vector<std::pair<FFAVDecodeStreamPtr, FFAVEncodeStreamPtr>> streamList;
     };
 };

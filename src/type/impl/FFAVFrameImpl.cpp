@@ -32,4 +32,8 @@ namespace ff {
     AVFramePtr FFAVFrameImpl::getRaw() {
         return this->frame;
     }
+
+    void FFAVFrameImpl::setNull() {
+		this->frame = std::shared_ptr<AVFrame>(nullptr, freeAVFrame);
+	}
 };

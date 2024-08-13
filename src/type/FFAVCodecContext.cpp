@@ -16,6 +16,8 @@ namespace ff {
         this->codecContextImpl = FFAVCodecContextImpl::create();
 
         this->cudaFormat = -1;
+
+        this->isCodecOpenFlag = false;
     }
 
     FFAVCodecContext::~FFAVCodecContext() {}
@@ -28,12 +30,24 @@ namespace ff {
         this->cudaFormat = cudaFormat;
     }
 
+    std::string FFAVCodecContext::getCodecName() {
+        return this->codecName;
+    }
+
+    void FFAVCodecContext::setCodecName(const std::string& codecName) {
+        this->codecName = codecName;
+    }
+
     int FFAVCodecContext::getCudaFormat() {
         return this->cudaFormat;
     }
 
     bool FFAVCodecContext::isCudaFormat() {
-		return this->cudaFormat != -1;
+        return this->cudaFormat != -1;
+    }
+
+    bool FFAVCodecContext::isCodecOpen() {
+		return this->isCodecOpenFlag;
 	}
 
     AVError FFAVCodecContext::setOpt(const std::string& key, const std::string& value) {
@@ -61,5 +75,21 @@ namespace ff {
             }
         }
         return false;
+    }
+
+    AVError FFAVCodecContext::openCodec() {
+        const AVCodec* avCodec = avcodec_find_encoder_by_name(this->codecName.c_str());
+        if (avCodec == nullptr) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_find_encoder_by_name failed", -1, "avcodec_find_encoder_by_name");
+        }
+
+        int ret = avcodec_open2(this->codecContextImpl->getRaw(), avCodec, nullptr);
+        if (ret < 0) {
+            return AVError(AV_ERROR_TYPE::AV_ERROR, "avcodec_open2 failed", ret, "avcodec_open2");
+        }
+
+        this->isCodecOpenFlag = true;
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 };

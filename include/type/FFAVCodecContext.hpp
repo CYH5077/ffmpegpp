@@ -18,21 +18,30 @@ namespace ff {
     public:
         static FFAVCodecContextPtr create();
 
+    public:
+        bool findCudaFormat();
+
+        AVError openCodec();
+
     public:  // get set
         FFAVCodecContextImplPtr getImpl();
 
-        void setCudaFormat(int cudaFormat);
         int getCudaFormat();
+        void setCudaFormat(int cudaFormat);
 
+        std::string getCodecName();
+        void setCodecName(const std::string& codecName);
+
+        bool isCodecOpen();
         bool isCudaFormat();
 
         AVError setOpt(const std::string& key, const std::string& value);
 
-    public:
-        bool findCudaFormat();
-       
     private:
         int cudaFormat;
+
+        bool isCodecOpenFlag;
+        std::string codecName;
 
         FFAVCodecContextImplPtr codecContextImpl;
     };

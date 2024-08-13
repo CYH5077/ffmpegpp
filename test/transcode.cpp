@@ -1,7 +1,7 @@
 #include "ffmpegpp.hpp"
 #include "gtest/gtest.h"
 
-TEST(TRANSCODE, H265_CPU) {
+TEST(TRANSCODE, TRANSCODE_GPU) {
     ff::FFAVInputContext inputContext;
     ff::AVError error = inputContext.open("sample.mp4", true);
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
@@ -12,13 +12,22 @@ TEST(TRANSCODE, H265_CPU) {
     auto audioStream = audioStreams->at(0);
 
     ff::FFAVOutputContext outputContext;
-    error = outputContext.open("output.mp4");
+    error = outputContext.open("hw_h264_encode.m3u8");
     ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
-    auto encodeVideoStream = outputContext.addStream(ff::VIDEO_CODEC::H264, videoStream);
+    
+
+    auto encodeVideoStream = outputContext.addStream(ff::HW_VIDEO_CODEC::H264, videoStream);
+    auto encodeVideoStream2 = outputContext.addStream(ff::VIDEO_CODEC::H264, videoStream);
     auto encodeAudioStream = outputContext.addStream(ff::AUDIO_CODEC::AAC, audioStream);
     ASSERT_TRUE(encodeVideoStream != nullptr);
+    ASSERT_TRUE(encodeVideoStream2 != nullptr);
     ASSERT_TRUE(encodeAudioStream != nullptr);
+
+    encodeVideoStream2->setBitrate(99999);
+
+    error = outputContext.writeHeader();
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
 
     ff::FFAVPacket packet;
     try {
@@ -26,10 +35,30 @@ TEST(TRANSCODE, H265_CPU) {
             // Decode
             if (videoStream->getStreamIndex() == packet.getStreamIndex()) { // Video Stream Index
                 auto videoFrameList = videoStream->decode(packet, &error);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
                 auto videoPacketList = encodeVideoStream->encode(videoFrameList, &error);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+                error = outputContext.writePacket(videoPacketList);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+                
+                auto videoPacketList2 = encodeVideoStream2->encode(videoFrameList, &error);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+                error = outputContext.writePacket(videoPacketList2);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
             } else if (audioStream->getStreamIndex() == packet.getStreamIndex()) { // Audio Stream Index
                 auto audioFrameList = audioStream->decode(packet, &error);
-                encodeAudioStream->encode(audioFrameList, &error);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+                auto audioPacketList = encodeAudioStream->encode(audioFrameList, &error);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+                error = outputContext.writePacket(audioPacketList);
+                ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
             }
         }
     } catch (ff::AVDemuxException& e) {
@@ -38,4 +67,20 @@ TEST(TRANSCODE, H265_CPU) {
         std::cout << "error message: " << error.getMessage() << std::endl;
     }
 
-    }
+    auto videoFrameList = encodeVideoStream->flush(&error);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    auto videoFrameList2 = encodeVideoStream2->flush(&error);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+    auto audioFrameList = encodeAudioStream->flush(&error);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+    error = outputContext.writePacket(videoFrameList);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+    error = outputContext.writePacket(videoFrameList2);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+
+    outputContext.writePacket(audioFrameList);
+    ASSERT_EQ(error.getType(), ff::AV_ERROR_TYPE::SUCCESS);
+}
+

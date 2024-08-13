@@ -14,21 +14,22 @@ namespace ff {
 
     class FFAVSwsContext : public std::enable_shared_from_this<FFAVSwsContext> {
     public:
+        explicit FFAVSwsContext(int width, int height, int avPictureFormat);
         explicit FFAVSwsContext(int width, int height, PICTURE_FORMAT format);
         virtual ~FFAVSwsContext();
 
     public:
         static FFAVSwsContextPtr create(int width, int height, PICTURE_FORMAT format = PICTURE_FORMAT::YUV420P);
+        static FFAVSwsContextPtr create(int width, int height, int avPictureFormat);
 
     public:
-        AVError convert(FFAVFrame& frame);
+        AVError convert(FFAVFrame* frame);
 
     public:  // get set
         FFAVSwsContextImplPtr getImpl();
 
         int getWidth();
         int getHeight();
-        PICTURE_FORMAT getFormat();
 
     private:
         AVError newSwsContext(FFAVFrame& frame);
@@ -39,6 +40,6 @@ namespace ff {
         int width;
         int height;
 
-        PICTURE_FORMAT format;
+        int avPictureFormat;
     };
 };

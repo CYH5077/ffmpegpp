@@ -18,20 +18,29 @@ namespace ff {
 
         virtual ~FFAVEncodeStream();
 
+    public:  // Encode parameter
+        void setBitrate(long long bitrate);
+        void setGOPSize(int gopSize);
+        void setMaxBFrames(int maxBFrames);
+
     public:
+        void setCodec(HW_VIDEO_CODEC codec);
         void setCodec(VIDEO_CODEC codec);
         void setCodec(AUDIO_CODEC codec);
 
         bool isVideoStream();
         bool isAudioStream();
 
+        HW_VIDEO_CODEC getHWVideoCodec();
         VIDEO_CODEC getVideoCodec();
         AUDIO_CODEC getAudioCodec();
 
     public:
         FFAVPacketListPtr encode(FFAVFrameListPtr frameList, AVError* error);
+        FFAVPacketListPtr flush(AVError* error);
 
     private:
+        HW_VIDEO_CODEC hwVideoCodec;
         VIDEO_CODEC videoCodec;
         AUDIO_CODEC audioCodec;
     };

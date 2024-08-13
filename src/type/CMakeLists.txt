@@ -23,6 +23,9 @@ set(SOURCES
 
         FFAVCodecContext.cpp
         impl/FFAVCodecContextImpl.cpp
+
+        FFAVSwsContext.cpp
+        impl/FFAVSwsContextImpl.cpp
 )
 
 set(UPDATED_SOURCES "")

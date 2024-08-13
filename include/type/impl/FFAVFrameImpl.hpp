@@ -22,6 +22,8 @@ namespace ff {
 
     public: // get set
         AVFramePtr getRaw();
+        
+        void setNull();
 
     private:
         AVFramePtr frame;

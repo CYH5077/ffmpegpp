@@ -25,11 +25,13 @@ namespace ff {
         void close();
 
         AVError writeHeader();
+        AVError writePacket(FFAVPacket packet);
         AVError writePacket(FFAVPacketListPtr packetList);
 
         FFAVEncodeStreamPtr addStream(HW_VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr decodeStream);
         FFAVEncodeStreamPtr addStream(VIDEO_CODEC videoCodec, FFAVDecodeStreamPtr decodeStream);
         FFAVEncodeStreamPtr addStream(AUDIO_CODEC audioCodec, FFAVDecodeStreamPtr decodeStream);
+        AVError copyStreams(FFAVDecodeStreamListPtr streamList);
 
     private:
         FFAVEncodeStreamPtr createStream(FFAVEncodeStreamPtr encodeStream, FFAVDecodeStreamPtr decodeStream, bool isVideo);

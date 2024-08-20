@@ -89,17 +89,30 @@ namespace ff {
         return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
+    AVError FFAVOutputContext::writePacket(FFAVPacket packet) {
+        if (this->streamList.size() <= packet.getStreamIndex()) {
+			return AVError(AV_ERROR_TYPE::AV_ERROR, "stream index out of range", -1, "writePacket");
+		}
+
+        FFAVDecodeStreamPtr decodeStream = this->streamList[packet.getStreamIndex()].first;
+        FFAVEncodeStreamPtr encodeStream = this->streamList[packet.getStreamIndex()].second;
+        packet.rescaleTS(decodeStream, encodeStream);
+
+        AVPacket* avPacket = packet.getImpl()->getRaw().get();
+        int ret = av_interleaved_write_frame(this->formatContextImpl->getRaw(), avPacket);
+        if (ret < 0) {
+            return AVError(
+                AV_ERROR_TYPE::AV_ERROR, "av_interleaved_write_frame failed", ret, "av_interleaved_write_frame");
+        }
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
+    }
+
     AVError FFAVOutputContext::writePacket(FFAVPacketListPtr packetList) {
         for (auto& packet : *packetList) {
-            FFAVDecodeStreamPtr decodeStream = this->streamList[packet.getStreamIndex()].first;
-            FFAVEncodeStreamPtr encodeStream = this->streamList[packet.getStreamIndex()].second;
-            packet.rescaleTS(decodeStream, encodeStream);
-
-            AVPacket* avPacket = packet.getImpl()->getRaw().get();
-            int ret = av_interleaved_write_frame(this->formatContextImpl->getRaw(), avPacket);
-            if (ret < 0) {
-                return AVError(
-                    AV_ERROR_TYPE::AV_ERROR, "av_interleaved_write_frame failed", ret, "av_interleaved_write_frame");
+            AVError error = this->writePacket(packet);
+            if (error.getType() != AV_ERROR_TYPE::SUCCESS) {
+                return error;
             }
         }
 
@@ -122,6 +135,23 @@ namespace ff {
         FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(DATA_TYPE::AUDIO);
         encodeStream->setCodec(audioCodec);
         return this->createStream(encodeStream, stream, false);
+    }
+
+    AVError FFAVOutputContext::copyStreams(FFAVDecodeStreamListPtr streamList) {
+        for (auto& stream : *streamList) {
+            FFAVEncodeStreamPtr encodeStream = FFAVEncodeStream::create(stream->getType());
+            AVStream* avStream = avformat_new_stream(this->formatContextImpl->getRaw(), nullptr);
+            int ret = avcodec_parameters_copy(avStream->codecpar, stream->getImpl()->getRaw()->codecpar);
+            if (ret < 0) {
+                return AVError(
+                    AV_ERROR_TYPE::AV_ERROR, "avcodec_parameters_copy failed", ret, "avcodec_parameters_copy");
+            }
+            encodeStream->getImpl()->setRaw(avStream);
+            encodeStream->setStreamIndex(this->streamList.size());
+            this->streamList.emplace_back(std::make_pair(stream, encodeStream));
+        }
+
+        return AVError(AV_ERROR_TYPE::SUCCESS);
     }
 
     FFAVEncodeStreamPtr FFAVOutputContext::createStream(FFAVEncodeStreamPtr encodeStream,

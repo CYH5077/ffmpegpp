@@ -2,7 +2,8 @@ set(SOURCES
         main.cpp
 
         decode.cpp
-        transcode.cpp
+        transmux.cpp
+        streaming.cpp
 )
 
 set(FFMPEGPP_TEST ffmpegpp_test)
